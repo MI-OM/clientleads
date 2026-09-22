@@ -28,8 +28,8 @@
 
 | Milestone | Phase | Target | Status | Notes |
 |---|---|---|---|---|
-| M0 | Project Setup | — | In Progress | Implementation done — waiting on Supabase creds + GitHub push |
-| M1 | Foundation | Week 1–2 | Not Started | |
+| M0 | Project Setup | — | In Progress | Implementation done — Supabase created + creds in `.env.local`; GitHub push pending |
+| M1 | Foundation | Week 1–2 | In Progress | Code complete — migrations applied but the applied RLS policies have a recursion bug; corrected + idempotent migrations ready to re-paste |
 | M2 | CRM | Week 3–5 | Not Started | |
 | M3 | Public Presence | Week 6–7 | Not Started | |
 | M4 | Booking | Week 8–10 | Not Started | |
@@ -64,26 +64,26 @@
 **Goal:** Auth, tenancy, profiles, settings — the security backbone everything else depends on.
 
 ### Tasks
-- [ ] **Authentication (PRD §7)**
-  - [ ] Email/password sign-up, sign-in, password reset (Supabase Auth)
-  - [ ] Protected route middleware for `/dashboard/*`
-  - [ ] Public route zones for `/[businessSlug]/*`, booking, and forms
-- [ ] **Tenancy core (PRD §39–41)**
-  - [ ] Migration: `organizations`, `organization_members`, `profiles`
-  - [ ] Seed the first real-estate client organization
-  - [ ] Auto-add registering users to the org (single-org flow, membership-based — no provisioning UI)
-  - [ ] Helper: current user's org + role resolution
+- [x] **Authentication (PRD §7)** — email/password sign-up, sign-in, password reset (Supabase Auth) via Server Actions + `src/app/auth/confirm` token exchange
+  - [x] Email/password sign-up, sign-in, password reset (Supabase Auth)
+  - [x] Protected route middleware for `/dashboard/*` + signed-in users bounced from `/login` & `/register`
+  - [ ] Public route zones for `/[businessSlug]/*`, booking, and forms — **lands with M3/M4 public pages** (proxy already leaves non-`/dashboard` routes unprotected)
+- [x] **Tenancy core (PRD §39–41)**
+  - [x] Migration: `organizations`, `organization_members`, `profiles` (`supabase/migrations/20260922000001_m1_tenancy_core.sql`)
+  - [x] Seed the first real-estate client organization (placeholder `First Client Real Estate` — rename before go-live)
+  - [x] Auto-add registering users to the org (single-org flow, membership-based — no provisioning UI) via `on_auth_user_created` trigger → `auto_join_organization()`
+  - [x] Helper: current user's org + role resolution (`src/lib/auth/org.ts` — `getMyOrg`, `requireUser`, cached per request)
 - [ ] **RLS (PRD §61)**
-  - [ ] Membership-based RLS policy template applied to every tenant table
-  - [ ] Automated RLS test script: user A cannot read/write another org's rows
-- [ ] **Business Profile / Settings (PRD §8)**
-  - [ ] Org profile edit: name, logo, contact info, address, timezone, social links, slug
-  - [ ] Branding settings: primary/secondary colors
-  - [ ] Supabase Storage buckets + policies for logos/images (org-scoped)
-  - [ ] User profile settings (name, avatar, password)
-- [ ] **Core UI / navigation**
-  - [ ] Dashboard shell: sidebar, header, mobile-responsive nav
-  - [ ] Roles: `owner` / `admin` / `staff` ( enforced in UI; configurable permissions deferred)
+  - [x] Membership-based RLS policy template applied to every tenant table (policies + grants ship in the same migration as each table)
+  - [ ] Automated RLS test script: user A cannot read/write another org's rows — **`scripts/check-rls.mjs` written (`npm run test:rls`); run against live project once creds are set**
+- [x] **Business Profile / Settings (PRD §8)**
+  - [x] Org profile edit: name, logo, contact info, address, timezone, social links, slug (`/dashboard/settings`, owner/admin-gated)
+  - [x] Branding settings: primary/secondary colors
+  - [x] Supabase Storage buckets + policies for logos/images (org-scoped) (`20260922000002_m1_storage.sql`, `org-assets` bucket)
+  - [x] User profile settings (name, avatar, password) (`/dashboard/settings/account`)
+- [x] **Core UI / navigation**
+  - [x] Dashboard shell: sidebar, header, mobile-responsive nav (M0) — now shows active user + org + sign-out
+  - [x] Roles: `owner` / `admin` / `staff` enforced in UI (configurable permissions deferred)
 
 ### Acceptance Criteria
 - A signed-in user sees only their org's data; cross-org access attempts fail at the DB level (verified by tests)
@@ -381,6 +381,10 @@ _Record decisions made during development that the PRD leaves open, and any devi
 | 2026-09-22 | Design system: hand-rolled primitives (no Radix/headless dep); CSS-variable tokens | Lean MVP per PRD; per-tenant branding maps to same tokens later | §8, §70 |
 | 2026-09-22 | Dashboard nav shows modules as planned (`M2`–`M6` badges) until built | Honest UI about roadmap; no dead routes/404s | §63 |
 | 2026-09-22 | Supabase project creation delegated to user - scaffold + `.env.local` ready | Requires their account/login | §7 |
+| 2026-09-22 | **Migrations are plain versioned SQL** (`supabase/migrations/*.sql`) applied via dashboard SQL editor or `supabase db push` | No local Docker/CLI dependency until user opts in; keeps migrations portable | §39 |
+| 2026-09-22 | **M1 grants strategy:** `authenticated` gets full DML on all tables, `service_role` full, `anon` none — RLS is the single enforcement layer | "No table without RLS"; grants are just the door, policies decide rows. Prevents per-column grant drift | §61 |
+| 2026-09-22 | `organizations.is_default` marker + `on_auth_user_created` trigger auto-join | Single-org bootstrap without provisioning UI; removable when real provisioning arrives | §5, §39 |
+| 2026-09-22 | `org-assets` storage bucket is **public-read** (logos/branding) with member-write policies keyed off object path | Logos are meant to render on the public business page; private files get their own private bucket later | §8, §65 |
 
 ---
 
@@ -390,3 +394,5 @@ _Record decisions made during development that the PRD leaves open, and any devi
 |---|---|---|
 | 2026-09-22 | Plan created from PRD | AI |
 | 2026-09-22 | M0 implemented: Next 16 scaffold, design system, dashboard shell, Supabase scaffolding, CI, Vercel target | AI |
+| 2026-09-22 | M1 implemented: auth pages/actions + confirm route, tenancy migrations + RLS, org/role helpers, business branding + logo upload, account settings, RLS test script | AI |
+| 2026-09-22 | **RLS recursion fix:** first applied migration v1 inlined `exists(organization_members)` inside policies on the same table → Postgres `42P17` infinite recursion, surfaced by the live project. Corrected to SECURITY DEFINER helpers (`is_org_member`/`is_org_admin`); migrations now fully idempotent | AI |

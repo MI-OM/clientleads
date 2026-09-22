@@ -25,6 +25,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { signOutAction } from "@/lib/auth/actions";
 
 interface NavEntry {
   title: string;
@@ -49,7 +50,10 @@ const moduleNav: NavEntry[] = [
   { title: "Resources", href: "/dashboard/resources", icon: FolderOpen, milestone: "M3" },
   { title: "Activities", href: "/dashboard/activities", icon: Activity, milestone: "M2" },
   { title: "Analytics", href: "/dashboard/analytics", icon: BarChart3, milestone: "M6" },
-  { title: "Settings", href: "/dashboard/settings", icon: Settings, milestone: "M1" },
+];
+
+const manageNav: NavEntry[] = [
+  { title: "Settings", href: "/dashboard/settings", icon: Settings },
 ];
 
 function NavLink({ entry, active }: { entry: NavEntry; active: boolean }) {
@@ -87,17 +91,22 @@ function PlannedNavItem({ entry }: { entry: NavEntry }) {
   );
 }
 
-function SidebarContent() {
+function SidebarContent({ orgName }: { orgName: string | null }) {
   const pathname = usePathname();
 
   return (
     <div className="flex h-full flex-col gap-6 overflow-y-auto px-3 py-4">
-      <Link href="/" className="flex items-center gap-2 px-3 font-semibold">
-        <span className="grid size-7 place-items-center rounded-md bg-primary text-sm font-bold text-primary-foreground">
-          CL
-        </span>
-        ClientLeads
-      </Link>
+      <div className="flex flex-col gap-1 px-3">
+        <Link href="/" className="flex items-center gap-2 font-semibold">
+          <span className="grid size-7 place-items-center rounded-md bg-primary text-sm font-bold text-primary-foreground">
+            CL
+          </span>
+          ClientLeads
+        </Link>
+        {orgName ? (
+          <span className="truncate text-xs text-muted-foreground">{orgName}</span>
+        ) : null}
+      </div>
 
       <nav className="flex flex-1 flex-col gap-6">
         <div className="flex flex-col gap-1">
@@ -118,16 +127,38 @@ function SidebarContent() {
             ),
           )}
         </div>
+
+        <div className="flex flex-col gap-1">
+          <p className="px-3 text-xs font-medium uppercase tracking-wider text-muted-foreground">
+            Manage
+          </p>
+          {manageNav.map((entry) => (
+            <NavLink key={entry.href} entry={entry} active={pathname === entry.href} />
+          ))}
+        </div>
       </nav>
 
       <p className="px-3 text-xs text-muted-foreground">
-        Roadmap: {overviewNav.length} built · {moduleNav.length} scheduled
+        {overviewNav.length + manageNav.length} built · {moduleNav.length} scheduled
       </p>
     </div>
   );
 }
 
-export function AppShell({ children }: { children: React.ReactNode }) {
+interface UserChip {
+  name: string | null;
+  email: string | null;
+}
+
+export function AppShell({
+  children,
+  user,
+  orgName,
+}: {
+  children: React.ReactNode;
+  user: UserChip | null;
+  orgName: string | null;
+}) {
   const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = usePathname();
 
@@ -135,7 +166,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     <div className="flex h-full">
       {/* Desktop sidebar */}
       <aside className="hidden w-64 shrink-0 border-r bg-card md:block">
-        <SidebarContent />
+        <SidebarContent orgName={orgName} />
       </aside>
 
       {/* Mobile sidebar */}
@@ -157,7 +188,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 <X className="size-4" />
               </Button>
             </div>
-            <SidebarContent />
+            <SidebarContent orgName={orgName} />
           </aside>
         </div>
       ) : null}
@@ -188,15 +219,34 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <Button variant="ghost" size="icon" aria-label="Notifications" disabled>
               <Bell className="size-4" />
             </Button>
-            <Link
-              href="/login"
-              className="flex items-center gap-2 rounded-full border border-border px-2 py-1 text-sm"
-            >
-              <span className="grid size-6 place-items-center rounded-full bg-secondary text-xs font-semibold">
-                ?
-              </span>
-              <span className="hidden pr-1 sm:inline">Signed out</span>
-            </Link>
+
+            {user ? (
+              <div className="flex items-center gap-2">
+                <span className="flex items-center gap-2 rounded-full border border-border px-2 py-1 text-sm">
+                  <span className="grid size-6 place-items-center rounded-full bg-secondary text-xs font-semibold">
+                    {user.name ? user.name.charAt(0).toUpperCase() : "?"}
+                  </span>
+                  <span className="hidden max-w-[10rem] truncate pr-1 sm:inline">
+                    {user.name ?? user.email}
+                  </span>
+                </span>
+                <form action={signOutAction}>
+                  <Button variant="ghost" size="sm" type="submit">
+                    Sign out
+                  </Button>
+                </form>
+              </div>
+            ) : (
+              <Link
+                href="/login"
+                className="flex items-center gap-2 rounded-full border border-border px-2 py-1 text-sm"
+              >
+                <span className="grid size-6 place-items-center rounded-full bg-secondary text-xs font-semibold">
+                  ?
+                </span>
+                <span className="hidden pr-1 sm:inline">Sign in</span>
+              </Link>
+            )}
           </div>
         </header>
 

@@ -11,11 +11,11 @@ const PROTECTED_PREFIXES = ["/dashboard"];
  * Responsibilities:
  *  - refresh Supabase auth session cookies on every request,
  *  - redirect unauthenticated visitors away from /dashboard,
- *  - redirect signed-in users away from /login.
+ *  - redirect signed-in users away from /login and /register.
  *
- * The real auth pages themselves belong to M1; until Supabase env vars are
- * set (this is M0 bootstrap), the proxy passes everything through so the
- * app can render its "not configured" state.
+ * The real auth pages landed in M1; until Supabase env vars are set (M0
+ * bootstrap state), the proxy passes everything through so the app can
+ * render its "not configured" state.
  */
 export async function proxy(request: NextRequest) {
   if (!isSupabaseConfigured()) {
@@ -57,7 +57,7 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  if (user && pathname.startsWith("/login")) {
+  if (user && (pathname.startsWith("/login") || pathname.startsWith("/register"))) {
     const url = request.nextUrl.clone();
     url.pathname = "/dashboard";
     return NextResponse.redirect(url);
@@ -69,5 +69,5 @@ export async function proxy(request: NextRequest) {
 export const config = {
   // Session refresh + guards only on routes that need them. Static assets,
   // public business pages (`/platform/*` later) and auth APIs are untouched.
-  matcher: ["/dashboard/:path*", "/login"],
+  matcher: ["/dashboard/:path*", "/login", "/register"],
 };

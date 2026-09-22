@@ -29,7 +29,7 @@ export default function DashboardPage() {
         description="An action-oriented overview of your business. Metrics populate as modules ship."
         actions={
           <Badge variant="secondary" className="h-fit">
-            Setup milestone · M0
+            Foundation · M1
           </Badge>
         }
       />

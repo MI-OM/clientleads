@@ -36,7 +36,7 @@ Open [http://localhost:3000](http://localhost:3000).
 
 > Supabase is not yet connected in M0 — the dashboard shows a "not configured"
 > state until `NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_ANON_KEY`
-> are set. Authentication arrives in M1.
+> are set. M1 ships real auth, tenancy + RLS, and settings — see below.
 
 ## Scripts
 
@@ -49,6 +49,38 @@ Open [http://localhost:3000](http://localhost:3000).
 | `npm run typecheck` | Generate route types, then `tsc --noEmit` |
 | `npm run format` | Prettier write |
 | `npm run format:check` | Prettier check |
+| `npm run test:rls` | RLS isolation check against the live Supabase project (skips when env is unset) |
+
+## Database (migrations)
+
+Migrations live in `supabase/migrations/` and are written in Supabase CLI format
+(`<timestamp>_<name>.sql`). They are **idempotent** (`create table if not exists`,
+`drop policy if exists`, `on conflict do nothing`) so they can be applied
+cleanly on a fresh project, or re-pasted to repair an existing one.
+
+- **Dashboard SQL editor** — open each file and paste it in, or
+- **Supabase CLI** — `supabase db push` once the project is linked.
+
+What M1 migrations create:
+
+| File | Contents |
+| --- | --- |
+| `20260922000001_m1_tenancy_core.sql` | `organizations`, `profiles`, `organization_members` + full RLS, signup trigger (new users auto-join the default org), grants, seed of the first client org |
+| `20260922000002_m1_storage.sql` | `org-assets` storage bucket (public-read, member-write) for logos |
+
+Every tenant-owned table created in later milestones carries `organization_id`
+and ships with RLS policies in the same migration — "no table without policies".
+
+### Before go-live
+
+- Rename the seeded placeholder org (`First Client Real Estate` / slug
+  `first-client`) in `20260922000001_m1_tenancy_core.sql` to the real client.
+- In Supabase Auth settings: enable **Confirm email**, note the **Site URL**,
+  and add `http://localhost:3000/auth/confirm` (dev) plus your production
+  domain to **Redirect URLs** so password-reset links work.
+- Set the three env vars (`NEXT_PUBLIC_SUPABASE_URL`,
+  `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`) locally and in
+  Vercel, then run `npm run test:rls` to verify cross-org isolation.
 
 ## Project structure
 
@@ -56,17 +88,24 @@ Open [http://localhost:3000](http://localhost:3000).
 src/
 ├── app/
 │   ├── (app)/dashboard/   # Authenticated app (protected by proxy)
-│   ├── (auth)/login/      # Auth pages (M1)
+│   ├── (auth)/            # login, register, reset-password (public)
+│   ├── auth/confirm/      # Supabase magic-link / recovery token exchange
 │   ├── layout.tsx         # Root layout (fonts, metadata)
 │   └── page.tsx           # Public landing
 ├── components/
 │   ├── dashboard/         # App navigation shell, page header
 │   └── ui/                # Design system primitives (button, input, card, …)
 ├── lib/
+│   ├── auth/              # Server actions + org/session helpers
 │   ├── env.ts             # Validated env access (client-safe split)
 │   ├── utils.ts           # cn() class-name helper
 │   └── supabase/          # client / server clients (Next 16 async cookies)
 └── proxy.ts               # Route protection + session refresh (Next 16 `proxy`)
+
+supabase/
+└── migrations/            # Versioned SQL (tenancy core, storage, later modules)
+scripts/
+└── check-rls.mjs          # RLS isolation verification (npm run test:rls)
 ```
 
 > Note: Next.js 16 renamed `middleware.ts` → `proxy.ts` and made `cookies()`,
