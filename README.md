@@ -1,36 +1,95 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# ClientLeads
 
-## Getting Started
+Client Engagement & Business Management Platform — one simple system to manage
+contacts, capture leads, accept bookings, communicate with clients, and grow
+relationships. Configured for a real-estate first client, architected to be
+tenant-ready for future multi-client deployments.
 
-First, run the development server:
+## Docs
+
+| Document | Purpose |
+| --- | --- |
+| [`clientleads.md`](./clientleads.md) | Product Requirements Document (source of truth) |
+| [`PROJECT_PLAN.md`](./PROJECT_PLAN.md) | Milestone roadmap and progress tracking |
+
+## Stack
+
+- **Frontend:** Next.js 16 (App Router) · React 19 · TypeScript · Tailwind CSS v4
+- **Backend:** Supabase (PostgreSQL, Auth, RLS, Storage)
+- **Email:** external provider (decision tracked in PROJECT_PLAN.md, M5)
+- **CI/CD:** GitHub Actions (lint + typecheck + build) → Vercel
+
+## Getting started
+
+Requirements: Node.js 20.9+ (developed on 24), npm.
 
 ```bash
+npm install
+
+# Copy env template and fill in your Supabase project URL + anon key
+cp .env.example .env.local
+
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+> Supabase is not yet connected in M0 — the dashboard shows a "not configured"
+> state until `NEXT_PUBLIC_SUPABASE_URL` / `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+> are set. Authentication arrives in M1.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Scripts
 
-## Learn More
+| Command | Description |
+| --- | --- |
+| `npm run dev` | Start the dev server (Turbopack) |
+| `npm run build` | Production build (Turbopack) |
+| `npm run start` | Start the production server |
+| `npm run lint` | ESLint (flat config) |
+| `npm run typecheck` | Generate route types, then `tsc --noEmit` |
+| `npm run format` | Prettier write |
+| `npm run format:check` | Prettier check |
 
-To learn more about Next.js, take a look at the following resources:
+## Project structure
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```text
+src/
+├── app/
+│   ├── (app)/dashboard/   # Authenticated app (protected by proxy)
+│   ├── (auth)/login/      # Auth pages (M1)
+│   ├── layout.tsx         # Root layout (fonts, metadata)
+│   └── page.tsx           # Public landing
+├── components/
+│   ├── dashboard/         # App navigation shell, page header
+│   └── ui/                # Design system primitives (button, input, card, …)
+├── lib/
+│   ├── env.ts             # Validated env access (client-safe split)
+│   ├── utils.ts           # cn() class-name helper
+│   └── supabase/          # client / server clients (Next 16 async cookies)
+└── proxy.ts               # Route protection + session refresh (Next 16 `proxy`)
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+> Note: Next.js 16 renamed `middleware.ts` → `proxy.ts` and made `cookies()`,
+> `headers()`, `params`, and `searchParams` async. Version-matched docs are in
+> `node_modules/next/dist/docs/`.
 
-## Deploy on Vercel
+## Environment variables
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+See `.env.example`. Rules:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- `NEXT_PUBLIC_*` values are safe for the browser.
+- `SUPABASE_SERVICE_ROLE_KEY` is server-only — never import it from a client
+  component and never expose it to the client bundle.
+
+## Branch strategy
+
+- `main` is the deployable branch — CI must pass to merge.
+- Work in short-lived branches: `feat/<module>` or `fix/<description>`.
+- PRs run lint, typecheck, and build automatically once pushed to GitHub.
+
+## Deployment
+
+Target: **Vercel**. Connect the GitHub repo in Vercel and environment variables
+will need to be added there (or via `vercel env`). CI here handles code quality;
+Vercel handles previews + production deploys. Full deployment steps land with
+M7 (Validation & Launch) in PROJECT_PLAN.md.
