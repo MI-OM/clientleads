@@ -552,9 +552,9 @@ begin
       organization_id, entity_type, name, field_key, field_type, options, sort_order
     )
     values
-      (v_org, 'contact', 'Preferred Area',   'preferred_area',   'text',          null, 1),
+      (v_org, 'contact', 'Preferred Area',   'preferred_area',   'text',          '[]'::jsonb, 1),
       (v_org, 'contact', 'Property Type',    'property_type',    'dropdown',      '["House","Condo","Townhouse","Land","Commercial"]'::jsonb, 2),
-      (v_org, 'contact', 'Budget',           'budget',           'number',        null, 3),
+      (v_org, 'contact', 'Budget',           'budget',           'number',        '[]'::jsonb, 3),
       (v_org, 'contact', 'Buying Timeline',  'buying_timeline',  'dropdown',      '["0-3 months","3-6 months","6-12 months","12+ months"]'::jsonb, 4)
     on conflict (organization_id, entity_type, field_key) do nothing;
   end if;
