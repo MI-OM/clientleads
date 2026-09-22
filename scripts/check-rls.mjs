@@ -15,6 +15,32 @@
  * Run: npm run test:rls
  */
 import { createClient } from "@supabase/supabase-js";
+import { readFileSync } from "node:fs";
+import { fileURLToPath } from "node:url";
+import { dirname, join } from "node:path";
+
+/**
+ * Load .env.local so `npm run test:rls` works without exporting vars into the
+ * shell. Real environment variables (CI / Vercel) always take precedence.
+ */
+function loadLocalEnv() {
+  const here = dirname(fileURLToPath(import.meta.url));
+  try {
+    const text = readFileSync(join(here, "..", ".env.local"), "utf8");
+    for (const line of text.split(/\r?\n/)) {
+      const trimmed = line.trim();
+      if (!trimmed || trimmed.startsWith("#")) continue;
+      const eq = trimmed.indexOf("=");
+      if (eq === -1) continue;
+      const key = trimmed.slice(0, eq).trim();
+      const value = trimmed.slice(eq + 1).trim().replace(/^["']|["']$/g, "");
+      if (key && process.env[key] === undefined) process.env[key] = value;
+    }
+  } catch {
+    // No .env.local — rely on the real environment (or skip).
+  }
+}
+loadLocalEnv();
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
