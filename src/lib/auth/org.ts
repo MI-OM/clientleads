@@ -86,9 +86,7 @@ export const getMyOrg = cache(async (): Promise<OrgContext | null> => {
 
   if (error || !data) return null;
 
-  const organization = data.organization as unknown as
-    | Record<string, unknown>
-    | null;
+  const organization = data.organization as unknown as Record<string, unknown> | null;
   if (!organization) return null;
 
   return { org: mapOrg(organization), role: data.role as OrgRole };

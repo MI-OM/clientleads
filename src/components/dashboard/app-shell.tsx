@@ -35,25 +35,24 @@ interface NavEntry {
   milestone?: string;
 }
 
-const overviewNav: NavEntry[] = [
-  { title: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-];
+const overviewNav: NavEntry[] = [{ title: "Dashboard", href: "/dashboard", icon: LayoutDashboard }];
 
 const moduleNav: NavEntry[] = [
-  { title: "Contacts", href: "/dashboard/contacts", icon: Users, milestone: "M2" },
-  { title: "Leads", href: "/dashboard/leads", icon: Target, milestone: "M2" },
+  { title: "Contacts", href: "/dashboard/contacts", icon: Users },
+  { title: "Leads", href: "/dashboard/leads", icon: Target },
   { title: "Appointments", href: "/dashboard/appointments", icon: CalendarDays, milestone: "M4" },
   { title: "Services", href: "/dashboard/services", icon: Wrench, milestone: "M3" },
   { title: "Tasks", href: "/dashboard/tasks", icon: ListTodo, milestone: "M6" },
   { title: "Campaigns", href: "/dashboard/campaigns", icon: Megaphone, milestone: "M5" },
   { title: "Forms", href: "/dashboard/forms", icon: ClipboardList, milestone: "M3" },
   { title: "Resources", href: "/dashboard/resources", icon: FolderOpen, milestone: "M3" },
-  { title: "Activities", href: "/dashboard/activities", icon: Activity, milestone: "M2" },
+  { title: "Activities", href: "/dashboard/activities", icon: Activity },
   { title: "Analytics", href: "/dashboard/analytics", icon: BarChart3, milestone: "M6" },
 ];
 
 const manageNav: NavEntry[] = [
   { title: "Settings", href: "/dashboard/settings", icon: Settings },
+  { title: "Custom fields", href: "/dashboard/settings/fields", icon: ListTodo },
 ];
 
 function NavLink({ entry, active }: { entry: NavEntry; active: boolean }) {
@@ -103,9 +102,7 @@ function SidebarContent({ orgName }: { orgName: string | null }) {
           </span>
           ClientLeads
         </Link>
-        {orgName ? (
-          <span className="truncate text-xs text-muted-foreground">{orgName}</span>
-        ) : null}
+        {orgName ? <span className="truncate text-xs text-muted-foreground">{orgName}</span> : null}
       </div>
 
       <nav className="flex flex-1 flex-col gap-6">
@@ -139,7 +136,8 @@ function SidebarContent({ orgName }: { orgName: string | null }) {
       </nav>
 
       <p className="px-3 text-xs text-muted-foreground">
-        {overviewNav.length + manageNav.length} built · {moduleNav.length} scheduled
+        {overviewNav.length + manageNav.length + moduleNav.filter((n) => !n.milestone).length} built
+        · {moduleNav.filter((n) => n.milestone).length} scheduled
       </p>
     </div>
   );
@@ -206,7 +204,10 @@ export function AppShell({
           </Button>
 
           <div className="relative hidden max-w-md flex-1 sm:block">
-            <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" aria-hidden />
+            <Search
+              className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
+              aria-hidden
+            />
             <input
               type="search"
               placeholder="Search contacts…"

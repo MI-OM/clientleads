@@ -7,10 +7,10 @@ tenant-ready for future multi-client deployments.
 
 ## Docs
 
-| Document | Purpose |
-| --- | --- |
-| [`clientleads.md`](./clientleads.md) | Product Requirements Document (source of truth) |
-| [`PROJECT_PLAN.md`](./PROJECT_PLAN.md) | Milestone roadmap and progress tracking |
+| Document                               | Purpose                                         |
+| -------------------------------------- | ----------------------------------------------- |
+| [`clientleads.md`](./clientleads.md)   | Product Requirements Document (source of truth) |
+| [`PROJECT_PLAN.md`](./PROJECT_PLAN.md) | Milestone roadmap and progress tracking         |
 
 ## Stack
 
@@ -40,17 +40,18 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ## Scripts
 
-| Command | Description |
-| --- | --- |
-| `npm run dev` | Start the dev server (Turbopack) |
-| `npm run build` | Production build (Turbopack) |
-| `npm run start` | Start the production server |
-| `npm run lint` | ESLint (flat config) |
-| `npm run typecheck` | Generate route types, then `tsc --noEmit` |
-| `npm run format` | Prettier write |
-| `npm run format:check` | Prettier check |
-| `npm run test:rls` | RLS isolation check against the live Supabase project (skips when env is unset) |
-| `npm run test:auth` | Live auth smoke test: signup → auto-join → sign-in → org visibility (skips when env is unset) |
+| Command                | Description                                                                                                                                     |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `npm run dev`          | Start the dev server (Turbopack)                                                                                                                |
+| `npm run build`        | Production build (Turbopack)                                                                                                                    |
+| `npm run start`        | Start the production server                                                                                                                     |
+| `npm run lint`         | ESLint (flat config)                                                                                                                            |
+| `npm run typecheck`    | Generate route types, then `tsc --noEmit`                                                                                                       |
+| `npm run format`       | Prettier write                                                                                                                                  |
+| `npm run format:check` | Prettier check                                                                                                                                  |
+| `npm run test:rls`     | RLS isolation check against the live Supabase project (skips when env is unset)                                                                 |
+| `npm run test:auth`    | Live auth smoke test: signup → auto-join → sign-in → org visibility (skips when env is unset)                                                   |
+| `npm run test:crm`     | Live CRM smoke test: tags, contacts, custom values, leads, stage changes, notes, auto-activities, same-org visibility (skips when env is unset) |
 
 ## Database (migrations)
 
@@ -62,15 +63,16 @@ cleanly on a fresh project, or re-pasted to repair an existing one.
 - **Dashboard SQL editor** — open each file and paste it in, or
 - **Supabase CLI** — `supabase db push` once the project is linked.
 
-What M1 migrations create:
+What the migrations create:
 
-| File | Contents |
-| --- | --- |
-| `20260922000001_m1_tenancy_core.sql` | `organizations`, `profiles`, `organization_members` + full RLS, signup trigger (new users auto-join the default org), grants, seed of the first client org |
-| `20260922000002_m1_storage.sql` | `org-assets` storage bucket (public-read, member-write) for logos |
+| File                                 | Contents                                                                                                                                                                                                                           |
+| ------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `20260922000001_m1_tenancy_core.sql` | `organizations`, `profiles`, `organization_members` + full RLS, signup trigger (new users auto-join the default org), grants, seed of the first client org                                                                         |
+| `20260922000002_m1_storage.sql`      | `org-assets` storage bucket (public-read, member-write) for logos                                                                                                                                                                  |
+| `20260922000003_m2_crm.sql`          | `contacts`, `tags`, `contact_tags`, `custom_fields`, `contact_custom_values`, `leads`, `activities` + RLS, auto-activity triggers, `log_activity()` helper, grants, config seed (example tags + real-estate custom fields as data) |
 
-Every tenant-owned table created in later milestones carries `organization_id`
-and ships with RLS policies in the same migration — "no table without policies".
+Every tenant-owned table carries `organization_id` and ships with RLS
+policies in the same migration — "no table without policies".
 
 ### Before go-live
 

@@ -6,13 +6,7 @@ import type { AccountState } from "./actions";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 function FormStatus({ state }: { state: AccountState }) {
   if (state.error) {
@@ -43,14 +37,14 @@ export function AccountSettingsForms({
   avatarUrl: string | null;
   email: string | null;
 }) {
-  const [profileState, profileAction, profilePending] = useActionState<
-    AccountState,
-    FormData
-  >(updateProfileAction, {});
-  const [passwordState, passwordAction, passwordPending] = useActionState<
-    AccountState,
-    FormData
-  >(changePasswordAction, {});
+  const [profileState, profileAction, profilePending] = useActionState<AccountState, FormData>(
+    updateProfileAction,
+    {},
+  );
+  const [passwordState, passwordAction, passwordPending] = useActionState<AccountState, FormData>(
+    changePasswordAction,
+    {},
+  );
 
   return (
     <div className="space-y-6">
@@ -58,8 +52,8 @@ export function AccountSettingsForms({
         <CardHeader>
           <CardTitle>Your profile</CardTitle>
           <CardDescription>
-            How you appear across the workspace. Your email is managed by
-            Supabase Auth and can&apos;t be changed here yet.
+            How you appear across the workspace. Your email is managed by Supabase Auth and
+            can&apos;t be changed here yet.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -67,12 +61,7 @@ export function AccountSettingsForms({
             <div className="grid gap-2 sm:grid-cols-2">
               <div className="grid gap-2">
                 <Label htmlFor="fullName">Full name</Label>
-                <Input
-                  id="fullName"
-                  name="fullName"
-                  defaultValue={fullName ?? ""}
-                  required
-                />
+                <Input id="fullName" name="fullName" defaultValue={fullName ?? ""} required />
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="email">Email</Label>

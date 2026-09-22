@@ -26,18 +26,15 @@ export default function Home() {
           One simple place to manage your client relationships.
         </h1>
         <p className="max-w-xl text-lg leading-8 text-muted-foreground">
-          ClientLeads connects your contacts, leads, bookings, communications
-          and follow-ups in a single lightweight system — with a branded public
-          page your prospects can book and inquire through.
+          ClientLeads connects your contacts, leads, bookings, communications and follow-ups in a
+          single lightweight system — with a branded public page your prospects can book and inquire
+          through.
         </p>
         <div className="flex flex-wrap gap-3">
           <Link href="/dashboard" className={buttonVariants({ size: "lg" })}>
             Get started
           </Link>
-          <Link
-            href="/login"
-            className={buttonVariants({ variant: "outline", size: "lg" })}
-          >
+          <Link href="/login" className={buttonVariants({ variant: "outline", size: "lg" })}>
             Sign in
           </Link>
         </div>

@@ -1,13 +1,7 @@
 import Link from "next/link";
 import { getMyOrg } from "@/lib/auth/org";
 import { BusinessSettingsForm } from "./business-form";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default async function SettingsPage() {
   const ctx = await getMyOrg();
@@ -21,12 +15,20 @@ export default async function SettingsPage() {
             Your business profile, branding, and workspace details.
           </p>
         </div>
-        <Link
-          href="/dashboard/settings/account"
-          className="text-sm text-primary underline-offset-4 hover:underline"
-        >
-          Account settings
-        </Link>
+        <div className="flex items-center gap-4">
+          <Link
+            href="/dashboard/settings/fields"
+            className="text-sm text-primary underline-offset-4 hover:underline"
+          >
+            Custom fields
+          </Link>
+          <Link
+            href="/dashboard/settings/account"
+            className="text-sm text-primary underline-offset-4 hover:underline"
+          >
+            Account settings
+          </Link>
+        </div>
       </div>
 
       {ctx ? (
@@ -39,14 +41,14 @@ export default async function SettingsPage() {
           <CardHeader>
             <CardTitle>No workspace found</CardTitle>
             <CardDescription>
-              Your account isn&apos;t linked to an organization yet. This usually
-              means the database migrations haven&apos;t been applied.
+              Your account isn&apos;t linked to an organization yet. This usually means the database
+              migrations haven&apos;t been applied.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground">
-              Apply the migrations in <code className="font-mono">supabase/migrations</code>{" "}
-              to your Supabase project, then refresh this page.
+              Apply the migrations in <code className="font-mono">supabase/migrations</code> to your
+              Supabase project, then refresh this page.
             </p>
           </CardContent>
         </Card>

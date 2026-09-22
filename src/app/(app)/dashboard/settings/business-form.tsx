@@ -9,13 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 const TIMEZONES = [
   "America/Halifax",
@@ -158,13 +152,7 @@ export function BusinessSettingsForm({ org, canEdit }: { org: Org; canEdit: bool
             <div className="grid gap-2 sm:grid-cols-2">
               <div className="grid gap-2">
                 <Label htmlFor="name">Business name</Label>
-                <Input
-                  id="name"
-                  name="name"
-                  defaultValue={org.name}
-                  disabled={!canEdit}
-                  required
-                />
+                <Input id="name" name="name" defaultValue={org.name} disabled={!canEdit} required />
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="slug">Web address</Label>
@@ -227,7 +215,12 @@ export function BusinessSettingsForm({ org, canEdit }: { org: Org; canEdit: bool
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="grid gap-2 sm:col-span-2">
                 <Label htmlFor="address">Street address</Label>
-                <Input id="address" name="address" defaultValue={org.address ?? ""} disabled={!canEdit} />
+                <Input
+                  id="address"
+                  name="address"
+                  defaultValue={org.address ?? ""}
+                  disabled={!canEdit}
+                />
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="city">City</Label>
@@ -235,22 +228,42 @@ export function BusinessSettingsForm({ org, canEdit }: { org: Org; canEdit: bool
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="province">Province / State</Label>
-                <Input id="province" name="province" defaultValue={org.province ?? ""} disabled={!canEdit} />
+                <Input
+                  id="province"
+                  name="province"
+                  defaultValue={org.province ?? ""}
+                  disabled={!canEdit}
+                />
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="country">Country</Label>
-                <Input id="country" name="country" defaultValue={org.country ?? ""} disabled={!canEdit} />
+                <Input
+                  id="country"
+                  name="country"
+                  defaultValue={org.country ?? ""}
+                  disabled={!canEdit}
+                />
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="postalCode">Postal / ZIP code</Label>
-                <Input id="postalCode" name="postalCode" defaultValue={org.postalCode ?? ""} disabled={!canEdit} />
+                <Input
+                  id="postalCode"
+                  name="postalCode"
+                  defaultValue={org.postalCode ?? ""}
+                  disabled={!canEdit}
+                />
               </div>
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="grid gap-2">
                 <Label htmlFor="timezone">Timezone</Label>
-                <Select id="timezone" name="timezone" defaultValue={org.timezone} disabled={!canEdit}>
+                <Select
+                  id="timezone"
+                  name="timezone"
+                  defaultValue={org.timezone}
+                  disabled={!canEdit}
+                >
                   {TIMEZONES.map((tz) => (
                     <option key={tz} value={tz}>
                       {tz}

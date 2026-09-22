@@ -35,7 +35,10 @@ function loadLocalEnv() {
       const eq = trimmed.indexOf("=");
       if (eq === -1) continue;
       const key = trimmed.slice(0, eq).trim();
-      const value = trimmed.slice(eq + 1).trim().replace(/^["']|["']$/g, "");
+      const value = trimmed
+        .slice(eq + 1)
+        .trim()
+        .replace(/^["']|["']$/g, "");
       if (key && process.env[key] === undefined) process.env[key] = value;
     }
   } catch {
@@ -92,7 +95,8 @@ try {
   userA = a.data.user;
   userB = b.data.user;
 
-  if (!userA || !userB) throw new Error(`Failed to create test users: ${a.error?.message ?? b.error?.message}`);
+  if (!userA || !userB)
+    throw new Error(`Failed to create test users: ${a.error?.message ?? b.error?.message}`);
 
   // ── Setup: two orgs + memberships (service role bypasses RLS) ──
   const orgARes = await admin
@@ -105,20 +109,29 @@ try {
     .insert({ name: `RLS Test B ${tag}`, slug: `rls-b-${tag}` })
     .select("id, name")
     .single();
-  if (orgARes.error || orgBRes.error) throw new Error(`Org creation failed: ${orgARes.error?.message ?? orgBRes.error?.message}`);
+  if (orgARes.error || orgBRes.error)
+    throw new Error(`Org creation failed: ${orgARes.error?.message ?? orgBRes.error?.message}`);
   orgA = orgARes.data;
   orgB = orgBRes.data;
 
-  await admin.from("organization_members").insert({ organization_id: orgA.id, user_id: userA.id, role: "admin" });
-  await admin.from("organization_members").insert({ organization_id: orgB.id, user_id: userB.id, role: "admin" });
+  await admin
+    .from("organization_members")
+    .insert({ organization_id: orgA.id, user_id: userA.id, role: "admin" });
+  await admin
+    .from("organization_members")
+    .insert({ organization_id: orgB.id, user_id: userB.id, role: "admin" });
 
   // ── Authenticate as each user ──
   const sessionA = await anon.auth.signInWithPassword({ email: emailA, password });
   const sessionB = await anon.auth.signInWithPassword({ email: emailB, password });
   if (sessionA.error || sessionB.error) throw new Error("Test sign-in failed");
 
-  const clientA = createClient(url, anonKey, { auth: { autoRefreshToken: false, persistSession: false } });
-  const clientB = createClient(url, anonKey, { auth: { autoRefreshToken: false, persistSession: false } });
+  const clientA = createClient(url, anonKey, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  });
+  const clientB = createClient(url, anonKey, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  });
   await clientA.auth.setSession(sessionA.data.session);
   await clientB.auth.setSession(sessionB.data.session);
 
@@ -130,13 +143,11 @@ try {
 
   // RLS filters cross-org updates to 0 rows (no error, no data change) —
   // verify by checking the target row is untouched afterwards.
-  const beforeUpdate = (
-    await admin.from("organizations").select("name").eq("id", orgB.id).single()
-  ).data;
+  const beforeUpdate = (await admin.from("organizations").select("name").eq("id", orgB.id).single())
+    .data;
   await clientA.from("organizations").update({ name: "Hacked" }).eq("id", orgB.id);
-  const afterUpdate = (
-    await admin.from("organizations").select("name").eq("id", orgB.id).single()
-  ).data;
+  const afterUpdate = (await admin.from("organizations").select("name").eq("id", orgB.id).single())
+    .data;
   record(
     "A cannot update B's org",
     beforeUpdate?.name !== undefined &&
@@ -148,10 +159,7 @@ try {
     .from("organization_members")
     .select("organization_id")
     .eq("organization_id", orgB.id);
-  record(
-    "A cannot read B's memberships",
-    !membersOfBAsA.error && membersOfBAsA.data.length === 0,
-  );
+  record("A cannot read B's memberships", !membersOfBAsA.error && membersOfBAsA.data.length === 0);
 
   // B as the mirror check
   const orgsAAsB = await clientB.from("organizations").select("id").eq("id", orgA.id);

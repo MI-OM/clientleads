@@ -27,7 +27,10 @@ function loadLocalEnv() {
       const eq = trimmed.indexOf("=");
       if (eq === -1) continue;
       const key = trimmed.slice(0, eq).trim();
-      const value = trimmed.slice(eq + 1).trim().replace(/^["']|["']$/g, "");
+      const value = trimmed
+        .slice(eq + 1)
+        .trim()
+        .replace(/^["']|["']$/g, "");
       if (key && process.env[key] === undefined) process.env[key] = value;
     }
   } catch {
@@ -100,7 +103,10 @@ try {
 
   // 2. Signup trigger created the profile + default-org membership.
   const profile = await admin.from("profiles").select("full_name").eq("id", userId).single();
-  record("profile auto-created from signup metadata", profile.data?.full_name === "Smoke Test User");
+  record(
+    "profile auto-created from signup metadata",
+    profile.data?.full_name === "Smoke Test User",
+  );
 
   const memberships = await admin
     .from("organization_members")
@@ -114,7 +120,11 @@ try {
 
   // 3. Password sign-in (what the login form does).
   const signIn = await anon.auth.signInWithPassword({ email, password });
-  record("password sign-in works", !signIn.error && !!signIn.data.session, signIn.error?.message ?? "");
+  record(
+    "password sign-in works",
+    !signIn.error && !!signIn.data.session,
+    signIn.error?.message ?? "",
+  );
 
   if (signIn.error || !signIn.data.session) throw new Error("sign-in failed");
 
@@ -131,13 +141,11 @@ try {
   );
 
   // 5. Staff cannot edit business settings (RLS filters the update to 0 rows).
-  const before = (
-    await admin.from("organizations").select("name").eq("id", defaultOrgId).single()
-  ).data?.name;
+  const before = (await admin.from("organizations").select("name").eq("id", defaultOrgId).single())
+    .data?.name;
   await userClient.from("organizations").update({ name: "Hacked" }).eq("id", defaultOrgId);
-  const after = (
-    await admin.from("organizations").select("name").eq("id", defaultOrgId).single()
-  ).data?.name;
+  const after = (await admin.from("organizations").select("name").eq("id", defaultOrgId).single())
+    .data?.name;
   record(
     "staff cannot edit business settings",
     before !== undefined && before === after && after !== "Hacked",

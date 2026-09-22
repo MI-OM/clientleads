@@ -40,7 +40,9 @@ export async function updateOrganizationAction(
   }
 
   const name = String(formData.get("name") ?? "").trim();
-  const slug = String(formData.get("slug") ?? "").trim().toLowerCase();
+  const slug = String(formData.get("slug") ?? "")
+    .trim()
+    .toLowerCase();
   const primaryColor = String(formData.get("primaryColor") ?? "").trim();
   const secondaryColor = String(formData.get("secondaryColor") ?? "").trim();
 

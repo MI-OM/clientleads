@@ -6,7 +6,7 @@ The key instruction for the eventual development agent should be:
 
 # Product Requirements Document (PRD)
 
-## Client Engagement & Business Management Platform 
+## Client Engagement & Business Management Platform
 
 ## APP Name - ClientLeads
 
@@ -34,30 +34,30 @@ The application will provide two connected experiences:
 
 Used by the business owner/team to:
 
-* manage contacts
-* manage leads
-* manage services
-* manage availability
-* manage appointments
-* manage newsletters
-* manage tasks and follow-ups
-* manage forms
-* manage resources
-* view activity
-* manage the public business page
-* view basic analytics
+- manage contacts
+- manage leads
+- manage services
+- manage availability
+- manage appointments
+- manage newsletters
+- manage tasks and follow-ups
+- manage forms
+- manage resources
+- view activity
+- manage the public business page
+- view basic analytics
 
 ### Public Business Experience
 
 Used by prospects and clients to:
 
-* view the business
-* learn about services
-* submit inquiries
-* book appointments
-* access resources
-* subscribe to communications
-* receive confirmation and follow-up communications
+- view the business
+- learn about services
+- submit inquiries
+- book appointments
+- access resources
+- subscribe to communications
+- receive confirmation and follow-up communications
 
 ---
 
@@ -73,12 +73,12 @@ Its value is simplicity and integration.
 
 Instead of requiring separate tools for:
 
-* website/profile
-* contact database
-* booking
-* forms
-* newsletters
-* follow-up
+- website/profile
+- contact database
+- booking
+- forms
+- newsletters
+- follow-up
 
 the business receives one connected system.
 
@@ -106,18 +106,18 @@ the business receives one connected system.
 
 The MVP will NOT attempt to become:
 
-* HubSpot
-* Salesforce
-* Mailchimp replacement
-* Calendly replacement
-* full website builder
-* accounting platform
-* property management platform
-* MLS platform
-* transaction management platform
-* social media management platform
-* full marketing automation platform
-* project management platform
+- HubSpot
+- Salesforce
+- Mailchimp replacement
+- Calendly replacement
+- full website builder
+- accounting platform
+- property management platform
+- MLS platform
+- transaction management platform
+- social media management platform
+- full marketing automation platform
+- project management platform
 
 Real-estate-specific functionality such as MLS integration, property matching and transaction management should remain outside the MVP unless specifically requested.
 
@@ -129,30 +129,30 @@ Real-estate-specific functionality such as MLS integration, property matching an
 
 Can:
 
-* manage business settings
-* manage contacts
-* manage leads
-* manage services
-* manage appointments
-* manage availability
-* create campaigns
-* manage forms
-* manage resources
-* manage tasks
-* view analytics
-* manage public page
-* manage users
+- manage business settings
+- manage contacts
+- manage leads
+- manage services
+- manage appointments
+- manage availability
+- create campaigns
+- manage forms
+- manage resources
+- manage tasks
+- view analytics
+- manage public page
+- manage users
 
 ## 5.2 Staff User
 
 Depending on the client's team structure, staff may:
 
-* view assigned contacts
-* manage appointments
-* add notes
-* complete tasks
-* view campaigns
-* manage assigned leads
+- view assigned contacts
+- manage appointments
+- add notes
+- complete tasks
+- view campaigns
+- manage assigned leads
 
 Role permissions should be configurable later.
 
@@ -160,12 +160,12 @@ Role permissions should be configurable later.
 
 Can:
 
-* view public page
-* view services
-* submit forms
-* book appointments
-* access public resources
-* subscribe to newsletters
+- view public page
+- view services
+- submit forms
+- book appointments
+- access public resources
+- subscribe to newsletters
 
 No account should be required for basic public interactions.
 
@@ -204,19 +204,19 @@ The application should use Supabase Authentication.
 
 ## Requirements
 
-* Email/password authentication
-* Password reset
-* Session management
-* Protected application routes
-* Public routes for public business pages
-* Public booking/form routes
+- Email/password authentication
+- Password reset
+- Session management
+- Protected application routes
+- Public routes for public business pages
+- Public booking/form routes
 
 Future:
 
-* Google login
-* Microsoft login
-* MFA
-* organization invitations
+- Google login
+- Microsoft login
+- MFA
+- organization invitations
 
 These should not be required for MVP.
 
@@ -228,33 +228,33 @@ Each business has a profile.
 
 ## Fields
 
-* Business name
-* Logo
-* Profile image
-* Description
-* Business email
-* Business phone
-* Address
-* City
-* Province/State
-* Country
-* Postal/ZIP code
-* Website
-* Social media links
-* Public URL/slug
-* Business hours
-* Time zone
-* Primary contact name
+- Business name
+- Logo
+- Profile image
+- Description
+- Business email
+- Business phone
+- Address
+- City
+- Province/State
+- Country
+- Postal/ZIP code
+- Website
+- Social media links
+- Public URL/slug
+- Business hours
+- Time zone
+- Primary contact name
 
 ## Branding
 
 The business should be able to configure:
 
-* logo
-* primary brand color
-* secondary brand color
-* button appearance
-* basic page styling
+- logo
+- primary brand color
+- secondary brand color
+- button appearance
+- basic page styling
 
 The UI should remain controlled by the platform rather than becoming a full website builder.
 
@@ -286,20 +286,20 @@ www.businessdomain.com
 
 ### Header
 
-* logo
-* business name
-* navigation
+- logo
+- business name
+- navigation
 
 ### Hero
 
-* headline
-* description
-* primary CTA
-* secondary CTA
+- headline
+- description
+- primary CTA
+- secondary CTA
 
 ### About
 
-* business/person description
+- business/person description
 
 ### Services
 
@@ -307,11 +307,11 @@ Display active services.
 
 Each service should include:
 
-* name
-* description
-* duration
-* price if applicable
-* booking CTA
+- name
+- description
+- duration
+- price if applicable
+- booking CTA
 
 ### Booking
 
@@ -329,17 +329,17 @@ Display published resources.
 
 Display:
 
-* email
-* phone
-* address
-* social links
+- email
+- phone
+- address
+- social links
 
 ### Footer
 
-* business name
-* copyright
-* privacy link
-* terms link
+- business name
+- copyright
+- privacy link
+- terms link
 
 ---
 
@@ -351,23 +351,23 @@ Contacts represent people/business relationships.
 
 Core fields:
 
-* First name
-* Last name
-* Email
-* Phone
-* Company
-* Address
-* City
-* Province/State
-* Country
-* Postal/ZIP
-* Contact type
-* Lead status
-* Source
-* Assigned user
-* Notes
-* Created date
-* Updated date
+- First name
+- Last name
+- Email
+- Phone
+- Company
+- Address
+- City
+- Province/State
+- Country
+- Postal/ZIP
+- Contact type
+- Lead status
+- Source
+- Assigned user
+- Notes
+- Created date
+- Updated date
 
 ## Contact Types
 
@@ -375,12 +375,12 @@ Should be configurable.
 
 Initial real-estate examples:
 
-* Lead
-* Prospect
-* Client
-* Past Client
-* Referral Partner
-* Other
+- Lead
+- Prospect
+- Client
+- Past Client
+- Referral Partner
+- Other
 
 ---
 
@@ -390,14 +390,14 @@ Contacts can have multiple tags.
 
 Examples:
 
-* Buyer
-* Seller
-* Investor
-* First-Time Buyer
-* Halifax
-* Dartmouth
-* Newsletter
-* Past Client
+- Buyer
+- Seller
+- Investor
+- First-Time Buyer
+- Halifax
+- Dartmouth
+- Newsletter
+- Past Client
 
 Tags should be organization-specific.
 
@@ -429,12 +429,12 @@ Buying Timeline
 
 Custom fields should support at minimum:
 
-* text
-* number
-* date
-* boolean
-* dropdown
-* multi-select
+- text
+- number
+- date
+- boolean
+- dropdown
+- multi-select
 
 The platform should not hard-code real-estate-specific fields into the core contact table.
 
@@ -448,23 +448,23 @@ Each contact should have a chronological activity timeline.
 
 Possible activities:
 
-* Contact created
-* Contact updated
-* Form submitted
-* Appointment booked
-* Appointment cancelled
-* Appointment completed
-* Email sent
-* Email opened
-* Link clicked
-* Newsletter sent
-* Note added
-* Task created
-* Task completed
-* Resource downloaded
-* Tag added
-* Tag removed
-* Lead stage changed
+- Contact created
+- Contact updated
+- Form submitted
+- Appointment booked
+- Appointment cancelled
+- Appointment completed
+- Email sent
+- Email opened
+- Link clicked
+- Newsletter sent
+- Note added
+- Task created
+- Task completed
+- Resource downloaded
+- Tag added
+- Tag removed
+- Lead stage changed
 
 Example:
 
@@ -492,16 +492,16 @@ A lead is a potential customer/business relationship.
 
 ## Lead Fields
 
-* Contact
-* Lead source
-* Lead stage
-* Assigned user
-* Priority
-* Expected value (optional)
-* Notes
-* Created date
-* Last activity
-* Next follow-up
+- Contact
+- Lead source
+- Lead stage
+- Assigned user
+- Priority
+- Expected value (optional)
+- Notes
+- Created date
+- Last activity
+- Next follow-up
 
 ## Initial Lead Stages
 
@@ -525,14 +525,14 @@ The system should identify where a lead originated.
 
 Examples:
 
-* Public website
-* Booking
-* Lead form
-* Newsletter
-* Referral
-* Manual entry
-* Import
-* Other
+- Public website
+- Booking
+- Lead form
+- Newsletter
+- Referral
+- Manual entry
+- Import
+- Other
 
 This allows basic source analytics.
 
@@ -544,26 +544,26 @@ Businesses can create services that customers can book.
 
 ## Service Fields
 
-* Name
-* Description
-* Duration
-* Price
-* Currency
-* Location type
-* Location details
-* Active/inactive
-* Booking enabled
-* Buffer before
-* Buffer after
-* Minimum notice
-* Maximum booking window
+- Name
+- Description
+- Duration
+- Price
+- Currency
+- Location type
+- Location details
+- Active/inactive
+- Booking enabled
+- Buffer before
+- Buffer after
+- Minimum notice
+- Maximum booking window
 
 ## Location Types
 
-* In-person
-* Phone
-* Video
-* Other
+- In-person
+- Phone
+- Video
+- Other
 
 ---
 
@@ -586,11 +586,11 @@ Wednesday
 
 Availability should support:
 
-* day of week
-* start time
-* end time
-* time zone
-* active/inactive
+- day of week
+- start time
+- end time
+- time zone
+- active/inactive
 
 ---
 
@@ -600,18 +600,18 @@ Users must be able to prevent booking during unavailable periods.
 
 Examples:
 
-* vacation
-* personal appointment
-* meeting
-* holiday
-* blocked business hours
+- vacation
+- personal appointment
+- meeting
+- holiday
+- blocked business hours
 
 The system should support:
 
-* date
-* start time
-* end time
-* reason
+- date
+- start time
+- end time
+- reason
 
 ---
 
@@ -619,14 +619,14 @@ The system should support:
 
 Appointments are connected to:
 
-* contact
-* service
-* assigned staff/user
-* date
-* start time
-* end time
-* location
-* status
+- contact
+- service
+- assigned staff/user
+- date
+- start time
+- end time
+- location
+- status
 
 ## Appointment Statuses
 
@@ -669,10 +669,10 @@ MVP should support basic reminders.
 
 Examples:
 
-* booking confirmation
-* appointment reminder
-* cancellation notification
-* rescheduling notification
+- booking confirmation
+- appointment reminder
+- cancellation notification
+- rescheduling notification
 
 Reminder timing should be configurable later.
 
@@ -708,15 +708,15 @@ Businesses can create lead/inquiry forms.
 
 Forms should support:
 
-* text
-* email
-* phone
-* textarea
-* dropdown
-* multi-select
-* checkbox
-* date
-* hidden/source field
+- text
+- email
+- phone
+- textarea
+- dropdown
+- multi-select
+- checkbox
+- date
+- hidden/source field
 
 Example:
 
@@ -766,15 +766,15 @@ Users can create tasks.
 
 ## Task Fields
 
-* Title
-* Description
-* Contact
-* Lead
-* Appointment
-* Assigned user
-* Due date
-* Priority
-* Status
+- Title
+- Description
+- Contact
+- Lead
+- Appointment
+- Assigned user
+- Due date
+- Priority
+- Status
 
 ## Statuses
 
@@ -802,15 +802,15 @@ The platform should support reusable templates.
 
 Initial templates:
 
-* Welcome
-* Appointment confirmation
-* Appointment reminder
-* Appointment cancellation
-* Appointment reschedule
-* Follow-up
-* Newsletter
-* Thank you
-* Lead response
+- Welcome
+- Appointment confirmation
+- Appointment reminder
+- Appointment cancellation
+- Appointment reschedule
+- Follow-up
+- Newsletter
+- Thank you
+- Lead response
 
 Templates should support variables such as:
 
@@ -831,16 +831,16 @@ Campaigns are reusable communication objects.
 
 ## Campaign Fields
 
-* Campaign name
-* Subject
-* Preview text
-* Content
-* Sender name
-* Sender email
-* Audience/segment
-* Status
-* Scheduled date
-* Sent date
+- Campaign name
+- Subject
+- Preview text
+- Content
+- Sender name
+- Sender email
+- Audience/segment
+- Status
+- Scheduled date
+- Sent date
 
 ## Campaign Status
 
@@ -900,13 +900,13 @@ The segmentation engine should be reusable across future industries.
 
 For each campaign, track:
 
-* recipients
-* sent
-* delivered
-* bounced
-* opened
-* clicked
-* unsubscribed
+- recipients
+- sent
+- delivered
+- bounced
+- opened
+- clicked
+- unsubscribed
 
 Where supported by the selected email provider.
 
@@ -928,11 +928,11 @@ Unsubscribed: 2
 
 The system must support:
 
-* unsubscribe mechanism
-* suppression/unsubscribe status
-* sender identity
-* appropriate consent tracking
-* campaign recipient exclusions
+- unsubscribe mechanism
+- suppression/unsubscribe status
+- sender identity
+- appropriate consent tracking
+- campaign recipient exclusions
 
 The application should not send marketing emails to contacts who have opted out.
 
@@ -944,22 +944,22 @@ Businesses can publish downloadable or viewable resources.
 
 Examples:
 
-* Market Reports
-* Buyer Guides
-* Seller Guides
-* Checklists
-* PDFs
-* Articles
+- Market Reports
+- Buyer Guides
+- Seller Guides
+- Checklists
+- PDFs
+- Articles
 
 ## Resource Fields
 
-* Title
-* Description
-* File
-* Thumbnail
-* Public/private
-* Published/unpublished
-* Download count
+- Title
+- Description
+- File
+- Thumbnail
+- Public/private
+- Published/unpublished
+- Download count
 
 ---
 
@@ -967,9 +967,9 @@ Examples:
 
 A resource may optionally require:
 
-* name
-* email
-* phone
+- name
+- email
+- phone
 
 before download.
 
@@ -1001,34 +1001,34 @@ Supported triggers:
 
 Actions:
 
-* create/update contact
-* create activity
-* send confirmation
-* create follow-up task if configured
+- create/update contact
+- create activity
+- send confirmation
+- create follow-up task if configured
 
 ### Form submitted
 
 Actions:
 
-* create/update contact
-* create lead
-* create activity
-* notify user
-* create task
+- create/update contact
+- create lead
+- create activity
+- notify user
+- create task
 
 ### Appointment completed
 
 Actions:
 
-* record activity
-* create follow-up task
+- record activity
+- create follow-up task
 
 ### Resource downloaded
 
 Actions:
 
-* create/update contact
-* record activity
+- create/update contact
+- record activity
 
 A full visual automation builder is **not required**.
 
@@ -1040,14 +1040,14 @@ The dashboard should provide actionable information.
 
 ## Key metrics
 
-* Total contacts
-* New contacts
-* Open leads
-* Upcoming appointments
-* Completed appointments
-* Pending tasks
-* Campaigns sent
-* Campaign engagement
+- Total contacts
+- New contacts
+- Open leads
+- Upcoming appointments
+- Completed appointments
+- Pending tasks
+- Campaigns sent
+- Campaign engagement
 
 ## Sections
 
@@ -1078,12 +1078,12 @@ Add Service
 
 Internal notifications should support:
 
-* new lead
-* new form submission
-* new appointment
-* appointment cancellation
-* appointment rescheduling
-* assigned task
+- new lead
+- new form submission
+- new appointment
+- appointment cancellation
+- appointment rescheduling
+- assigned task
 
 Initial notification channel:
 
@@ -1097,20 +1097,20 @@ In-app notifications can be added later.
 
 Global search should eventually allow users to find:
 
-* contacts
-* leads
-* appointments
-* campaigns
-* tasks
+- contacts
+- leads
+- appointments
+- campaigns
+- tasks
 
 MVP can initially focus on contact search.
 
 Search fields:
 
-* name
-* email
-* phone
-* company
+- name
+- email
+- phone
+- company
 
 ---
 
@@ -1164,12 +1164,12 @@ Important administrative actions should be recorded.
 
 Examples:
 
-* contact deleted
-* contact updated
-* campaign sent
-* appointment cancelled
-* user added
-* service changed
+- contact deleted
+- contact updated
+- campaign sent
+- appointment cancelled
+- user added
+- service changed
 
 This provides accountability without requiring a sophisticated enterprise audit system.
 
@@ -1185,13 +1185,13 @@ However:
 
 Do not build:
 
-* tenant billing
-* subscription management
-* tenant provisioning UI
-* super-admin SaaS dashboard
-* tenant self-service onboarding
-* usage billing
-* plan management
+- tenant billing
+- subscription management
+- tenant provisioning UI
+- super-admin SaaS dashboard
+- tenant self-service onboarding
+- usage billing
+- plan management
 
 The database should simply be **tenant-ready**.
 
@@ -1777,11 +1777,11 @@ Use an external transactional/marketing email provider rather than building an e
 
 The provider should support:
 
-* transactional email
-* campaign delivery
-* delivery tracking
-* unsubscribe handling
-* webhook events
+- transactional email
+- campaign delivery
+- delivery tracking
+- unsubscribe handling
+- webhook events
 
 The exact provider should be selected based on pricing, deliverability, API simplicity and Canadian/privacy requirements.
 
@@ -1849,11 +1849,11 @@ Public users must never have direct access to private organization data.
 
 Supabase Storage can handle:
 
-* business logos
-* profile images
-* resource PDFs
-* campaign assets
-* document attachments
+- business logos
+- profile images
+- resource PDFs
+- campaign assets
+- document attachments
 
 Storage policies must respect organization boundaries.
 
@@ -1867,18 +1867,18 @@ Private files must never be exposed through predictable unrestricted URLs.
 
 The application must:
 
-* use HTTPS
-* use Supabase Auth
-* enforce RLS
-* validate server-side inputs
-* sanitize user-generated content
-* protect authenticated routes
-* protect public form endpoints from abuse
-* rate-limit sensitive public actions
-* validate uploaded files
-* restrict upload size/type
-* avoid exposing service-role keys to the client
-* log important administrative events
+- use HTTPS
+- use Supabase Auth
+- enforce RLS
+- validate server-side inputs
+- sanitize user-generated content
+- protect authenticated routes
+- protect public form endpoints from abuse
+- rate-limit sensitive public actions
+- validate uploaded files
+- restrict upload size/type
+- avoid exposing service-role keys to the client
+- log important administrative events
 
 ---
 
@@ -1888,11 +1888,11 @@ Because forms are public, they must be protected from spam.
 
 Possible controls:
 
-* rate limiting
-* CAPTCHA/Turnstile
-* honeypot field
-* server-side validation
-* submission throttling
+- rate limiting
+- CAPTCHA/Turnstile
+- honeypot field
+- server-side validation
+- submission throttling
 
 A lightweight solution should be preferred.
 
@@ -1906,10 +1906,10 @@ A visitor should not be able to enumerate other appointments.
 
 Public booking endpoints must not expose:
 
-* other customers
-* private notes
-* internal staff information beyond what is necessary
-* private calendar information
+- other customers
+- private notes
+- internal staff information beyond what is necessary
+- private calendar information
 
 ---
 
@@ -1919,13 +1919,13 @@ The platform will contain personal information.
 
 The implementation should therefore support:
 
-* consent tracking
-* unsubscribe status
-* privacy policy
-* data export
-* deletion workflows
-* access control
-* minimum necessary data collection
+- consent tracking
+- unsubscribe status
+- privacy policy
+- data export
+- deletion workflows
+- access control
+- minimum necessary data collection
 
 The final privacy/legal requirements should be reviewed according to the client's jurisdiction and actual operation.
 
@@ -1967,57 +1967,57 @@ The first client should be able to:
 
 ### Contacts
 
-* import existing contacts
-* add contacts
-* edit contacts
-* search contacts
-* tag contacts
-* view contact history
+- import existing contacts
+- add contacts
+- edit contacts
+- search contacts
+- tag contacts
+- view contact history
 
 ### Leads
 
-* receive leads
-* assign leads
-* move leads through stages
-* schedule follow-ups
+- receive leads
+- assign leads
+- move leads through stages
+- schedule follow-ups
 
 ### Services
 
-* create services
-* configure duration
-* configure availability
-* publish services
+- create services
+- configure duration
+- configure availability
+- publish services
 
 ### Appointments
 
-* receive bookings
-* view calendar
-* confirm appointments
-* cancel appointments
-* reschedule appointments
-* receive notifications
+- receive bookings
+- view calendar
+- confirm appointments
+- cancel appointments
+- reschedule appointments
+- receive notifications
 
 ### Public Experience
 
-* publish branded profile
-* display services
-* accept inquiries
-* accept bookings
-* publish resources
+- publish branded profile
+- display services
+- accept inquiries
+- accept bookings
+- publish resources
 
 ### Communications
 
-* create newsletters
-* select audience
-* send campaigns
-* view campaign performance
-* manage unsubscribe status
+- create newsletters
+- select audience
+- send campaigns
+- view campaign performance
+- manage unsubscribe status
 
 ### Management
 
-* create tasks
-* track activities
-* view dashboard metrics
+- create tasks
+- track activities
+- view dashboard metrics
 
 If the client can accomplish those workflows comfortably, the MVP has achieved its purpose.
 
@@ -2110,62 +2110,62 @@ The underlying application remains the same.
 
 ## Phase 1 — Foundation
 
-* Next.js
-* Supabase
-* Authentication
-* Database
-* RLS
-* Organization structure
-* User profiles
-* Core UI
-* Business settings
+- Next.js
+- Supabase
+- Authentication
+- Database
+- RLS
+- Organization structure
+- User profiles
+- Core UI
+- Business settings
 
 ## Phase 2 — CRM
 
-* Contacts
-* Tags
-* Custom fields
-* Leads
-* Activities
-* Notes
-* Import/export
-* Search
+- Contacts
+- Tags
+- Custom fields
+- Leads
+- Activities
+- Notes
+- Import/export
+- Search
 
 ## Phase 3 — Public Presence
 
-* Business profile
-* Public page
-* Services
-* Public forms
-* Resources
+- Business profile
+- Public page
+- Services
+- Public forms
+- Resources
 
 ## Phase 4 — Booking
 
-* Availability
-* Blocked times
-* Appointment engine
-* Booking flow
-* Confirmation
-* Cancellation
-* Rescheduling
-* Appointment dashboard
+- Availability
+- Blocked times
+- Appointment engine
+- Booking flow
+- Confirmation
+- Cancellation
+- Rescheduling
+- Appointment dashboard
 
 ## Phase 5 — Communication
 
-* Email provider
-* Templates
-* Campaigns
-* Segmentation
-* Delivery
-* Unsubscribe
-* Analytics
+- Email provider
+- Templates
+- Campaigns
+- Segmentation
+- Delivery
+- Unsubscribe
+- Analytics
 
 ## Phase 6 — Productivity
 
-* Tasks
-* Follow-ups
-* Basic automations
-* Notifications
+- Tasks
+- Follow-ups
+- Basic automations
+- Notifications
 
 ## Phase 7 — Validation
 
@@ -2175,12 +2175,12 @@ Observe actual usage.
 
 Identify:
 
-* unused features
-* missing workflows
-* confusing screens
-* manual workarounds
-* requested integrations
-* performance issues
+- unused features
+- missing workflows
+- confusing screens
+- manual workarounds
+- requested integrations
+- performance issues
 
 Only then evolve the platform.
 
@@ -2252,16 +2252,16 @@ That keeps the product coherent.
 
 The first client's real-estate workflow gives us the initial use case, while the underlying architecture remains generic enough to later support:
 
-* real estate
-* mortgage
-* insurance
-* consulting
-* professional services
-* agencies
-* contractors
-* nonprofits
-* churches
-* other relationship-driven SMBs
+- real estate
+- mortgage
+- insurance
+- consulting
+- professional services
+- agencies
+- contractors
+- nonprofits
+- churches
+- other relationship-driven SMBs
 
 ---
 

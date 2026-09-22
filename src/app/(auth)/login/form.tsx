@@ -9,10 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 export function LoginForm({ notice }: { notice?: string }) {
-  const [state, formAction, pending] = useActionState<AuthFormState, FormData>(
-    signInAction,
-    {},
-  );
+  const [state, formAction, pending] = useActionState<AuthFormState, FormData>(signInAction, {});
 
   return (
     <form action={formAction} className="flex flex-col gap-4">

@@ -23,7 +23,9 @@ export async function signInAction(
   _prev: AuthFormState,
   formData: FormData,
 ): Promise<AuthFormState> {
-  const email = String(formData.get("email") ?? "").trim().toLowerCase();
+  const email = String(formData.get("email") ?? "")
+    .trim()
+    .toLowerCase();
   const password = String(formData.get("password") ?? "");
 
   if (!email || !password) {
@@ -47,7 +49,9 @@ export async function signUpAction(
   formData: FormData,
 ): Promise<AuthFormState> {
   const fullName = String(formData.get("fullName") ?? "").trim();
-  const email = String(formData.get("email") ?? "").trim().toLowerCase();
+  const email = String(formData.get("email") ?? "")
+    .trim()
+    .toLowerCase();
   const password = String(formData.get("password") ?? "");
   const confirm = String(formData.get("confirmPassword") ?? "");
 
@@ -80,8 +84,7 @@ export async function signUpAction(
   }
 
   return {
-    success:
-      "Check your inbox to confirm your email address, then sign in.",
+    success: "Check your inbox to confirm your email address, then sign in.",
   };
 }
 
@@ -95,7 +98,9 @@ export async function resetPasswordAction(
   _prev: AuthFormState,
   formData: FormData,
 ): Promise<AuthFormState> {
-  const email = String(formData.get("email") ?? "").trim().toLowerCase();
+  const email = String(formData.get("email") ?? "")
+    .trim()
+    .toLowerCase();
 
   if (!email) {
     return { error: "Email is required." };
