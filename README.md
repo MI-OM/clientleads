@@ -50,6 +50,7 @@ Open [http://localhost:3000](http://localhost:3000).
 | `npm run format` | Prettier write |
 | `npm run format:check` | Prettier check |
 | `npm run test:rls` | RLS isolation check against the live Supabase project (skips when env is unset) |
+| `npm run test:auth` | Live auth smoke test: signup → auto-join → sign-in → org visibility (skips when env is unset) |
 
 ## Database (migrations)
 

@@ -10,7 +10,8 @@
     "typecheck": "next typegen && tsc --noEmit",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "test:rls": "node scripts/check-rls.mjs"
+    "test:rls": "node scripts/check-rls.mjs",
+    "test:auth": "node scripts/smoke-auth.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",

@@ -29,7 +29,7 @@
 | Milestone | Phase | Target | Status | Notes |
 |---|---|---|---|---|
 | M0 | Project Setup | — | In Progress | Implementation done — Supabase created + creds in `.env.local`; GitHub push pending |
-| M1 | Foundation | Week 1–2 | In Progress | Code complete — migrations applied but the applied RLS policies have a recursion bug; corrected + idempotent migrations ready to re-paste |
+| M1 | Foundation | Week 1–2 | In Progress | Code + migrations verified live: RLS 6/6, auth smoke 7/7. Remaining: real account + branding data + GitHub push |
 | M2 | CRM | Week 3–5 | Not Started | |
 | M3 | Public Presence | Week 6–7 | Not Started | |
 | M4 | Booking | Week 8–10 | Not Started | |
@@ -73,9 +73,9 @@
   - [x] Seed the first real-estate client organization (placeholder `First Client Real Estate` — rename before go-live)
   - [x] Auto-add registering users to the org (single-org flow, membership-based — no provisioning UI) via `on_auth_user_created` trigger → `auto_join_organization()`
   - [x] Helper: current user's org + role resolution (`src/lib/auth/org.ts` — `getMyOrg`, `requireUser`, cached per request)
-- [ ] **RLS (PRD §61)**
+- [x] **RLS (PRD §61)**
   - [x] Membership-based RLS policy template applied to every tenant table (policies + grants ship in the same migration as each table)
-  - [ ] Automated RLS test script: user A cannot read/write another org's rows — **`scripts/check-rls.mjs` written (`npm run test:rls`); run against live project once creds are set**
+  - [x] Automated RLS test script: user A cannot read/write another org's rows — `scripts/check-rls.mjs` (`npm run test:rls`) — **6/6 PASS against live project**; `scripts/smoke-auth.mjs` (`npm run test:auth`) — **7/7 PASS** (signup → auto-join → sign-in → org visibility → staff restrictions)
 - [x] **Business Profile / Settings (PRD §8)**
   - [x] Org profile edit: name, logo, contact info, address, timezone, social links, slug (`/dashboard/settings`, owner/admin-gated)
   - [x] Branding settings: primary/secondary colors
@@ -346,7 +346,7 @@ Do **not** start these until M7 validation completes:
 
 | Concern | Where enforced | Status |
 |---|---|---|
-| RLS on every new table | Every migration in M1–M6 | Not Started |
+| RLS on every new table | Every migration in M1–M6 | In Progress — M1 tables verified 6/6 |
 | `organization_id` on tenant tables | Every migration in M1–M6 | Not Started |
 | Server-side validation | Every endpoint, M3–M6 | Not Started |
 | Activity recorded for meaningful events | Every module, M2–M6 | Not Started |
@@ -396,3 +396,4 @@ _Record decisions made during development that the PRD leaves open, and any devi
 | 2026-09-22 | M0 implemented: Next 16 scaffold, design system, dashboard shell, Supabase scaffolding, CI, Vercel target | AI |
 | 2026-09-22 | M1 implemented: auth pages/actions + confirm route, tenancy migrations + RLS, org/role helpers, business branding + logo upload, account settings, RLS test script | AI |
 | 2026-09-22 | **RLS recursion fix:** first applied migration v1 inlined `exists(organization_members)` inside policies on the same table → Postgres `42P17` infinite recursion, surfaced by the live project. Corrected to SECURITY DEFINER helpers (`is_org_member`/`is_org_admin`); migrations now fully idempotent | AI |
+| 2026-09-22 | **M1 verified live:** cross-org RLS isolation `test:rls` 6/6 PASS; auth journey `test:auth` 7/7 PASS (signup → profile/auto-join trigger → password sign-in → org visibility → staff block on settings). Signup rate-limit fallback noted in smoke script | AI |

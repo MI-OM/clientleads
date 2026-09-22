@@ -4,7 +4,9 @@
  *   "a user can only access records of an organization they belong to"
  *
  * Flow: creates two throwaway users + two orgs, assigns each user to one
- * org, then asserts neither can read or mutate the other's data.
+ * org, then asserts neither can read or mutate the other's data. (Test users
+ * also auto-join the seeded default org via the signup trigger — that extra
+ * membership is expected and must never leak the other org's rows.)
  * All test data is cleaned up afterwards.
  *
  * Requires (in the environment): NEXT_PUBLIC_SUPABASE_URL,
@@ -126,16 +128,29 @@ try {
   record("A reads its own org", !orgsA.error && orgsA.data.length === 1);
   record("A cannot read B's org", !orgsFromBAsA.error && orgsFromBAsA.data.length === 0);
 
-  const updateB = await clientA.from("organizations").update({ name: "Hacked" }).eq("id", orgB.id);
-  record("A cannot update B's org", !!updateB.error);
+  // RLS filters cross-org updates to 0 rows (no error, no data change) —
+  // verify by checking the target row is untouched afterwards.
+  const beforeUpdate = (
+    await admin.from("organizations").select("name").eq("id", orgB.id).single()
+  ).data;
+  await clientA.from("organizations").update({ name: "Hacked" }).eq("id", orgB.id);
+  const afterUpdate = (
+    await admin.from("organizations").select("name").eq("id", orgB.id).single()
+  ).data;
+  record(
+    "A cannot update B's org",
+    beforeUpdate?.name !== undefined &&
+      beforeUpdate.name === afterUpdate?.name &&
+      afterUpdate.name !== "Hacked",
+  );
 
-  const membersA = await clientA
+  const membersOfBAsA = await clientA
     .from("organization_members")
     .select("organization_id")
-    .eq("user_id", userA.id);
+    .eq("organization_id", orgB.id);
   record(
-    "A sees only own memberships",
-    !membersA.error && membersA.data.every((m) => m.organization_id === orgA.id),
+    "A cannot read B's memberships",
+    !membersOfBAsA.error && membersOfBAsA.data.length === 0,
   );
 
   // B as the mirror check
@@ -159,4 +174,4 @@ try {
 
 const failed = results.filter((r) => !r.ok);
 console.log(`\n${results.length - failed.length}/${results.length} checks passed`);
-process.exit(failed.length > 0 ? 1 : 0);
+process.exitCode = failed.length > 0 ? 1 : 0;
