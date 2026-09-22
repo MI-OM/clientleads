@@ -344,11 +344,15 @@ create policy profiles_select_org_member on public.profiles for select
 -- SECURITY DEFINER + member guard: prevents a member from writing
 -- activities into another org, while still allowing the triggers (and
 -- future anon/public form flows, where auth.uid() is null) to log.
+-- NB: every parameter AFTER a defaulted one must also have a default
+-- (Postgres error 42P13). p_activity_type is defaulted to null purely to
+-- satisfy that ordering rule; the activities.activity_type column is
+-- NOT NULL, so a missing type still fails at insert time.
 create or replace function public.log_activity(
   p_organization_id uuid,
   p_contact_id      uuid default null,
   p_lead_id         uuid default null,
-  p_activity_type   text,
+  p_activity_type   text default null,
   p_subject         text default null,
   p_description     text default null,
   p_metadata        jsonb default '{}'::jsonb
