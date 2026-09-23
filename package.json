@@ -12,7 +12,8 @@
     "format:check": "prettier --check .",
     "test:rls": "node scripts/check-rls.mjs",
     "test:auth": "node scripts/smoke-auth.mjs",
-    "test:crm": "node scripts/smoke-crm.mjs"
+    "test:crm": "node scripts/smoke-crm.mjs",
+    "test:public": "node scripts/smoke-public.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",

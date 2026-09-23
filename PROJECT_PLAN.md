@@ -31,8 +31,8 @@
 | --------- | ------------------- | ---------- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
 | M0        | Project Setup       | —          | In Progress | Implementation done — Supabase created + creds in `.env.local`; GitHub push pending                                                                |
 | M1        | Foundation          | Week 1–2   | In Progress | Code + migrations verified live: RLS 6/6, auth smoke 7/7. Remaining: real account + branding data + GitHub push                                    |
-| M2        | CRM                 | Week 3–5   | In Progress | Code + `20260922000003_m2_crm.sql` written; build/typecheck green. **Awaiting migration paste in Supabase**, then live verify (`npm run test:crm`) |
-| M3        | Public Presence     | Week 6–7   | Not Started |                                                                                                                                                    |
+| M2        | CRM                 | Week 3–5   | Done       | `20260922000003_m2_crm.sql` applied + live-verified (CRM 16/16, RLS 6/6, auth 7/7); import template shipped. Remaining (user): own account + owner role + GitHub push                                |
+| M3        | Public Presence     | Week 6–7   | In Progress | Code + `20260922000004_m3_public.sql` written; build/typecheck green. **Awaiting migration paste**, then live verify (`npm run test:public`)                                                |
 | M4        | Booking             | Week 8–10  | Not Started |                                                                                                                                                    |
 | M5        | Communication       | Week 11–13 | Not Started | Requires email provider decision                                                                                                                   |
 | M6        | Productivity        | Week 14–15 | Not Started |                                                                                                                                                    |
@@ -147,22 +147,23 @@
 
 ### Tasks
 
-- [ ] **Services (PRD §16)**
-  - [ ] Service CRUD: name, description, duration, price/currency, location type, active, booking-enabled flag, buffers, minimum notice, max booking window
-- [ ] **Public Business Page (PRD §9)**
-  - [ ] `/[businessSlug]` route: header, hero, about, services, lead form, resources, contact, footer
-  - [ ] Brand colors applied; mobile-first layout (PRD §70)
-  - [ ] 404 for unknown/disabled slugs
-- [ ] **Forms (PRD §22–23)**
-  - [ ] Form builder: text, email, phone, textarea, dropdown, multi-select, checkbox, date, hidden/source
-  - [ ] Public form rendering + submission endpoint
-  - [ ] Submission workflow: validate → find/create contact (email/phone match) → activity → create/update lead → assign source → notify business
-  - [ ] Spam controls: honeypot + rate limiting + server-side validation (CAPTCHA only if needed) (PRD §67)
-- [ ] **Resources (PRD §30–31)**
-  - [ ] Resource CRUD: title, description, file, thumbnail, public/private, published/unpublished, download count
-  - [ ] Storage policies per visibility; private files never via predictable URLs (PRD §65)
-  - [ ] Gated resources: name/email/phone form before download → contact create/update → activity
-- [ ] **Notifications (PRD §34)** — email notifications for new lead / form submission (needs M5 provider; interim: single transactional email)
+- [x] **Services (PRD §16)** — `/dashboard/services` CRUD (owner/admin)
+  - [x] Service CRUD: name, description, duration, price/currency, location type, active, booking-enabled flag, buffers, minimum notice, max booking window
+- [x] **Public Business Page (PRD §9)** — `/[businessSlug]` (e.g. `/first-client`)
+  - [x] `/[businessSlug]` route: header, hero, about, services, lead form, resources, contact, footer
+  - [x] Brand colors applied (`primary_color`/`secondary_color` as CSS vars); mobile-first layout (PRD §70)
+  - [x] 404 for unknown slugs (`get_public_page` → null → `notFound()`)
+- [x] **Forms (PRD §22–23)** — `/dashboard/forms` builder (owner/admin)
+  - [x] Form builder: text, email, phone, textarea, dropdown, multi-select, checkbox, date, hidden/source
+  - [x] Public form rendering + submission endpoint (server action → SECURITY DEFINER RPC)
+  - [x] Submission workflow: validate → find/create contact (email/phone match) → activity → create/update lead → assign source
+  - [x] Spam controls: honeypot + per-IP rate limiting (10/hr/form) + server-side validation (PRD §67)
+  - [ ] Notify business on new lead — **deferred to M5** (email provider decision); submission already writes activity + lead + audit metadata for M5
+- [x] **Resources (PRD §30–31)** — `/dashboard/resources` CRUD (owner/admin)
+  - [x] Resource CRUD: title, description, file, public/private, published/unpublished, gated, download count
+  - [x] Storage policies per visibility; private `resources` bucket, files served only via short-lived signed URLs (PRD §65)
+  - [x] Gated resources: name/email/phone form before download → contact create/update → activity (one-time tokens)
+- [ ] **Notifications (PRD §34)** — email notification for new lead / form submission — **M5** (provider decision pending); the M3 flow records activity + lead + form metadata ready for M5 to consume
 
 ### Acceptance Criteria
 
