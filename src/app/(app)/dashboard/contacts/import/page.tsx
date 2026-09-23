@@ -1,7 +1,13 @@
 import { getMyOrg } from "@/lib/auth/org";
 import { PageHeader } from "@/components/dashboard/page-header";
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { ImportWizard } from "./import-wizard";
+import { SampleCsvTemplate } from "./sample-csv-template";
 
 export default async function ImportContactsPage() {
   const ctx = await getMyOrg();
@@ -23,7 +29,10 @@ export default async function ImportContactsPage() {
         title="Import contacts"
         description="Bring your existing list into ClientLeads from a CSV (PRD §36)."
       />
-      <ImportWizard />
+      <div className="flex gap-2">
+        <SampleCsvTemplate />
+        <ImportWizard />
+      </div>
     </div>
   );
 }
