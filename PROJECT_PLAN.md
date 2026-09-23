@@ -33,7 +33,7 @@
 | M1        | Foundation          | Week 1–2   | In Progress | Code + migrations verified live: RLS 6/6, auth smoke 7/7. Remaining: real account + branding data + GitHub push                                    |
 | M2        | CRM                 | Week 3–5   | Done       | `20260922000003_m2_crm.sql` applied + live-verified (CRM 16/16, RLS 6/6, auth 7/7); import template shipped. Remaining (user): own account + owner role + GitHub push                                |
 | M3        | Public Presence     | Week 6–7   | Done    | **Live-verified 2026-09-23** — `npm run test:public` 34/34 + `npm run test:pages` 16/16 (`debd36e` + `13f5932`)                                                                                       |
-| M4        | Booking             | Week 8–10  | Not Started |                                                                                                                                                    |
+| M4        | Booking             | Week 8–10  | In Progress | Code + `20260922000005_m4_booking.sql` written, build/typecheck green — needs migration paste + live smoke (`npm run test:booking`) |
 | M5        | Communication       | Week 11–13 | Not Started | Requires email provider decision                                                                                                                   |
 | M6        | Productivity        | Week 14–15 | Not Started |                                                                                                                                                    |
 | M7        | Validation & Launch | Week 16    | Not Started |                                                                                                                                                    |
@@ -181,23 +181,24 @@
 
 ### Tasks
 
-- [ ] **Availability (PRD §17)** — weekly rules: day, start/end time, timezone, active; per-user or org-level
-- [ ] **Blocked Times (PRD §18)** — date/time ranges with reason
-- [ ] **Appointment engine**
-  - [ ] Slot computation: availability − blocked times − existing appointments − buffers − minimum-notice/max-window rules
-  - [ ] `appointments` table with statuses: Scheduled, Confirmed, Completed, Cancelled, No-show, Rescheduled
-  - [ ] Conflict-safe booking (server-side re-validation + DB constraint to prevent double-booking)
-- [ ] **Public booking flow (PRD §19)**
-  - [ ] `/[slug]/book` → service → date → time → contact info → confirm
-  - [ ] Creates/updates contact, records activity, sends confirmation
-  - [ ] Secure, non-enumerable booking tokens (PRD §68)
-- [ ] **Confirmation / Cancellation / Rescheduling (PRD §20–21)**
-  - [ ] Public reschedule/cancel via secure token link
-  - [ ] Emails to business + client on all status changes
-- [ ] **Internal appointment management**
-  - [ ] Calendar/list view; confirm, complete, cancel, reschedule, mark no-show
-  - [ ] Dashboard widgets: upcoming appointments (PRD §33)
-- [ ] **Reminders (PRD §20)** — 24h and 2h before appointment (timing config deferred)
+- [x] **Availability (PRD §17)** — weekly rules: day, start/end time, timezone, active; per-user or org-level
+- [x] **Blocked Times (PRD §18)** — date/time ranges with reason
+- [x] **Appointment engine**
+  - [x] Slot computation: availability − blocked times − existing appointments − buffers − minimum-notice/max-window rules
+  - [x] `appointments` table with statuses: Scheduled, Confirmed, Completed, Cancelled, No-show, Rescheduled
+  - [x] Conflict-safe booking (server-side re-validation + btree_gist exclusion constraint preventing double-booking)
+- [x] **Public booking flow (PRD §19)**
+  - [x] `/[slug]/book` → service → date → time → contact info → confirm
+  - [x] Creates/updates contact, records activity, sends confirmation (Resend, key-gated)
+  - [x] Secure, non-enumerable booking tokens (PRD §68) + 5 bookings/IP/hour rate limit + honeypot
+- [x] **Confirmation / Cancellation / Rescheduling (PRD §20–21)**
+  - [x] Public reschedule/cancel via secure token link
+  - [x] Emails to business + client on all status changes
+- [x] **Internal appointment management**
+  - [x] List view; confirm, complete, cancel, mark no-show
+  - [x] Dashboard widgets: upcoming appointments (PRD §33) + Availability page
+- [ ] **Reminders (PRD §20)** — 24h and 2h before appointment (deferred per plan)
+- [ ] **Live verification** — user pastes `20260922000005_m4_booking.sql`, then `npm run test:booking` + `npm run test:pages`
 
 ### Acceptance Criteria
 

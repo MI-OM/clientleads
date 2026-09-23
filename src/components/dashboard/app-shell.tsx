@@ -40,7 +40,7 @@ const overviewNav: NavEntry[] = [{ title: "Dashboard", href: "/dashboard", icon:
 const moduleNav: NavEntry[] = [
   { title: "Contacts", href: "/dashboard/contacts", icon: Users },
   { title: "Leads", href: "/dashboard/leads", icon: Target },
-  { title: "Appointments", href: "/dashboard/appointments", icon: CalendarDays, milestone: "M4" },
+  { title: "Appointments", href: "/dashboard/appointments", icon: CalendarDays },
   { title: "Services", href: "/dashboard/services", icon: Wrench },
   { title: "Tasks", href: "/dashboard/tasks", icon: ListTodo, milestone: "M6" },
   { title: "Campaigns", href: "/dashboard/campaigns", icon: Megaphone, milestone: "M5" },
@@ -51,6 +51,7 @@ const moduleNav: NavEntry[] = [
 ];
 
 const manageNav: NavEntry[] = [
+  { title: "Availability", href: "/dashboard/availability", icon: CalendarDays },
   { title: "Settings", href: "/dashboard/settings", icon: Settings },
   { title: "Custom fields", href: "/dashboard/settings/fields", icon: ListTodo },
 ];

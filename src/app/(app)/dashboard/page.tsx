@@ -2,6 +2,7 @@ import Link from "next/link";
 import { AlertTriangle } from "lucide-react";
 import { getMyOrg } from "@/lib/auth/org";
 import { getDashboardCounts } from "@/lib/crm/queries";
+import { countUpcomingAppointments } from "@/lib/booking/queries";
 import { PageHeader } from "@/components/dashboard/page-header";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
@@ -12,6 +13,9 @@ export default async function DashboardPage() {
   const configured = isSupabaseConfigured();
   const ctx = await getMyOrg();
   const counts = ctx ? await getDashboardCounts(ctx.org.id) : null;
+  const upcomingAppointments = ctx
+    ? await countUpcomingAppointments(ctx.org.id, new Date().toISOString())
+    : null;
 
   const linkAction = (href: string, label: string) => (
     <Link href={href} className={buttonVariants({ variant: "outline" })}>
@@ -26,7 +30,7 @@ export default async function DashboardPage() {
         description="An action-oriented overview of your business."
         actions={
           <Badge variant="secondary" className="h-fit">
-            CRM · M2
+            CRM · M4
           </Badge>
         }
       />
@@ -76,8 +80,12 @@ export default async function DashboardPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-semibold">—</p>
-            <p className="mt-1 text-xs text-muted-foreground">Booking lands in M4</p>
+            <p className="text-3xl font-semibold">
+              {upcomingAppointments?.toLocaleString() ?? "—"}
+            </p>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Scheduled + confirmed, from now on
+            </p>
           </CardContent>
         </Card>
         <Card>
@@ -106,13 +114,18 @@ export default async function DashboardPage() {
           >
             Import contacts
           </Link>
-          <span
-            className={buttonVariants({ variant: "outline" }) + " cursor-not-allowed opacity-50"}
-            title="Bookings land in M4"
-            aria-disabled
+          <Link
+            href="/dashboard/availability"
+            className={buttonVariants({ variant: "outline" })}
           >
-            Book appointment
-          </span>
+            Set availability
+          </Link>
+          <Link
+            href="/dashboard/appointments"
+            className={buttonVariants({ variant: "outline" })}
+          >
+            View appointments
+          </Link>
           <span
             className={buttonVariants({ variant: "outline" }) + " cursor-not-allowed opacity-50"}
             title="Campaigns land in M5"

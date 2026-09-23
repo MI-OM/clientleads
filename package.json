@@ -15,7 +15,8 @@
     "test:crm": "node scripts/smoke-crm.mjs",
     "test:public": "node scripts/smoke-public.mjs",
     "test:pages": "node scripts/check-pages.mjs",
-    "test:upload": "node scripts/check-upload.mjs"
+    "test:upload": "node scripts/check-upload.mjs",
+    "test:booking": "node scripts/smoke-booking.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",

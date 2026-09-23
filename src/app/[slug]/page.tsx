@@ -70,7 +70,15 @@ function SectionTitle({ children }: { children: ReactNode }) {
   );
 }
 
-function ServiceCard({ service, enquireHref }: { service: PublicService; enquireHref: string }) {
+function ServiceCard({
+  service,
+  enquireHref,
+  bookHref,
+}: {
+  service: PublicService;
+  enquireHref: string;
+  bookHref?: string;
+}) {
   return (
     <article className="flex flex-col gap-3 rounded-lg border border-border bg-card p-5 shadow-sm">
       <h3 className="text-lg font-semibold">{service.name}</h3>
@@ -83,17 +91,27 @@ function ServiceCard({ service, enquireHref }: { service: PublicService; enquire
         </div>
         <div className="text-muted-foreground">{locationShort(service.location_type)}</div>
       </dl>
-      <div className="flex items-center justify-between gap-3 border-t border-border pt-3">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-border pt-3">
         <span className="text-base font-semibold">
           {formatPrice(service.price, service.currency) ?? "Pricing on request"}
         </span>
-        <a
-          href={enquireHref}
-          className="rounded-md px-3 py-1.5 text-sm font-medium text-white transition-opacity hover:opacity-90"
-          style={{ backgroundColor: "var(--brand)" }}
-        >
-          Enquire
-        </a>
+        <div className="flex items-center gap-2">
+          {bookHref ? (
+            <Link
+              href={bookHref}
+              className="rounded-md px-3 py-1.5 text-sm font-medium text-white transition-opacity hover:opacity-90"
+              style={{ backgroundColor: "var(--brand)" }}
+            >
+              Book
+            </Link>
+          ) : null}
+          <a
+            href={enquireHref}
+            className="rounded-md border border-border px-3 py-1.5 text-sm font-medium transition-colors hover:bg-muted"
+          >
+            Enquire
+          </a>
+        </div>
       </div>
     </article>
   );
@@ -241,6 +259,11 @@ export default async function PublicBusinessPage({ params }: PageProps) {
                   key={service.id}
                   service={service}
                   enquireHref={page.forms.length > 0 ? "#lead" : "#contact"}
+                  bookHref={
+                    service.booking_enabled
+                      ? `/${org.slug}/book?service=${service.id}`
+                      : undefined
+                  }
                 />
               ))}
             </div>
