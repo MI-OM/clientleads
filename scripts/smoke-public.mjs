@@ -71,13 +71,15 @@ const tag = Date.now().toString(36);
 const cleanupIds = { contacts: [], leads: [], resources: [], gates: [], events: [] };
 
 try {
-  // 0) Tables exist
-  const { data: tables } = await admin
-    .from("pg_tables")
-    .select("tablename")
-    .in("tablename", ["services", "public_forms", "form_fields", "resources", "resource_gates", "form_submission_events"]);
-  const tableNames = new Set((tables ?? []).map((t) => t.tablename));
-  for (const t of ["services", "public_forms", "form_fields", "resources", "resource_gates", "form_submission_events"]) {
+  // 0) Tables exist — probe each with a trivial service-role select (bypasses
+  //    RLS). PostgREST in this project only exposes the `public` schema, so the
+  //    pg_tables / information_schema reflection views are NOT reachable over
+  //    REST; an absent table surfaces as "Could not find the table ...".
+  const tableNames = new Set();
+  const EXPECTED_TABLES = ["services", "public_forms", "form_fields", "resources", "resource_gates", "form_submission_events"];
+  for (const t of EXPECTED_TABLES) {
+    const { error } = await admin.from(t).select("id").limit(1);
+    if (!error || !/could not find the table/i.test(error.message)) tableNames.add(t);
     record(`table ${t} exists`, tableNames.has(t));
   }
   if (!tableNames.has("services")) {

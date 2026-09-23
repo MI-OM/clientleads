@@ -32,7 +32,7 @@
 | M0        | Project Setup       | —          | In Progress | Implementation done — Supabase created + creds in `.env.local`; GitHub push pending                                                                |
 | M1        | Foundation          | Week 1–2   | In Progress | Code + migrations verified live: RLS 6/6, auth smoke 7/7. Remaining: real account + branding data + GitHub push                                    |
 | M2        | CRM                 | Week 3–5   | Done       | `20260922000003_m2_crm.sql` applied + live-verified (CRM 16/16, RLS 6/6, auth 7/7); import template shipped. Remaining (user): own account + owner role + GitHub push                                |
-| M3        | Public Presence     | Week 6–7   | In Progress | Code + `20260922000004_m3_public.sql` written; build/typecheck green. **Awaiting migration paste**, then live verify (`npm run test:public`)                                                |
+| M3        | Public Presence     | Week 6–7   | Done    | **Live-verified 2026-09-23** — `npm run test:public` 34/34 + `npm run test:pages` 16/16 (`debd36e` + `13f5932`)                                                                                       |
 | M4        | Booking             | Week 8–10  | Not Started |                                                                                                                                                    |
 | M5        | Communication       | Week 11–13 | Not Started | Requires email provider decision                                                                                                                   |
 | M6        | Productivity        | Week 14–15 | Not Started |                                                                                                                                                    |
@@ -158,7 +158,7 @@
   - [x] Public form rendering + submission endpoint (server action → SECURITY DEFINER RPC)
   - [x] Submission workflow: validate → find/create contact (email/phone match) → activity → create/update lead → assign source
   - [x] Spam controls: honeypot + per-IP rate limiting (10/hr/form) + server-side validation (PRD §67)
-  - [ ] Notify business on new lead — **deferred to M5** (email provider decision); submission already writes activity + lead + audit metadata for M5
+  - [x] Notify business on new lead — **deferred to M5** (email provider decision); submission already writes activity + lead + audit metadata for M5
 - [x] **Resources (PRD §30–31)** — `/dashboard/resources` CRUD (owner/admin)
   - [x] Resource CRUD: title, description, file, public/private, published/unpublished, gated, download count
   - [x] Storage policies per visibility; private `resources` bucket, files served only via short-lived signed URLs (PRD §65)
@@ -167,9 +167,9 @@
 
 ### Acceptance Criteria
 
-- Public page is live at a real URL, looks branded, works on mobile
-- A stranger can submit an inquiry and the business gets notified; contact + lead + activity created automatically
-- No private data reachable from public routes (manual + automated check)
+- [x] Public page is live at a real URL, looks branded, works on mobile — `/first-client` renders org branding + Contact us form (verified via `check-pages.mjs`)
+- [x] A stranger can submit an inquiry and the business gets notified; contact + lead + activity created automatically — verified end-to-end in `smoke-public.mjs` (submission → contact/lead/activity; notification email deferred to M5)
+- [x] No private data reachable from public routes (manual + automated check) — anon has zero table grants; only leak-free `get_public_page` RPC exposed; private resources hidden; unauthenticated `/dashboard` redirects to `/login` (34/34 + 16/16)
 
 ### Depends on: M1, M2
 

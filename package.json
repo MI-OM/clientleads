@@ -13,7 +13,8 @@
     "test:rls": "node scripts/check-rls.mjs",
     "test:auth": "node scripts/smoke-auth.mjs",
     "test:crm": "node scripts/smoke-crm.mjs",
-    "test:public": "node scripts/smoke-public.mjs"
+    "test:public": "node scripts/smoke-public.mjs",
+    "test:pages": "node scripts/check-pages.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",
