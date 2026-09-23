@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { getMyOrg } from "@/lib/auth/org";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 export interface ResourceActionState {
   error?: string;
@@ -11,12 +12,36 @@ export interface ResourceActionState {
 
 const MAX_FILE_SIZE = 50 * 1024 * 1024; // bucket limit (50 MB)
 
-function safeExt(name: string): string {
-  const ext = name.split(".").pop()?.toLowerCase() ?? "";
-  return ext && ext.length <= 8 ? `.${ext}` : "";
+/**
+ * File uploads go straight from the browser to the private `resources` bucket
+ * (storage RLS limits writes to the user's own org + owner/admin role). The
+ * server action only records metadata, so nothing large crosses the Server
+ * Action body (1 MB Next default, 4.5 MB Vercel functions).
+ *
+ * Owned paths are minted client-side as `orgs/<orgId>/<file>` — we re-check
+ * that the claimed path sits inside the caller's org prefix and actually
+ * exists in storage before creating the row.
+ */
+function parseOwnedPath(orgId: string, raw: string | undefined): string | null {
+  const prefix = `orgs/${orgId}/`;
+  const path = String(raw ?? "").trim();
+  const rest = path.startsWith(prefix) ? path.slice(prefix.length) : "";
+  if (rest.length === 0 || rest.includes("/")) return null;
+  return path;
 }
 
-/** Owner/admin-only: create a resource with an uploaded file (PRD §30). */
+async function storageObjectExists(supabase: SupabaseClient, path: string): Promise<boolean> {
+  const idx = path.lastIndexOf("/");
+  const folder = path.slice(0, idx);
+  const name = path.slice(idx + 1);
+  const { data } = await supabase.storage.from("resources").list(folder, {
+    limit: 1000,
+    search: name,
+  });
+  return (data ?? []).some((o) => o.name === name);
+}
+
+/** Owner/admin-only: create a resource from an already-uploaded file (PRD §30). */
 export async function createResourceAction(
   _prev: ResourceActionState,
   formData: FormData,
@@ -30,49 +55,38 @@ export async function createResourceAction(
   const title = String(formData.get("title") ?? "").trim();
   if (!title) return { error: "Title is required." };
 
-  const file = formData.get("file");
-  if (!(file instanceof File) || file.size === 0) {
-    return { error: "Choose a file to upload." };
-  }
-  if (file.size > MAX_FILE_SIZE) {
+  const filePath = parseOwnedPath(ctx.org.id, String(formData.get("file_path") ?? ""));
+  if (!filePath) return { error: "Upload didn't finish — please choose the file again." };
+
+  const fileSize = Number(formData.get("file_size") ?? 0);
+  if (!Number.isFinite(fileSize) || fileSize <= 0 || fileSize > MAX_FILE_SIZE) {
     return { error: "Files must be smaller than 50 MB." };
   }
 
-  const fileName = file.name.trim() || "download";
-  const path = `orgs/${ctx.org.id}/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
+  const thumbnailRaw = String(formData.get("thumbnail_path") ?? "").trim();
+  const thumbnailPath = thumbnailRaw ? parseOwnedPath(ctx.org.id, thumbnailRaw) : null;
+  if (thumbnailRaw && !thumbnailPath) {
+    return { error: "Upload didn't finish — please choose the file again." };
+  }
 
   const supabase = await createClient();
-
-  const { error: uploadError } = await supabase.storage
-    .from("resources")
-    .upload(path, file, { contentType: file.type || "application/octet-stream", upsert: false });
-  if (uploadError) return { error: friendlyDbError(uploadError.message) };
-
-  const thumbnail = formData.get("thumbnail");
-  let thumbnailPath: string | null = null;
-  if (thumbnail instanceof File && thumbnail.size > 0) {
-    if (thumbnail.size > MAX_FILE_SIZE) {
-      await supabase.storage.from("resources").remove([path]);
-      return { error: "Thumbnails must be smaller than 50 MB." };
-    }
-    thumbnailPath = `orgs/${ctx.org.id}/thumb-${Date.now()}-${thumbnail.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
-    const { error: thumbError } = await supabase.storage
-      .from("resources")
-      .upload(thumbnailPath, thumbnail, { contentType: thumbnail.type, upsert: false });
-    if (thumbError) {
-      await supabase.storage.from("resources").remove([path]);
-      return { error: friendlyDbError(thumbError.message) };
-    }
+  if (!(await storageObjectExists(supabase, filePath))) {
+    return { error: "Upload didn't finish — please choose the file again." };
   }
+  if (thumbnailPath && !(await storageObjectExists(supabase, thumbnailPath))) {
+    return { error: "Upload didn't finish — please choose the file again." };
+  }
+
+  const uploadedPaths = [filePath, ...(thumbnailPath ? [thumbnailPath] : [])];
 
   const { error } = await supabase.from("resources").insert({
     organization_id: ctx.org.id,
     title,
     description: String(formData.get("description") ?? "").trim() || null,
-    file_path: path,
-    file_name: fileName,
-    mime_type: file.type || null,
-    file_size: file.size,
+    file_path: filePath,
+    file_name: String(formData.get("file_name") ?? "").trim() || "download",
+    mime_type: String(formData.get("file_type") ?? "").trim() || null,
+    file_size: fileSize,
     thumbnail_path: thumbnailPath,
     visibility: formData.get("visibility") === "private" ? "private" : "public",
     published: formData.get("published") === "1",
@@ -80,9 +94,7 @@ export async function createResourceAction(
   });
 
   if (error) {
-    await supabase.storage
-      .from("resources")
-      .remove([path, ...(thumbnailPath ? [thumbnailPath] : [])]);
+    await supabase.storage.from("resources").remove(uploadedPaths);
     return { error: friendlyDbError(error.message) };
   }
 
@@ -114,6 +126,7 @@ export async function updateResourceAction(
     .eq("id", id)
     .eq("organization_id", ctx.org.id)
     .maybeSingle();
+  if (!current) return { error: "Resource not found." };
 
   const patch: Record<string, unknown> = {
     title,
@@ -123,38 +136,39 @@ export async function updateResourceAction(
     gated: formData.get("gated") === "1",
   };
 
-  const file = formData.get("file");
-  let newPath: string | null = null;
+  let newFilePath: string | null = null;
   let newThumbPath: string | null = null;
 
-  if (file instanceof File && file.size > 0) {
-    if (file.size > MAX_FILE_SIZE) return { error: "Files must be smaller than 50 MB." };
-    newPath = `orgs/${ctx.org.id}/${Date.now()}-${file.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
-    const { error: uploadError } = await supabase.storage
-      .from("resources")
-      .upload(newPath, file, { contentType: file.type || "application/octet-stream", upsert: false });
-    if (uploadError) return { error: friendlyDbError(uploadError.message) };
-    patch.file_path = newPath;
-    patch.file_name = file.name.trim() || "download";
-    patch.mime_type = file.type || null;
-    patch.file_size = file.size;
+  const newFileRaw = String(formData.get("file_path") ?? "").trim();
+  if (newFileRaw) {
+    const parsed = parseOwnedPath(ctx.org.id, newFileRaw);
+    if (!parsed) return { error: "Upload didn't finish — please choose the file again." };
+    if (parsed !== current.file_path) {
+      const fileSize = Number(formData.get("file_size") ?? 0);
+      if (!Number.isFinite(fileSize) || fileSize <= 0 || fileSize > MAX_FILE_SIZE) {
+        return { error: "Files must be smaller than 50 MB." };
+      }
+      if (!(await storageObjectExists(supabase, parsed))) {
+        return { error: "Upload didn't finish — please choose the file again." };
+      }
+      newFilePath = parsed;
+      patch.file_path = newFilePath;
+      patch.file_name = String(formData.get("file_name") ?? "").trim() || "download";
+      patch.mime_type = String(formData.get("file_type") ?? "").trim() || null;
+      patch.file_size = fileSize;
+    }
   }
 
-  const thumbnail = formData.get("thumbnail");
-  if (thumbnail instanceof File && thumbnail.size > 0) {
-    if (thumbnail.size > MAX_FILE_SIZE) {
-      if (newPath) await supabase.storage.from("resources").remove([newPath]);
-      return { error: "Thumbnails must be smaller than 50 MB." };
+  const newThumbRaw = String(formData.get("thumbnail_path") ?? "").trim();
+  if (newThumbRaw) {
+    const parsed = parseOwnedPath(ctx.org.id, newThumbRaw);
+    if (parsed && parsed !== current.thumbnail_path) {
+      if (!(await storageObjectExists(supabase, parsed))) {
+        return { error: "Upload didn't finish — please choose the file again." };
+      }
+      newThumbPath = parsed;
+      patch.thumbnail_path = newThumbPath;
     }
-    newThumbPath = `orgs/${ctx.org.id}/thumb-${Date.now()}-${thumbnail.name.replace(/[^a-zA-Z0-9._-]/g, "_")}`;
-    const { error: thumbError } = await supabase.storage
-      .from("resources")
-      .upload(newThumbPath, thumbnail, { contentType: thumbnail.type, upsert: false });
-    if (thumbError) {
-      if (newPath) await supabase.storage.from("resources").remove([newPath]);
-      return { error: friendlyDbError(thumbError.message) };
-    }
-    patch.thumbnail_path = newThumbPath;
   }
 
   const { error } = await supabase
@@ -164,18 +178,18 @@ export async function updateResourceAction(
     .eq("organization_id", ctx.org.id);
 
   if (error) {
-    const toRemove = [newPath, newThumbPath].filter((p): p is string => Boolean(p));
+    const toRemove = [newFilePath, newThumbPath].filter((p): p is string => Boolean(p));
     if (toRemove.length > 0) await supabase.storage.from("resources").remove(toRemove);
     return { error: friendlyDbError(error.message) };
   }
 
   // Clean up replaced objects
   const toRemove: string[] = [];
-  if (newPath && current?.file_path && current.file_path !== newPath) {
-    toRemove.push(current.file_path as string);
+  if (newFilePath && current.file_path && current.file_path !== newFilePath) {
+    toRemove.push(current.file_path);
   }
-  if (newThumbPath && current?.thumbnail_path && current.thumbnail_path !== newThumbPath) {
-    toRemove.push(current.thumbnail_path as string);
+  if (newThumbPath && current.thumbnail_path && current.thumbnail_path !== newThumbPath) {
+    toRemove.push(current.thumbnail_path);
   }
   if (toRemove.length > 0) {
     await supabase.storage.from("resources").remove(toRemove);

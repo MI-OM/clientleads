@@ -11,7 +11,7 @@ export default async function NewResourcePage() {
   return (
     <div className="mx-auto max-w-3xl flex flex-col gap-6">
       <PageHeader title="New resource" description="Upload a file to share with visitors." />
-      <ResourceForm />
+      <ResourceForm orgId={ctx.org.id} />
     </div>
   );
 }

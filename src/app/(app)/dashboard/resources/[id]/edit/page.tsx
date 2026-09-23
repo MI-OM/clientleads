@@ -20,7 +20,7 @@ export default async function EditResourcePage({ params }: EditResourcePageProps
   return (
     <div className="mx-auto max-w-3xl flex flex-col gap-6">
       <PageHeader title={`Edit: ${resource.title}`} description="Update the resource details." />
-      <ResourceForm resource={resource} />
+      <ResourceForm resource={resource} orgId={ctx.org.id} />
     </div>
   );
 }

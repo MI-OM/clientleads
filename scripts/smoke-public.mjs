@@ -68,6 +68,7 @@ const record = (name, ok, detail = "") => {
 };
 
 const tag = Date.now().toString(36);
+const runPhone = `902-555-${String(Date.now()).slice(-4)}`; // unique per run — contact matching also keys on phone digits
 const cleanupIds = { contacts: [], leads: [], resources: [], gates: [], events: [] };
 
 try {
@@ -162,7 +163,7 @@ try {
   const submit = await admin.rpc("submit_public_form", {
     p_form_slug: "contact-us",
     p_ip_hash: ip1,
-    p_values: { name: "Public Smoke", email: submissionEmail, phone: "902-555-0188", message: "Hello!" },
+    p_values: { name: "Public Smoke", email: submissionEmail, phone: runPhone, message: "Hello!" },
   });
   const submitData = submit.data;
   record("form submission creates contact+lead", submitData?.ok === true, submit.error?.message ?? "");
