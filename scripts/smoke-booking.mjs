@@ -129,7 +129,7 @@ try {
     .from("availability_rules")
     .select("day_of_week, start_time, end_time")
     .eq("organization_id", orgId)
-    .eq("user_id", null)
+    .is("user_id", null)
     .eq("active", true);
   const ruleDays = new Set((rules ?? []).map((r) => r.day_of_week));
   record(
@@ -461,9 +461,12 @@ try {
     p_name: "Hacker",
     p_email: "hacker@example.com",
   });
+  const permissionRejected = /permission denied|42501/i.test(
+    anonWrite.error?.message ?? "",
+  );
   record(
-    "anon cannot execute book_appointment (no grant)",
-    !!anonWrite.error,
+    "anon cannot execute book_appointment (permission denied)",
+    permissionRejected,
     anonWrite.error?.message ?? "",
   );
 

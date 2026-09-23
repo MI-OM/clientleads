@@ -752,6 +752,30 @@ grant execute on function public.book_appointment(uuid, timestamptz, text, text,
 grant execute on function public.cancel_appointment(uuid) to service_role;
 grant execute on function public.reschedule_appointment(uuid, timestamptz) to service_role;
 
+-- Postgres grants EXECUTE on new functions to PUBLIC by default — that would
+-- let anon call the WRITE RPCs directly (bypassing server actions), so revoke
+-- it everywhere and re-grant only the intended roles (idempotent; this also
+-- closes the same pre-existing hole for the M3 write RPCs).
+revoke execute on function public.get_public_page(text) from public;
+revoke execute on function public.get_available_slots(text, uuid, date) from public;
+revoke execute on function public.get_appointment_by_token(uuid) from public;
+revoke execute on function public.submit_public_form(text, text, jsonb) from public;
+revoke execute on function public.request_resource_download(uuid, text, text, text) from public;
+revoke execute on function public.record_resource_download(uuid, uuid) from public;
+revoke execute on function public.book_appointment(uuid, timestamptz, text, text, text, text, text) from public;
+revoke execute on function public.cancel_appointment(uuid) from public;
+revoke execute on function public.reschedule_appointment(uuid, timestamptz) from public;
+
+grant execute on function public.get_public_page(text) to anon, authenticated;
+grant execute on function public.get_available_slots(text, uuid, date) to anon, authenticated;
+grant execute on function public.get_appointment_by_token(uuid) to anon, authenticated;
+grant execute on function public.submit_public_form(text, text, jsonb) to service_role;
+grant execute on function public.request_resource_download(uuid, text, text, text) to service_role;
+grant execute on function public.record_resource_download(uuid, uuid) to service_role;
+grant execute on function public.book_appointment(uuid, timestamptz, text, text, text, text, text) to service_role;
+grant execute on function public.cancel_appointment(uuid) to service_role;
+grant execute on function public.reschedule_appointment(uuid, timestamptz) to service_role;
+
 -- =====================================================================
 -- Seed (first-client demo): an org-wide weekly calendar and one bookable
 -- service so the public flow is testable right after the migration lands.
