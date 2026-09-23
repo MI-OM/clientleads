@@ -33,7 +33,7 @@
 | M1        | Foundation          | Week 1–2   | In Progress | Code + migrations verified live: RLS 6/6, auth smoke 7/7. Remaining: real account + branding data + GitHub push                                    |
 | M2        | CRM                 | Week 3–5   | Done       | `20260922000003_m2_crm.sql` applied + live-verified (CRM 16/16, RLS 6/6, auth 7/7); import template shipped. Remaining (user): own account + owner role + GitHub push                                |
 | M3        | Public Presence     | Week 6–7   | Done    | **Live-verified 2026-09-23** — `npm run test:public` 34/34 + `npm run test:pages` 16/16 (`debd36e` + `13f5932`)                                                                                       |
-| M4        | Booking             | Week 8–10  | In Progress | Code + `20260922000005_m4_booking.sql` written, build/typecheck green — needs migration paste + live smoke (`npm run test:booking`) |
+| M4        | Booking             | Week 8–10  | Done       | **Live-verified 2026-09-23** — `20260922000005_m4_booking.sql` applied (revoke PUBLIC EXECUTE on write RPCs), `npm run test:booking` 33/33 + browser flow (`/book` wizard, slots API, manage/cancel) verified live (`108df08` + `eef731e`) |
 | M5        | Communication       | Week 11–13 | Not Started | Requires email provider decision                                                                                                                   |
 | M6        | Productivity        | Week 14–15 | Not Started |                                                                                                                                                    |
 | M7        | Validation & Launch | Week 16    | Not Started |                                                                                                                                                    |
@@ -198,7 +198,7 @@
   - [x] List view; confirm, complete, cancel, mark no-show
   - [x] Dashboard widgets: upcoming appointments (PRD §33) + Availability page
 - [ ] **Reminders (PRD §20)** — 24h and 2h before appointment (deferred per plan)
-- [ ] **Live verification** — user pastes `20260922000005_m4_booking.sql`, then `npm run test:booking` + `npm run test:pages`
+- [x] **Live verification** — migration applied; `npm run test:booking` 33/33; browser flow (wizard → slots → book → manage → cancel) verified
 
 ### Acceptance Criteria
 

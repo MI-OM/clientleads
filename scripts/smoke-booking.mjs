@@ -477,8 +477,19 @@ try {
 } finally {
   // ── cleanup ────────────────────────────────────────────────────────
   const ids = (arr) => arr.filter(Boolean);
+  let activityCount = 0;
   for (const id of ids(cleanup.appointments)) {
     await admin.from("appointments").delete().eq("id", id);
+  }
+  // contact delete sets activities.contact_id → null, so sweep the run's
+  // activity rows BEFORE deleting the contacts (they never cascade).
+  for (const id of ids(cleanup.contacts)) {
+    const { count } = await admin
+      .from("activities")
+      .select("id", { count: "exact", head: true })
+      .eq("contact_id", id);
+    activityCount += count ?? 0;
+    await admin.from("activities").delete().eq("contact_id", id);
   }
   for (const id of ids(cleanup.leads)) {
     await admin.from("leads").delete().eq("id", id);
@@ -490,7 +501,7 @@ try {
     await admin.from("services").delete().eq("id", id);
   }
   console.log(
-    `\ncleaned up ${cleanup.appointments.length} appointments, ${cleanup.leads.length} leads, ${cleanup.contacts.length} contacts, ${cleanup.services.length} services`,
+    `\ncleaned up ${cleanup.appointments.length} appointments, ${activityCount} activities, ${cleanup.leads.length} leads, ${cleanup.contacts.length} contacts, ${cleanup.services.length} services`,
   );
 }
 
