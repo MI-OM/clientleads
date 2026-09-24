@@ -270,7 +270,7 @@ begin
     end if;
 
     if v_delay > 0 then
-      v_run_at := now() + make_interval(hours => v_delay);
+      v_run_at := now() + (v_delay * interval '1 hour');
     elsif v_type in ('send_email', 'notify') then
       -- app-drained even at delay 0 (SQL cannot send mail)
       v_run_at := now();

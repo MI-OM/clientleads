@@ -519,9 +519,9 @@ try {
   record("events campaign resolved 2 recipients", !!r1 && !!r2);
 
   const eventAt = new Date().toISOString();
-  const fire = (recipientId, event) =>
+  const fire = (recipientId, event, campaignId = cEvents?.id) =>
     admin.rpc("process_campaign_event", {
-      p_campaign_id: cEvents?.id,
+      p_campaign_id: campaignId,
       p_recipient_id: recipientId,
       p_event: event,
       p_occurred_at: eventAt,
@@ -588,7 +588,7 @@ try {
   const unsubContactId = unsubRecipients?.[0]?.contact?.id;
   record("unsubscribe campaign has tokenized recipient", !!unsubToken && !!unsubContactId);
 
-  const unsubEvent = await fire(unsubRecipients?.[0]?.id, "email.unsubscribed");
+  const unsubEvent = await fire(unsubRecipients?.[0]?.id, "email.unsubscribed", cUnsub?.id);
   record(
     "email.unsubscribed maps to unsubscribe",
     unsubEvent.data?.ok === true && unsubEvent.data?.status === "Unsubscribed",
