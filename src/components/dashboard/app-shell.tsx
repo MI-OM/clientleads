@@ -15,6 +15,7 @@ import {
   Mail,
   Menu,
   Megaphone,
+  Plug,
   Search,
   Settings,
   Target,
@@ -43,6 +44,7 @@ const moduleNav: NavEntry[] = [
   { title: "Contacts", href: "/dashboard/contacts", icon: Users },
   { title: "Leads", href: "/dashboard/leads", icon: Target },
   { title: "Appointments", href: "/dashboard/appointments", icon: CalendarDays },
+  { title: "Calendar", href: "/dashboard/calendar", icon: CalendarDays },
   { title: "Services", href: "/dashboard/services", icon: Wrench },
   { title: "Tasks", href: "/dashboard/tasks", icon: ListTodo },
   { title: "Campaigns", href: "/dashboard/campaigns", icon: Megaphone },
@@ -57,6 +59,7 @@ const manageNav: NavEntry[] = [
   { title: "Availability", href: "/dashboard/availability", icon: CalendarDays },
   { title: "Automations", href: "/dashboard/automations", icon: Workflow },
   { title: "Settings", href: "/dashboard/settings", icon: Settings },
+  { title: "Integrations", href: "/dashboard/integrations", icon: Plug },
   { title: "Custom fields", href: "/dashboard/settings/fields", icon: ListTodo },
 ];
 
