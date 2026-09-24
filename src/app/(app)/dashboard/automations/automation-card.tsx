@@ -18,6 +18,15 @@ interface AutomationCardProps {
   options: AutomationFormOptions;
 }
 
+/** Friendly labels for notification kinds (raw snake_case stored in config). */
+const NOTIFY_LABELS: Record<string, string> = {
+  new_lead: "New lead",
+  form_submission: "Form submission",
+  appointment_created: "Appointment created",
+  appointment_cancelled: "Appointment cancelled",
+  appointment_rescheduled: "Appointment rescheduled",
+};
+
 /** One-line human summary of a step, for the collapsed card view. */
 function stepDetail(step: AutomationStep, options: AutomationFormOptions): string {
   switch (step.type) {
@@ -41,7 +50,7 @@ function stepDetail(step: AutomationStep, options: AutomationFormOptions): strin
       return template ? `Send "${template.name}"${delay}` : `Send template email${delay}`;
     }
     case "notify":
-      return `Notify business (${step.kind ?? "new_lead"})`;
+      return `Notify business (${NOTIFY_LABELS[step.kind ?? "new_lead"] ?? "New lead"})`;
   }
 }
 

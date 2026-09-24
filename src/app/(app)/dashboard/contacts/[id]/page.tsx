@@ -101,7 +101,7 @@ export default async function ContactDetailPage({ params }: { params: Promise<{ 
             <CardHeader>
               <CardTitle>Activity timeline</CardTitle>
               <CardDescription>
-                Every change to this contact is recorded automatically (PRD §13, §38).
+                Every change to this contact is recorded automatically.
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -194,9 +194,7 @@ export default async function ContactDetailPage({ params }: { params: Promise<{ 
           <Card>
             <CardHeader>
               <CardTitle>Custom fields</CardTitle>
-              <CardDescription>
-                Stored per contact without schema changes (PRD §12, §45).
-              </CardDescription>
+              <CardDescription>Stored per contact — no schema changes needed.</CardDescription>
             </CardHeader>
             <CardContent>
               <CustomValuesForm

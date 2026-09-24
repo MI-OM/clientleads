@@ -18,7 +18,7 @@ export default async function ServicesPage() {
     <div className="flex flex-col gap-6">
       <PageHeader
         title="Services"
-        description="What you offer — shown on your public page (PRD §16)."
+        description="What you offer, shown on your public page."
         actions={
           canManage ? (
             <Link href="/dashboard/services/new" className={buttonVariants({})}>
@@ -55,7 +55,9 @@ export default async function ServicesPage() {
               </CardHeader>
               <CardContent className="flex flex-1 flex-col gap-3">
                 {service.description ? (
-                  <p className="line-clamp-2 text-sm text-muted-foreground">{service.description}</p>
+                  <p className="line-clamp-2 text-sm text-muted-foreground">
+                    {service.description}
+                  </p>
                 ) : (
                   <p className="text-sm text-muted-foreground">—</p>
                 )}
@@ -70,7 +72,9 @@ export default async function ServicesPage() {
                 {canManage ? (
                   <Link
                     href={`/dashboard/services/${service.id}/edit`}
-                    className={buttonVariants({ variant: "outline", size: "sm" }) + " mt-auto self-start"}
+                    className={
+                      buttonVariants({ variant: "outline", size: "sm" }) + " mt-auto self-start"
+                    }
                   >
                     <Pencil className="size-3.5" aria-hidden /> Edit
                   </Link>

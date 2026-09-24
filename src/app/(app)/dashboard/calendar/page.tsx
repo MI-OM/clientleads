@@ -22,7 +22,7 @@ const MONTH_RE = /^\d{4}-(0[1-9]|1[0-2])$/;
 const VIEW_PAD_MS = 7 * 864e5;
 
 const ERROR_MESSAGES: Record<string, string> = {
-  not_configured: "This integration isn’t configured — add its keys to .env.local first.",
+  not_configured: "This integration isn’t configured — check your workspace setup and try again.",
   integration_state:
     "Your Google connection attempt was cancelled or failed its security check — please try again.",
   google_connect_failed: "Google didn’t complete the connection — please try again.",
@@ -144,7 +144,7 @@ export default async function CalendarPage({
     <div className="flex flex-col gap-6">
       <PageHeader
         title="Calendar"
-        description="Merged month view of appointments, imported events (Google Calendar / Calendly) and blocked times (M8)."
+        description="Appointments, imported events and blocked times, all in one month view."
       />
 
       {connectedMessage ? (

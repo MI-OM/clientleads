@@ -20,7 +20,7 @@ export default async function LeadsPage() {
     <div className="flex flex-col gap-6">
       <PageHeader
         title="Leads pipeline"
-        description="Track potential clients through your stages (PRD §14)."
+        description="Track potential clients through your pipeline."
         actions={
           <Link href="/dashboard/leads/new" className={buttonVariants({})}>
             New lead

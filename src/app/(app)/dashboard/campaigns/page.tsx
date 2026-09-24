@@ -32,12 +32,20 @@ function formatWhen(value: string | null): string {
       }).format(d);
 }
 
-export default async function CampaignsPage({ searchParams }: { searchParams: Promise<{ page?: string | string[] }> }) {
+export default async function CampaignsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string | string[] }>;
+}) {
   const ctx = await getMyOrg();
   const canManage = ctx?.role === "owner" || ctx?.role === "admin";
 
   const params = await searchParams;
-  const page = Number.parseInt(Array.isArray(params.page) ? params.page[0] ?? "" : params.page ?? "", 10) || 1;
+  const page =
+    Number.parseInt(
+      Array.isArray(params.page) ? (params.page[0] ?? "") : (params.page ?? ""),
+      10,
+    ) || 1;
   const result = ctx ? await listCampaignsPage(ctx.org.id, page) : { campaigns: [], totalPages: 1 };
   const campaigns = result.campaigns;
 
@@ -45,7 +53,7 @@ export default async function CampaignsPage({ searchParams }: { searchParams: Pr
     <div className="flex flex-col gap-6">
       <PageHeader
         title="Campaigns"
-        description="Email campaigns to your contacts (PRD §26–29)."
+        description="Email campaigns to your contacts."
         actions={
           canManage ? (
             <>
@@ -137,7 +145,11 @@ export default async function CampaignsPage({ searchParams }: { searchParams: Pr
           ))}
         </div>
       )}
-      <Pagination page={page} totalPages={result.totalPages} href={(target) => `/dashboard/campaigns?page=${target}`} />
+      <Pagination
+        page={page}
+        totalPages={result.totalPages}
+        href={(target) => `/dashboard/campaigns?page=${target}`}
+      />
     </div>
   );
 }

@@ -6,30 +6,35 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { ActivityTimeline } from "@/components/crm/activity-timeline";
 import Link from "next/link";
 
-export default async function ActivitiesPage({ searchParams }: { searchParams: Promise<{ page?: string | string[] }> }) {
+export default async function ActivitiesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string | string[] }>;
+}) {
   const ctx = await getMyOrg();
   if (!ctx) {
     return (
       <Card>
         <CardHeader>
           <CardTitle>No workspace found</CardTitle>
-          <CardDescription>Apply the database migrations, then refresh this page.</CardDescription>
+          <CardDescription>Your account isn&apos;t linked to an organization yet.</CardDescription>
         </CardHeader>
       </Card>
     );
   }
 
   const params = await searchParams;
-  const page = Number.parseInt(Array.isArray(params.page) ? params.page[0] ?? "" : params.page ?? "", 10) || 1;
+  const page =
+    Number.parseInt(
+      Array.isArray(params.page) ? (params.page[0] ?? "") : (params.page ?? ""),
+      10,
+    ) || 1;
   const result = await listActivitiesPage(ctx.org.id, page);
   const activities = result.activities;
 
   return (
     <div className="flex flex-col gap-6">
-      <PageHeader
-        title="Activity"
-        description="The latest changes across your workspace (PRD §38)."
-      />
+      <PageHeader title="Activity" description="The latest changes across your workspace." />
       <Card>
         <CardHeader>
           <CardTitle>Recent activity</CardTitle>
@@ -52,7 +57,11 @@ export default async function ActivitiesPage({ searchParams }: { searchParams: P
         </Link>{" "}
         to see per-contact timelines.
       </p>
-      <Pagination page={page} totalPages={result.totalPages} href={(target) => `/dashboard/activities?page=${target}`} />
+      <Pagination
+        page={page}
+        totalPages={result.totalPages}
+        href={(target) => `/dashboard/activities?page=${target}`}
+      />
     </div>
   );
 }

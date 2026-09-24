@@ -16,7 +16,7 @@ export default async function FormsPage() {
     <div className="flex flex-col gap-6">
       <PageHeader
         title="Forms"
-        description="Lead-capture forms shown on your public page (PRD §22)."
+        description="Lead-capture forms shown on your public page."
         actions={
           canManage ? (
             <Link href="/dashboard/forms/new" className={buttonVariants({})}>
@@ -31,8 +31,8 @@ export default async function FormsPage() {
           <CardContent className="flex flex-col items-center gap-2 p-10 text-center">
             <p className="font-medium">No forms yet</p>
             <p className="max-w-sm text-sm text-muted-foreground">
-              A form lets visitors send you inquiries — each submission becomes a contact and a
-              lead in your CRM.
+              A form lets visitors send you inquiries — each submission becomes a contact and a lead
+              in your CRM.
             </p>
           </CardContent>
         </Card>
@@ -60,7 +60,9 @@ export default async function FormsPage() {
                 {canManage ? (
                   <Link
                     href={`/dashboard/forms/${form.id}`}
-                    className={buttonVariants({ variant: "outline", size: "sm" }) + " mt-auto self-start"}
+                    className={
+                      buttonVariants({ variant: "outline", size: "sm" }) + " mt-auto self-start"
+                    }
                   >
                     <Pencil className="size-3.5" aria-hidden /> Edit fields
                   </Link>

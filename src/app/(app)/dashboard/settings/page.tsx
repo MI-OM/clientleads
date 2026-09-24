@@ -41,14 +41,13 @@ export default async function SettingsPage() {
           <CardHeader>
             <CardTitle>No workspace found</CardTitle>
             <CardDescription>
-              Your account isn&apos;t linked to an organization yet. This usually means the database
-              migrations haven&apos;t been applied.
+              Your account isn&apos;t linked to an organization yet. Ask your workspace owner to add
+              you, then refresh this page.
             </CardDescription>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground">
-              Apply the migrations in <code className="font-mono">supabase/migrations</code> to your
-              Supabase project, then refresh this page.
+              You can still manage your sign-in details from Account settings above.
             </p>
           </CardContent>
         </Card>

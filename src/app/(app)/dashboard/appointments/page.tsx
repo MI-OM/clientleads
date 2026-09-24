@@ -113,13 +113,21 @@ function AppointmentRow({
   );
 }
 
-export default async function AppointmentsPage({ searchParams }: { searchParams: Promise<{ page?: string | string[] }> }) {
+export default async function AppointmentsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string | string[] }>;
+}) {
   const ctx = await getMyOrg();
   const canManage = ctx?.role === "owner" || ctx?.role === "admin";
 
   const now = new Date().toISOString();
   const params = await searchParams;
-  const page = Number.parseInt(Array.isArray(params.page) ? params.page[0] ?? "" : params.page ?? "", 10) || 1;
+  const page =
+    Number.parseInt(
+      Array.isArray(params.page) ? (params.page[0] ?? "") : (params.page ?? ""),
+      10,
+    ) || 1;
   const [upcoming, pastResult] = ctx
     ? await Promise.all([
         listUpcomingAppointments(ctx.org.id, now),
@@ -132,7 +140,7 @@ export default async function AppointmentsPage({ searchParams }: { searchParams:
     <div className="flex flex-col gap-6">
       <PageHeader
         title="Appointments"
-        description="Bookings from your public page, and their status (PRD §19–21)."
+        description="Bookings from your public page and their status."
         actions={
           <Link href="/dashboard/availability" className={buttonVariants({ variant: "outline" })}>
             <CalendarPlus className="size-4" aria-hidden /> Availability
@@ -188,7 +196,11 @@ export default async function AppointmentsPage({ searchParams }: { searchParams:
           </CardContent>
         </Card>
       ) : null}
-      <Pagination page={page} totalPages={pastResult.totalPages} href={(target) => `/dashboard/appointments?page=${target}`} />
+      <Pagination
+        page={page}
+        totalPages={pastResult.totalPages}
+        href={(target) => `/dashboard/appointments?page=${target}`}
+      />
     </div>
   );
 }

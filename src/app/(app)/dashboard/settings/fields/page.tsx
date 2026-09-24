@@ -11,7 +11,7 @@ export default async function CustomFieldsSettingsPage() {
       <Card>
         <CardHeader>
           <CardTitle>No workspace found</CardTitle>
-          <CardDescription>Apply the database migrations, then refresh this page.</CardDescription>
+          <CardDescription>Your account isn&apos;t linked to an organization yet.</CardDescription>
         </CardHeader>
       </Card>
     );
@@ -24,7 +24,7 @@ export default async function CustomFieldsSettingsPage() {
     <div className="mx-auto flex max-w-4xl flex-col gap-6">
       <PageHeader
         title="Custom fields"
-        description="Add industry-specific fields that render on every contact — no schema changes (PRD §12, §44–45)."
+        description="Add industry-specific fields that appear on every contact."
       />
       <CustomFieldsForm fields={fields} canManage={canManage} />
     </div>

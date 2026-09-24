@@ -141,7 +141,7 @@ export default async function TasksPage({ searchParams }: { searchParams: Promis
     <div className="flex flex-col gap-6">
       <PageHeader
         title="Tasks"
-        description="Follow-ups, to-dos and assignments for your team (PRD §24)."
+        description="Follow-ups, to-dos and assignments for your team."
         actions={
           <Link href="/dashboard/tasks/new" className={buttonVariants({ variant: "default" })}>
             <ClipboardPlus className="size-4" aria-hidden /> New task

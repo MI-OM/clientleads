@@ -69,7 +69,7 @@ export default async function LeadDetailPage({ params }: { params: Promise<{ id:
             <CardHeader>
               <CardTitle>Activity timeline</CardTitle>
               <CardDescription>
-                Stage changes and updates are recorded automatically (PRD §13).
+                Stage changes and updates are recorded automatically.
               </CardDescription>
             </CardHeader>
             <CardContent>

@@ -5,7 +5,6 @@ import { getDashboardCounts } from "@/lib/crm/queries";
 import { countUpcomingAppointments } from "@/lib/booking/queries";
 import { countPendingTasks } from "@/lib/tasks/queries";
 import { PageHeader } from "@/components/dashboard/page-header";
-import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { isSupabaseConfigured } from "@/lib/env";
@@ -27,15 +26,7 @@ export default async function DashboardPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <PageHeader
-        title="Dashboard"
-        description="An action-oriented overview of your business."
-        actions={
-          <Badge variant="secondary" className="h-fit">
-            CRM · M6
-          </Badge>
-        }
-      />
+      <PageHeader title="Dashboard" description="An action-oriented overview of your business." />
 
       {!configured ? (
         <Card className="border-warning bg-amber-50/50">

@@ -43,8 +43,8 @@ export default async function ContactsPage({
         <CardHeader>
           <CardTitle>No workspace found</CardTitle>
           <CardDescription>
-            Your account isn&apos;t linked to an organization yet. This usually means the database
-            migrations haven&apos;t been applied.
+            Your account isn&apos;t linked to an organization yet. Ask your workspace owner to add
+            you, then refresh this page.
           </CardDescription>
         </CardHeader>
       </Card>
@@ -78,7 +78,7 @@ export default async function ContactsPage({
     <div className="flex flex-col gap-6">
       <PageHeader
         title="Contacts"
-        description="People and businesses you work with (PRD §10)."
+        description="People and businesses you work with."
         actions={
           <>
             <Link
@@ -235,7 +235,7 @@ export default async function ContactsPage({
       <Card>
         <CardHeader>
           <CardTitle>Tags</CardTitle>
-          <CardDescription>Organize contacts by tag (PRD §11).</CardDescription>
+          <CardDescription>Organize contacts by tag.</CardDescription>
         </CardHeader>
         <CardContent>
           <TagsManager tags={tags} canManage={ctx.role === "owner" || ctx.role === "admin"} />

@@ -15,7 +15,7 @@ export default async function NewContactPage() {
 
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-6">
-      <PageHeader title="New contact" description="Add someone to your contact list (PRD §10)." />
+      <PageHeader title="New contact" description="Add someone to your contact list." />
       <ContactForm mode="create" fields={fields} tags={tags} members={members} />
     </div>
   );

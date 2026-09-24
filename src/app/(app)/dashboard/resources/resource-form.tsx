@@ -114,26 +114,27 @@ export function ResourceForm({ resource, orgId }: ResourceFormProps) {
       // Re-submit now that the file metadata is in hidden fields.
       formRef.current?.requestSubmit();
     } catch (err) {
-      setUploadError(err instanceof Error ? err.message : "The file upload failed. Please try again.");
+      setUploadError(
+        err instanceof Error ? err.message : "The file upload failed. Please try again.",
+      );
     } finally {
       setUploading(false);
     }
   }
 
-  const fileStatus =
-    uploaded ? (
-      <p className="text-xs text-muted-foreground">
-        Ready: {uploaded.fileName} ({formatSize(uploaded.fileSize)})
-      </p>
-    ) : selectedFile ? (
-      <p className="text-xs text-muted-foreground">
-        New file: {selectedFile.name} ({formatSize(selectedFile.size)}) — uploading when you save
-      </p>
-    ) : resource ? (
-      <p className="text-xs text-muted-foreground">
-        Current: {resource.fileName} ({formatSize(resource.fileSize)})
-      </p>
-    ) : null;
+  const fileStatus = uploaded ? (
+    <p className="text-xs text-muted-foreground">
+      Ready: {uploaded.fileName} ({formatSize(uploaded.fileSize)})
+    </p>
+  ) : selectedFile ? (
+    <p className="text-xs text-muted-foreground">
+      New file: {selectedFile.name} ({formatSize(selectedFile.size)}) — uploading when you save
+    </p>
+  ) : resource ? (
+    <p className="text-xs text-muted-foreground">
+      Current: {resource.fileName} ({formatSize(resource.fileSize)})
+    </p>
+  ) : null;
 
   return (
     <form ref={formRef} action={formAction} onSubmit={handleSubmit} className="flex flex-col gap-6">
@@ -152,8 +153,8 @@ export function ResourceForm({ resource, orgId }: ResourceFormProps) {
         <CardHeader>
           <CardTitle>Resource details</CardTitle>
           <CardDescription>
-            Files visitors can download from your public page. Public resources are listed;
-            private ones stay internal (PRD §30).
+            Files visitors can download from your public page. Public resources are listed there;
+            private ones stay internal.
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
@@ -180,7 +181,11 @@ export function ResourceForm({ resource, orgId }: ResourceFormProps) {
             </div>
             <div className="grid gap-2">
               <Label htmlFor="visibility">Visibility</Label>
-              <Select id="visibility" name="visibility" defaultValue={resource?.visibility ?? "public"}>
+              <Select
+                id="visibility"
+                name="visibility"
+                defaultValue={resource?.visibility ?? "public"}
+              >
                 <option value="public">Public — shown on my page</option>
                 <option value="private">Private — dashboard only</option>
               </Select>
@@ -233,9 +238,14 @@ export function ResourceForm({ resource, orgId }: ResourceFormProps) {
 
       <FormStatus state={state} />
       {(uploadError || uploading) && (
-        <p role={uploadError ? "alert" : "status"} className="flex items-center gap-2 text-sm text-muted-foreground">
+        <p
+          role={uploadError ? "alert" : "status"}
+          className="flex items-center gap-2 text-sm text-muted-foreground"
+        >
           {uploading ? <LoaderCircle className="size-4 animate-spin" aria-hidden /> : null}
-          <span className={uploadError ? "text-destructive" : undefined}>{uploadError ?? "Uploading file…"}</span>
+          <span className={uploadError ? "text-destructive" : undefined}>
+            {uploadError ?? "Uploading file…"}
+          </span>
         </p>
       )}
       <div>

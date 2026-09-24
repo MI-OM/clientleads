@@ -54,7 +54,7 @@ export default async function AutomationsPage() {
     <div className="flex flex-col gap-6">
       <PageHeader
         title="Automations"
-        description="Configurable workflows that fire on CRM events: follow-up tasks, tags, emails and notifications (PRD §32)."
+        description="Workflows that respond to CRM events — follow-ups, tags, emails and notifications."
       />
 
       <div className="grid gap-6 lg:grid-cols-2">
@@ -82,8 +82,7 @@ export default async function AutomationsPage() {
               </CardHeader>
               <CardContent className="flex flex-col gap-4">
                 <p className="text-sm text-muted-foreground">
-                  This trigger isn&apos;t configured yet — the migration seed only covers the
-                  “first-client” demo org.
+                  This trigger isn&apos;t configured yet.
                 </p>
               </CardContent>
             </Card>
@@ -92,9 +91,7 @@ export default async function AutomationsPage() {
       </div>
 
       <p className="text-xs text-muted-foreground">
-        SQL triggers execute task/tag/activity/lead-stage steps synchronously; emails and
-        notifications are queued and drained by the automation cron (no-op until RESEND_API_KEY is
-        set).
+        Your automations run automatically whenever their trigger fires — no manual work needed.
       </p>
     </div>
   );

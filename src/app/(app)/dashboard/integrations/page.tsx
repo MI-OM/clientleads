@@ -13,8 +13,7 @@ const ERROR_MESSAGES: Record<string, string> = {
     "The connection request expired or didn't match — please try the Connect button again.",
   hubspot_denied: "The HubSpot connection was cancelled.",
   integration_auth: "You need to be signed in to connect HubSpot.",
-  integration_config:
-    "HubSpot isn't configured — add HUBSPOT_CLIENT_ID and HUBSPOT_CLIENT_SECRET to .env.local to enable it.",
+  integration_config: "HubSpot isn't set up for this workspace yet.",
   hubspot_token: "HubSpot couldn't complete the connection. Please try again.",
 };
 
@@ -37,7 +36,7 @@ export default async function IntegrationsPage({
     <div className="flex flex-col gap-6">
       <PageHeader
         title="Integrations"
-        description="Connect external tools to ClientLeads: import CRM contacts from HubSpot and keep your calendar in sync (PRD §33)."
+        description="Import contacts from HubSpot and keep your calendar in sync."
       />
 
       {connected ? (
@@ -107,10 +106,8 @@ export default async function IntegrationsPage({
       </Card>
 
       <p className="text-xs text-muted-foreground">
-        HubSpot connects via OAuth (scopes: crm.objects.contacts.read) with the app&apos;s
-        HUBSPOT_CLIENT_ID / HUBSPOT_CLIENT_SECRET. Calendar providers need GOOGLE_CAL_CLIENT_ID /
-        GOOGLE_CAL_CLIENT_SECRET (OAuth) or CALENDLY_API_KEY (personal access token). See
-        app.hubspot.com, console.cloud.google.com and calendly.com for app registration.
+        HubSpot connects with read-only access to your contacts. Calendar sync is managed from the
+        Calendar page.
       </p>
     </div>
   );

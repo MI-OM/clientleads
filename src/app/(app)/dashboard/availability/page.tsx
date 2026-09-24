@@ -15,7 +15,7 @@ export default async function AvailabilityPage() {
     <div className="flex flex-col gap-6">
       <PageHeader
         title="Availability"
-        description="Your weekly booking windows and one-off closures (PRD §17–18)."
+        description="Your weekly booking windows and one-off closures."
       />
       <AvailabilityForm
         rules={rules}

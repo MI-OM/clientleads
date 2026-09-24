@@ -139,7 +139,7 @@ export function ImportWizard() {
             <div className="rounded-md bg-amber-50 p-3 text-sm">
               <p className="mb-1 font-medium text-amber-900">
                 {summary.duplicates} rows were not imported — they match existing contacts and were
-                flagged for review instead of being merged (PRD §37).
+                flagged for review instead of being merged.
               </p>
               <ul className="mt-2 list-inside list-disc space-y-0.5 text-amber-800">
                 {summary.samples.map((sample, i) => (
@@ -272,7 +272,7 @@ export function ImportWizard() {
         <CardTitle>Upload a CSV</CardTitle>
         <CardDescription>
           Contacts are matched against existing rows by email, then phone. Nothing is ever merged
-          automatically — duplicates are flagged for review (PRD §37).
+          automatically — duplicates are flagged for review.
         </CardDescription>
       </CardHeader>
       <CardContent>

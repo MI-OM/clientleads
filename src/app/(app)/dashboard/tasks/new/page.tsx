@@ -12,7 +12,7 @@ export default async function NewTaskPage() {
 
   return (
     <div className="mx-auto max-w-3xl flex flex-col gap-6">
-      <PageHeader title="New task" description="Capture a follow-up or to-do (PRD §24)." />
+      <PageHeader title="New task" description="Capture a follow-up or to-do." />
       <TaskForm
         members={options.members}
         contacts={options.contacts}

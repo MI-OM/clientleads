@@ -59,9 +59,7 @@ function CampaignMetrics({ m, rangeLabel }: { m: AnalyticsMetrics; rangeLabel: s
         <CardTitle className="flex items-center gap-2 text-base">
           <Megaphone className="size-4" aria-hidden /> Campaigns
         </CardTitle>
-        <CardDescription>
-          Email campaign delivery for the selected period.
-        </CardDescription>
+        <CardDescription>Email campaign delivery for the selected period.</CardDescription>
       </CardHeader>
       <CardContent className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {items.map((item) => (
@@ -80,7 +78,7 @@ interface SearchParams {
 }
 
 function first(value: string | string[] | undefined): string {
-  return Array.isArray(value) ? value[0] ?? "" : value ?? "";
+  return Array.isArray(value) ? (value[0] ?? "") : (value ?? "");
 }
 
 function dateInTimeZone(date: Date, timeZone: string): string {
@@ -124,7 +122,7 @@ export default async function AnalyticsPage({
       <Card>
         <CardHeader>
           <CardTitle>No workspace found</CardTitle>
-          <CardDescription>Apply the database migrations, then refresh this page.</CardDescription>
+          <CardDescription>Your account isn&apos;t linked to an organization yet.</CardDescription>
         </CardHeader>
       </Card>
     );
@@ -181,7 +179,7 @@ export default async function AnalyticsPage({
 
   return (
     <div className="flex flex-col gap-6">
-      <PageHeader title="Analytics" description={`Key numbers for ${ctx.org.name} (PRD §33).`} />
+      <PageHeader title="Analytics" description={`Key numbers for ${ctx.org.name}.`} />
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {primary.map((metric) => (
@@ -197,18 +195,26 @@ export default async function AnalyticsPage({
 
       <CampaignMetrics
         m={m}
-        rangeLabel={range === "custom" ? "the selected period" : `the last ${range.replace("d", " days")}`}
+        rangeLabel={
+          range === "custom" ? "the selected period" : `the last ${range.replace("d", " days")}`
+        }
       />
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Filters</CardTitle>
-          <CardDescription>Campaign metrics use the sent date and your business timezone.</CardDescription>
+          <CardDescription>
+            Campaign metrics use the sent date and your business timezone.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <form method="get" className="grid gap-4 sm:grid-cols-4 sm:items-end">
             <label className="grid gap-2 text-sm font-medium">
               Period
-              <select name="range" defaultValue={range} className="h-10 rounded-md border border-input bg-card px-3 text-sm">
+              <select
+                name="range"
+                defaultValue={range}
+                className="h-10 rounded-md border border-input bg-card px-3 text-sm"
+              >
                 <option value="7d">Last 7 days</option>
                 <option value="30d">Last 30 days</option>
                 <option value="90d">Last 90 days</option>
@@ -217,15 +223,29 @@ export default async function AnalyticsPage({
             </label>
             <label className="grid gap-2 text-sm font-medium">
               From
-              <input name="from" type="date" defaultValue={selectedRange.fromDate} className="h-10 rounded-md border border-input bg-card px-3 text-sm" />
+              <input
+                name="from"
+                type="date"
+                defaultValue={selectedRange.fromDate}
+                className="h-10 rounded-md border border-input bg-card px-3 text-sm"
+              />
             </label>
             <label className="grid gap-2 text-sm font-medium">
               To
-              <input name="to" type="date" defaultValue={selectedRange.toDate} className="h-10 rounded-md border border-input bg-card px-3 text-sm" />
+              <input
+                name="to"
+                type="date"
+                defaultValue={selectedRange.toDate}
+                className="h-10 rounded-md border border-input bg-card px-3 text-sm"
+              />
             </label>
             <label className="grid gap-2 text-sm font-medium">
               Campaign status
-              <select name="campaignStatus" defaultValue={campaignStatus} className="h-10 rounded-md border border-input bg-card px-3 text-sm">
+              <select
+                name="campaignStatus"
+                defaultValue={campaignStatus}
+                className="h-10 rounded-md border border-input bg-card px-3 text-sm"
+              >
                 <option value="all">All statuses</option>
                 <option value="Sent">Sent</option>
                 <option value="Scheduled">Scheduled</option>
@@ -233,7 +253,10 @@ export default async function AnalyticsPage({
                 <option value="Cancelled">Cancelled</option>
               </select>
             </label>
-            <button type="submit" className="h-10 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground sm:col-span-4 sm:justify-self-start">
+            <button
+              type="submit"
+              className="h-10 rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground sm:col-span-4 sm:justify-self-start"
+            >
               Apply filters
             </button>
           </form>

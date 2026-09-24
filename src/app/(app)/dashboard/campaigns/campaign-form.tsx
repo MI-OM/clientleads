@@ -123,7 +123,7 @@ export function CampaignForm({
           <CardTitle>Campaign details</CardTitle>
           <CardDescription>
             What your recipients see. Use {"{{"}variables{"}"} like {"{{first_name}}"} and{" "}
-            {"{{unsubscribe_url}}"} to personalize (PRD §25–26).
+            {"{{unsubscribe_url}}"} to personalize.
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
@@ -235,8 +235,7 @@ export function CampaignForm({
         <CardHeader>
           <CardTitle>Audience</CardTitle>
           <CardDescription>
-            Who this campaign reaches. Unsubscribed and opted-out contacts are always excluded (PRD
-            §29).
+            Who this campaign reaches. Unsubscribed and opted-out contacts are always excluded.
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">

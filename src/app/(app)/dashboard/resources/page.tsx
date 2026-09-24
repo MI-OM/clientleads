@@ -7,7 +7,7 @@ import { deleteResourceAction } from "./actions";
 import { PageHeader } from "@/components/dashboard/page-header";
 import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 
 function formatSize(bytes: number | null): string {
   if (!bytes) return "—";
@@ -15,11 +15,19 @@ function formatSize(bytes: number | null): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-export default async function ResourcesPage({ searchParams }: { searchParams: Promise<{ page?: string | string[] }> }) {
+export default async function ResourcesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ page?: string | string[] }>;
+}) {
   const ctx = await getMyOrg();
   const canManage = ctx?.role === "owner" || ctx?.role === "admin";
   const params = await searchParams;
-  const page = Number.parseInt(Array.isArray(params.page) ? params.page[0] ?? "" : params.page ?? "", 10) || 1;
+  const page =
+    Number.parseInt(
+      Array.isArray(params.page) ? (params.page[0] ?? "") : (params.page ?? ""),
+      10,
+    ) || 1;
   const result = ctx ? await listResourcesPage(ctx.org.id, page) : { resources: [], totalPages: 1 };
   const resources = result.resources;
 
@@ -27,7 +35,7 @@ export default async function ResourcesPage({ searchParams }: { searchParams: Pr
     <div className="flex flex-col gap-6">
       <PageHeader
         title="Resources"
-        description="Files visitors can download from your public page (PRD §30)."
+        description="Files visitors can download from your public page."
         actions={
           canManage ? (
             <Link href="/dashboard/resources/new" className={buttonVariants({})}>
@@ -42,7 +50,8 @@ export default async function ResourcesPage({ searchParams }: { searchParams: Pr
           <CardContent className="flex flex-col items-center gap-2 p-10 text-center">
             <p className="font-medium">No resources yet</p>
             <p className="max-w-sm text-sm text-muted-foreground">
-              Upload guides, checklists, or brochures. Public resources appear on your business page.
+              Upload guides, checklists, or brochures. Public resources appear on your business
+              page.
             </p>
           </CardContent>
         </Card>
@@ -123,7 +132,11 @@ export default async function ResourcesPage({ searchParams }: { searchParams: Pr
           </div>
         </Card>
       )}
-      <Pagination page={page} totalPages={result.totalPages} href={(target) => `/dashboard/resources?page=${target}`} />
+      <Pagination
+        page={page}
+        totalPages={result.totalPages}
+        href={(target) => `/dashboard/resources?page=${target}`}
+      />
     </div>
   );
 }

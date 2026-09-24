@@ -154,8 +154,7 @@ export function CustomFieldsForm({
 
       {fields.length === 0 ? (
         <p className="text-sm text-muted-foreground">
-          No custom fields yet. Fields render on contact forms and detail pages without any schema
-          change (PRD §12, §45).
+          No custom fields yet. Add one and it will appear on contact forms and detail pages.
         </p>
       ) : (
         <div className="overflow-x-auto rounded-lg border bg-card">

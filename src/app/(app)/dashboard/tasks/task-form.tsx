@@ -58,7 +58,7 @@ export function TaskForm({ task, members, contacts, leads, appointments }: TaskF
         <CardHeader>
           <CardTitle>Task</CardTitle>
           <CardDescription>
-            What needs doing, who it&apos;s for, and when it&apos;s due (PRD §24).
+            What needs doing, who it&apos;s for, and when it&apos;s due.
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">

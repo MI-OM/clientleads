@@ -37,6 +37,15 @@ export interface AutomationFormOptions {
   members: { id: string; name: string }[];
 }
 
+/** Friendly labels for notification kinds (raw snake_case stored in config). */
+const NOTIFY_KIND_LABELS: Record<string, string> = {
+  new_lead: "New lead",
+  form_submission: "Form submission",
+  appointment_created: "Appointment created",
+  appointment_cancelled: "Appointment cancelled",
+  appointment_rescheduled: "Appointment rescheduled",
+};
+
 interface AutomationConfigFormProps {
   automation: Automation;
   trigger: Automation["triggerType"];
@@ -320,7 +329,7 @@ export function AutomationConfigForm({ automation, trigger, options }: Automatio
                     >
                       {NOTIFY_KINDS.map((k) => (
                         <option key={k} value={k}>
-                          {k}
+                          {NOTIFY_KIND_LABELS[k] ?? k}
                         </option>
                       ))}
                     </Select>

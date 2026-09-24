@@ -194,7 +194,7 @@ export default async function CampaignDetailPage({ params }: CampaignDetailPageP
           <CardTitle>Recipients</CardTitle>
           <CardDescription>
             {recipients.length} shown ({campaign.recipientsCount} total). Per-recipient delivery
-            state is updated by webhooks (PRD §28).
+            status updates automatically.
           </CardDescription>
         </CardHeader>
         <CardContent>

@@ -125,7 +125,7 @@ export default async function SearchPage({
     <div className="flex flex-col gap-6">
       <PageHeader
         title="Search"
-        description="One box across contacts, leads, tasks and more (PRD §35)."
+        description="One search box across contacts, leads, tasks and more."
       />
 
       <form action="/dashboard/search" method="GET" className="flex gap-2">
@@ -159,7 +159,7 @@ export default async function SearchPage({
           <CardHeader>
             <CardTitle>No workspace found</CardTitle>
             <CardDescription>
-              Apply the database migrations, then refresh this page.
+              Your account isn&apos;t linked to an organization yet.
             </CardDescription>
           </CardHeader>
         </Card>

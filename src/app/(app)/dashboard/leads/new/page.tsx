@@ -20,7 +20,7 @@ export default async function NewLeadPage({
 
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-6">
-      <PageHeader title="New lead" description="Create a lead linked to a contact (PRD §14)." />
+      <PageHeader title="New lead" description="Create a lead linked to a contact." />
       <LeadForm
         mode="create"
         contacts={contacts}

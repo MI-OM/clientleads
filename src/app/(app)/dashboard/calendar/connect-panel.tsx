@@ -37,19 +37,14 @@ interface ConnectPanelProps {
   hasImportedEvents: boolean;
 }
 
-const PROVIDER_META: Record<
-  CalendarProvider,
-  { title: string; description: string; configHint: string }
-> = {
+const PROVIDER_META: Record<CalendarProvider, { title: string; description: string }> = {
   google_calendar: {
     title: "Google Calendar",
-    description: "Connect a Google account’s primary calendar (OAuth, read-only).",
-    configHint: "add GOOGLE_CAL_CLIENT_ID and GOOGLE_CAL_CLIENT_SECRET to .env.local",
+    description: "Connect a Google account’s primary calendar (read-only).",
   },
   calendly: {
     title: "Calendly",
-    description: "Import your Calendly scheduled events with an API key.",
-    configHint: "add CALENDLY_API_KEY to .env.local",
+    description: "Import your Calendly scheduled events.",
   },
 };
 
@@ -180,7 +175,7 @@ function ProviderCard({ data }: { data: ConnectPanelProvider }) {
               Connect {provider === "google_calendar" ? "Google Calendar" : "Calendly"}
             </Button>
             <p className="text-sm text-muted-foreground">
-              Not configured — {meta.configHint} to enable this connection.
+              Not available yet — your workspace administrator can enable it.
             </p>
           </div>
         )}

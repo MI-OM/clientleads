@@ -73,7 +73,7 @@ export function TemplateForm({ template }: TemplateFormProps) {
           <CardTitle>Template</CardTitle>
           <CardDescription>
             Reusable emails for campaigns. Use {"{{variables}}"} to personalize — include{" "}
-            {"{{unsubscribe_url}}"} so recipients can opt out (PRD §25).
+            {"{{unsubscribe_url}}"} so recipients can opt out.
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">

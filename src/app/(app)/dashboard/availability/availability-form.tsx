@@ -167,7 +167,7 @@ export function AvailabilityForm({
         <div className="border-b border-border px-5 py-4">
           <h2 className="font-semibold">Blocked times</h2>
           <p className="text-sm text-muted-foreground">
-            One-off closures — holidays, vacations, maintenance (PRD §18).
+            One-off closures — holidays, vacations, maintenance.
           </p>
         </div>
 

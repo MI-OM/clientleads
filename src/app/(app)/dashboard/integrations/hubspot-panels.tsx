@@ -57,7 +57,7 @@ function ImportResults({ state }: { state: IntegrationActionState }) {
         <div className="rounded-md bg-amber-50 p-3 text-sm">
           <p className="mb-1 font-medium text-amber-900">
             {summary.duplicates} contacts were not imported — they match existing contacts and were
-            flagged for review instead of being merged (PRD §37).
+            flagged for review instead of being merged.
           </p>
           <ul className="mt-2 list-inside list-disc space-y-0.5 text-amber-800">
             {summary.samples.map((sample, i) => (
@@ -192,8 +192,7 @@ function ConnectPanel() {
     <form action={connectHubSpotAction}>
       <div className="flex flex-col gap-3">
         <p className="text-sm text-muted-foreground">
-          Sign in with HubSpot to import your contacts. Only{" "}
-          <code className="font-mono text-xs">crm.objects.contacts.read</code> access is requested.
+          Sign in with HubSpot to import your contacts. We only request read-only access.
         </p>
         <div>
           <Button type="submit">
@@ -210,16 +209,14 @@ function NotConfiguredPanel() {
   return (
     <div className="flex flex-col gap-3">
       <p className="text-sm text-muted-foreground">
-        HubSpot CRM import isn&apos;t configured for this deployment.
+        HubSpot import isn&apos;t available for this workspace yet.
       </p>
       <div>
         <Button type="button" disabled>
           <Link2 className="size-4" aria-hidden /> Connect HubSpot
         </Button>
         <p className="mt-2 text-xs text-muted-foreground">
-          Add <code className="font-mono">HUBSPOT_CLIENT_ID</code> and{" "}
-          <code className="font-mono">HUBSPOT_CLIENT_SECRET</code> to .env.local to enable this
-          integration.
+          Contact your workspace administrator to enable it.
         </p>
       </div>
     </div>

@@ -1,11 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
-import {
-  createServiceAction,
-  updateServiceAction,
-  type ServiceActionState,
-} from "./actions";
+import { createServiceAction, updateServiceAction, type ServiceActionState } from "./actions";
 import type { Service } from "@/lib/services/queries";
 import { CURRENCIES, LOCATION_TYPES, LOCATION_TYPE_LABELS } from "@/lib/services/constants";
 import { Button } from "@/components/ui/button";
@@ -149,8 +145,7 @@ export function ServiceForm({ service }: ServiceFormProps) {
         <CardHeader>
           <CardTitle>Booking</CardTitle>
           <CardDescription>
-            Enable online booking for this service. Booking availability arrives in M4; these
-            settings are ready now.
+            Enable online booking for this service so visitors can book it from your public page.
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
