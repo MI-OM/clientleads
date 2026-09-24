@@ -33,6 +33,7 @@ export default async function EditTaskPage({ params }: EditTaskPageProps) {
         contacts={options.contacts}
         leads={options.leads}
         appointments={options.appointments}
+        timezone={ctx.org.timezone}
       />
     </div>
   );

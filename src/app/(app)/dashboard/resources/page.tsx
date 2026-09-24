@@ -30,6 +30,7 @@ export default async function ResourcesPage({
     ) || 1;
   const result = ctx ? await listResourcesPage(ctx.org.id, page) : { resources: [], totalPages: 1 };
   const resources = result.resources;
+  const appUrl = (process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000").replace(/\/+$/, "");
 
   return (
     <div className="flex flex-col gap-6">
@@ -66,6 +67,7 @@ export default async function ResourcesPage({
                   <th className="px-4 py-3 font-medium">Status</th>
                   <th className="px-4 py-3 font-medium">Downloads</th>
                   <th className="px-4 py-3 font-medium">Gated</th>
+                  <th className="px-4 py-3 font-medium">Embed</th>
                   {canManage ? <th className="px-4 py-3 font-medium">Actions</th> : null}
                 </tr>
               </thead>
@@ -101,6 +103,14 @@ export default async function ResourcesPage({
                     </td>
                     <td className="px-4 py-3 text-muted-foreground">
                       {resource.gated ? "Yes" : "No"}
+                    </td>
+                    <td className="px-4 py-3">
+                      {resource.published && resource.visibility === "public" ? (
+                        <details className="text-xs">
+                          <summary className="cursor-pointer font-medium text-primary">Embed</summary>
+                          <code className="mt-2 block max-w-xs overflow-x-auto rounded bg-muted p-2">{`<iframe src="${appUrl}/${ctx?.org.slug ?? ""}/resources/${resource.id}/embed" title="${resource.title}" style="width:100%;min-height:220px;border:0"></iframe>`}</code>
+                        </details>
+                      ) : null}
                     </td>
                     {canManage ? (
                       <td className="px-4 py-3">

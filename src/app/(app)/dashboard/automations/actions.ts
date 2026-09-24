@@ -6,7 +6,7 @@ import { getCurrentUser, getMyOrg } from "@/lib/auth/org";
 import { getAutomation } from "@/lib/automations/queries";
 import { DEFAULT_ACTION_CONFIG } from "@/lib/automations/types";
 import type { AutomationActionConfig, AutomationStep } from "@/lib/automations/types";
-import { AUTOMATION_STEP_TYPES, NOTIFY_KINDS } from "@/lib/automations/types";
+import { AUTOMATION_RECIPIENTS, AUTOMATION_STEP_TYPES, NOTIFY_KINDS } from "@/lib/automations/types";
 
 export interface AutomationActionState {
   error?: string;
@@ -34,6 +34,11 @@ function cleanTags(raw: unknown): string[] {
   const list = Array.isArray(raw) ? raw : String(raw ?? "").split(",");
   const tags = list.map((t) => String(t).trim()).filter(Boolean);
   return [...new Set(tags)].slice(0, 20);
+}
+
+function cleanMemberIds(raw: unknown): string[] {
+  if (!Array.isArray(raw)) return [];
+  return [...new Set(raw.map(String).filter((id) => UUID_RE.test(id)))].slice(0, 25);
 }
 
 function parseStepInput(raw: unknown): AutomationStep | null {
@@ -70,6 +75,11 @@ function parseStepInput(raw: unknown): AutomationStep | null {
         type,
         template_id: step.template_id ? String(step.template_id) : null,
         delay_hours: clampHours(step.delay_hours),
+        hours_before: clampHours(step.hours_before),
+        recipient: AUTOMATION_RECIPIENTS.includes(step.recipient as (typeof AUTOMATION_RECIPIENTS)[number])
+          ? (step.recipient as "customer" | "business" | "selected_members")
+          : "customer",
+        member_ids: cleanMemberIds(step.member_ids),
       };
     case "notify":
       return {
@@ -77,6 +87,8 @@ function parseStepInput(raw: unknown): AutomationStep | null {
         kind: NOTIFY_KINDS.includes(step.kind as (typeof NOTIFY_KINDS)[number])
           ? (step.kind as (typeof NOTIFY_KINDS)[number])
           : "new_lead",
+        recipient: step.recipient === "selected_members" ? "selected_members" : "business",
+        member_ids: cleanMemberIds(step.member_ids),
       };
     default:
       return null;

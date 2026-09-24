@@ -49,7 +49,17 @@ function renderVars(
   step: Record<string, unknown>,
   org: Record<string, unknown> | null,
   contact: Record<string, unknown> | null,
+  appointment: Record<string, unknown> | null,
 ): Record<string, string | undefined> {
+  const service = appointment?.service as { name?: string } | null;
+  const timezone = String(appointment?.timezone ?? org?.timezone ?? "America/Halifax");
+  const startsAt = appointment?.starts_at ? new Date(String(appointment.starts_at)) : null;
+  const appointmentDate = startsAt
+    ? new Intl.DateTimeFormat("en-CA", { timeZone: timezone, dateStyle: "long" }).format(startsAt)
+    : "";
+  const appointmentTime = startsAt
+    ? new Intl.DateTimeFormat("en-CA", { timeZone: timezone, timeStyle: "short" }).format(startsAt)
+    : "";
   return {
     first_name: (contact?.first_name as string) || "",
     last_name: (contact?.last_name as string) || "",
@@ -58,6 +68,12 @@ function renderVars(
     phone: (org?.phone as string) || "",
     setup_url: `${baseUrl()}/dashboard/automations`,
     dashboard_url: `${baseUrl()}/dashboard`,
+    service_name: service?.name ?? "Appointment",
+    appointment_date: appointmentDate,
+    appointment_time: appointmentTime,
+    booking_link: appointment?.token
+      ? `${baseUrl()}/${String(org?.slug ?? "")}/book/${String(appointment.token)}`
+      : undefined,
     ...(typeof step.vars === "object" && step.vars !== null
       ? (step.vars as Record<string, string | undefined>)
       : {}),
@@ -67,12 +83,10 @@ function renderVars(
 /** Deliver one template email via Resend (no-op + log when the key is unset). */
 async function sendTemplateEmail(
   org: Record<string, unknown> | null,
-  contact: Record<string, unknown> | null,
+  to: string,
   template: { subject: string; body: string } | null,
   vars: Record<string, string | undefined>,
 ): Promise<{ ok: boolean; error?: string; skipped?: boolean }> {
-  const to = (contact?.email as string | null) ?? null;
-  if (!to) return { ok: false, error: "CONTACT_NO_EMAIL" };
   if (!template) return { ok: false, error: "TEMPLATE_NOT_FOUND" };
 
   const key = process.env.RESEND_API_KEY;
@@ -108,6 +122,41 @@ async function sendTemplateEmail(
   } catch (err) {
     return { ok: false, error: err instanceof Error ? err.message : String(err) };
   }
+}
+
+/** Resolve configured recipients without trusting IDs stored in JSON config. */
+async function resolveRecipients(
+  admin: SupabaseClient,
+  orgId: string,
+  step: Record<string, unknown>,
+  defaultRecipient: "customer" | "business",
+  org: Record<string, unknown> | null,
+  contact: Record<string, unknown> | null,
+): Promise<string[]> {
+  const recipient = String(step.recipient ?? defaultRecipient);
+  if (recipient === "customer") {
+    const email = contact?.email as string | null;
+    return email?.trim() ? [email.trim()] : [];
+  }
+  if (recipient === "business") {
+    const email = org?.email as string | null;
+    return email?.trim() ? [email.trim()] : [];
+  }
+  if (recipient !== "selected_members" || !Array.isArray(step.member_ids)) return [];
+  const requested = step.member_ids.map(String).filter((id) => /^[0-9a-f-]{36}$/i.test(id));
+  if (requested.length === 0) return [];
+  const { data: memberships } = await admin
+    .from("organization_members")
+    .select("user_id")
+    .eq("organization_id", orgId)
+    .in("user_id", requested);
+  const emails = await Promise.all(
+    (memberships ?? []).map(async ({ user_id }) => {
+      const { data } = await admin.rpc("get_user_email", { p_user_id: user_id });
+      return typeof data === "string" ? data.trim() : "";
+    }),
+  );
+  return [...new Set(emails.filter(Boolean))];
 }
 
 /** Resolve the org's email template by id (NULL-safe). */
@@ -153,7 +202,7 @@ async function runRow(
   // shared context
   const { data: org } = await admin
     .from("organizations")
-    .select("id, name, slug, email")
+    .select("id, name, slug, email, timezone")
     .eq("id", orgId)
     .maybeSingle();
   const { data: contact } = row.contact_id
@@ -163,11 +212,24 @@ async function runRow(
         .eq("id", row.contact_id)
         .maybeSingle()
     : { data: null };
+  const { data: appointment } = row.appointment_id
+    ? await admin
+        .from("appointments")
+        .select("starts_at, ends_at, timezone, token, status, service:services(name)")
+        .eq("id", row.appointment_id)
+        .maybeSingle()
+    : { data: null };
+
+  if (row.trigger_type === "appointment_reminder" &&
+      (!appointment || !["Scheduled", "Confirmed"].includes(String(appointment.status)))) {
+    return { ok: true, skipped: true };
+  }
 
   const vars = renderVars(
     row.step,
     (org as Record<string, unknown> | null) ?? null,
     contact as Record<string, unknown> | null,
+    appointment as Record<string, unknown> | null,
   );
 
   switch (type) {
@@ -235,24 +297,33 @@ async function runRow(
     }
     case "send_email": {
       const template = await resolveTemplate(admin, orgId, row.step.template_id as string | null);
-      return sendTemplateEmail(
-        (org as Record<string, unknown> | null) ?? null,
+      const recipients = await resolveRecipients(
+        admin, orgId, row.step, "customer", (org as Record<string, unknown> | null) ?? null,
         (contact as Record<string, unknown> | null) ?? null,
-        template,
-        vars,
       );
+      if (recipients.length === 0) return { ok: true, skipped: true };
+      for (const to of recipients) {
+        const outcome = await sendTemplateEmail((org as Record<string, unknown> | null) ?? null, to, template, vars);
+        if (!outcome.ok) return outcome;
+      }
+      return { ok: true };
     }
     case "notify": {
       const kind = notifyKindFor(row.step, row.trigger_type);
-      const orgEmail = (org?.email as string | null) ?? null;
-      if (!orgEmail) return { ok: true, skipped: true };
-      await sendNotificationEmail({
-        kind: kind as Parameters<typeof sendNotificationEmail>[0]["kind"],
-        to: orgEmail,
-        orgName: (org?.name as string) || "",
-        contactName: (contact?.first_name as string) || "",
-        extras: { automation: row.trigger_type },
-      });
+      const recipients = await resolveRecipients(
+        admin, orgId, row.step, "business", (org as Record<string, unknown> | null) ?? null,
+        (contact as Record<string, unknown> | null) ?? null,
+      );
+      if (recipients.length === 0) return { ok: true, skipped: true };
+      for (const to of recipients) {
+        await sendNotificationEmail({
+          kind: kind as Parameters<typeof sendNotificationEmail>[0]["kind"],
+          to,
+          orgName: (org?.name as string) || "",
+          contactName: (contact?.first_name as string) || "",
+          extras: { automation: row.trigger_type },
+        });
+      }
       return { ok: true };
     }
     default:
@@ -314,4 +385,54 @@ export async function processDueAutomationActions(
   }
 
   return result;
+}
+
+/** Enqueue each configured appointment reminder once when its time arrives. */
+export async function enqueueDueAppointmentReminders(): Promise<number> {
+  const admin = createAdminClient();
+  const now = new Date();
+  const horizon = new Date(now.getTime() + 7 * 86400_000).toISOString();
+  const { data: automations } = await admin
+    .from("automations")
+    .select("id, organization_id, action_config")
+    .eq("trigger_type", "appointment_reminder")
+    .eq("active", true);
+  let queued = 0;
+  for (const automation of automations ?? []) {
+    const config = (automation.action_config ?? {}) as { steps?: Record<string, unknown>[] };
+    const steps = Array.isArray(config.steps) ? config.steps : [];
+    const { data: appointments } = await admin
+      .from("appointments")
+      .select("id, contact_id, lead_id, organization_id, starts_at")
+      .eq("organization_id", automation.organization_id)
+      .in("status", ["Scheduled", "Confirmed"])
+      .gte("starts_at", now.toISOString())
+      .lte("starts_at", horizon);
+    for (const appointment of appointments ?? []) {
+      for (const step of steps) {
+        if (!step || (step.type !== "send_email" && step.type !== "notify")) continue;
+        const hoursBefore = Math.max(0, Number(step.hours_before ?? 24));
+        const runAt = new Date(new Date(String(appointment.starts_at)).getTime() - hoursBefore * 3600000);
+        if (runAt > now) continue;
+        const { data: existing } = await admin
+          .from("automation_actions")
+          .select("id, step")
+          .eq("appointment_id", appointment.id)
+          .eq("trigger_type", "appointment_reminder");
+        const duplicate = (existing ?? []).some((row) => JSON.stringify(row.step) === JSON.stringify(step));
+        if (duplicate) continue;
+        const { error } = await admin.from("automation_actions").insert({
+          organization_id: automation.organization_id,
+          trigger_type: "appointment_reminder",
+          step,
+          contact_id: appointment.contact_id,
+          lead_id: appointment.lead_id,
+          appointment_id: appointment.id,
+          run_at: now.toISOString(),
+        });
+        if (!error) queued += 1;
+      }
+    }
+  }
+  return queued;
 }

@@ -22,6 +22,7 @@ const TRIGGER_DESCRIPTIONS: Record<AutomationTrigger, string> = {
   lead_stage_changed: "When a lead moves between stages",
   appointment_cancelled: "When an appointment is cancelled",
   appointment_no_show: "When an appointment is marked no-show",
+  appointment_reminder: "Before an upcoming appointment",
 };
 
 export default async function AutomationsPage() {

@@ -1,5 +1,6 @@
 "use server";
 
+import { localDateTimeToUtc } from "@/lib/timezone";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
@@ -496,7 +497,13 @@ export async function createLeadAction(_prev: CrmState, formData: FormData): Pro
   const expectedRaw = text(formData, "expectedValue");
   const expectedValue = expectedRaw === "" ? null : Number(expectedRaw);
   const nextFollowUpRaw = text(formData, "nextFollowUpAt");
-  const nextFollowUpAt = nextFollowUpRaw === "" ? null : new Date(nextFollowUpRaw).toISOString();
+  const nextFollowUpAt =
+    nextFollowUpRaw === ""
+      ? null
+      : (localDateTimeToUtc(
+          nextFollowUpRaw,
+          ctx?.org?.timezone ?? "America/Halifax",
+        )?.toISOString() ?? null);
 
   const supabase = await createClient();
   const { data, error } = await supabase
@@ -540,7 +547,13 @@ export async function updateLeadAction(_prev: CrmState, formData: FormData): Pro
   const expectedRaw = text(formData, "expectedValue");
   const expectedValue = expectedRaw === "" ? null : Number(expectedRaw);
   const nextFollowUpRaw = text(formData, "nextFollowUpAt");
-  const nextFollowUpAt = nextFollowUpRaw === "" ? null : new Date(nextFollowUpRaw).toISOString();
+  const nextFollowUpAt =
+    nextFollowUpRaw === ""
+      ? null
+      : (localDateTimeToUtc(
+          nextFollowUpRaw,
+          ctx?.org?.timezone ?? "America/Halifax",
+        )?.toISOString() ?? null);
 
   const supabase = await createClient();
   const { error } = await supabase

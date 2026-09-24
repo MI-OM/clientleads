@@ -5,7 +5,7 @@ import { LEAD_SOURCES, LEAD_STAGES, PRIORITIES } from "@/lib/crm/constants";
 import { createLeadAction, updateLeadAction } from "@/lib/crm/actions";
 import type { CrmState } from "@/lib/crm/actions";
 import type { Lead, OrgMember } from "@/lib/crm/types";
-import { toLocalInputValue } from "@/lib/crm/format";
+import { utcToLocalDateTime } from "@/lib/timezone";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -19,12 +19,14 @@ export function LeadForm({
   members,
   initial,
   preselectContactId,
+  timezone,
 }: {
   mode: "create" | "edit";
   contacts: Array<{ id: string; name: string }>;
   members: OrgMember[];
   initial?: Lead;
   preselectContactId?: string;
+  timezone: string;
 }) {
   const action = mode === "create" ? createLeadAction : updateLeadAction;
   const [state, formAction, pending] = useActionState<CrmState, FormData>(action, {});
@@ -117,7 +119,7 @@ export function LeadForm({
               id="nextFollowUpAt"
               name="nextFollowUpAt"
               type="datetime-local"
-              defaultValue={toLocalInputValue(initial?.nextFollowUpAt)}
+              defaultValue={utcToLocalDateTime(initial?.nextFollowUpAt, timezone)}
             />
           </div>
           <div className="grid gap-2 sm:col-span-2">

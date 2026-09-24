@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { processDueAutomationActions } from "@/lib/automations/run";
+import { enqueueDueAppointmentReminders, processDueAutomationActions } from "@/lib/automations/run";
 
 export const dynamic = "force-dynamic";
 
@@ -15,6 +15,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 
+  const queuedReminders = await enqueueDueAppointmentReminders();
   const result = await processDueAutomationActions();
-  return NextResponse.json(result);
+  return NextResponse.json({ ...result, queuedReminders });
 }

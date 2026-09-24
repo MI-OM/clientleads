@@ -26,7 +26,8 @@ export type AutomationTrigger =
   | "contact_created"
   | "lead_stage_changed"
   | "appointment_cancelled"
-  | "appointment_no_show";
+  | "appointment_no_show"
+  | "appointment_reminder";
 
 export const AUTOMATION_TRIGGERS: AutomationTrigger[] = [
   "appointment_booked",
@@ -37,6 +38,7 @@ export const AUTOMATION_TRIGGERS: AutomationTrigger[] = [
   "lead_stage_changed",
   "appointment_cancelled",
   "appointment_no_show",
+  "appointment_reminder",
 ];
 
 export const AUTOMATION_TRIGGER_LABELS: Record<AutomationTrigger, string> = {
@@ -48,6 +50,7 @@ export const AUTOMATION_TRIGGER_LABELS: Record<AutomationTrigger, string> = {
   lead_stage_changed: "Lead stage changed",
   appointment_cancelled: "Appointment cancelled",
   appointment_no_show: "Appointment no-show",
+  appointment_reminder: "Appointment reminder",
 };
 
 /** Step types the engine can execute (see migration 00015 for semantics). */
@@ -89,6 +92,7 @@ export const AUTOMATION_STEP_TYPES_BY_TRIGGER: Record<AutomationTrigger, Automat
   lead_stage_changed: ["create_task", "add_tags", "add_activity", "send_email", "notify"],
   appointment_cancelled: ["create_task", "add_activity", "send_email", "notify"],
   appointment_no_show: ["create_task", "add_activity", "send_email", "notify"],
+  appointment_reminder: ["send_email", "notify"],
 };
 
 /** @deprecated use AUTOMATION_STEP_TYPES_BY_TRIGGER */
@@ -103,6 +107,12 @@ export const NOTIFY_KINDS = [
   "appointment_rescheduled",
 ] as const;
 export type NotifyKind = (typeof NOTIFY_KINDS)[number];
+export type AutomationRecipient = "customer" | "business" | "selected_members";
+export const AUTOMATION_RECIPIENTS: AutomationRecipient[] = [
+  "customer",
+  "business",
+  "selected_members",
+];
 
 export interface CreateTaskStep {
   type: "create_task";
@@ -128,10 +138,17 @@ export interface SendEmailStep {
   type: "send_email";
   template_id?: string | null;
   delay_hours?: number;
+  hours_before?: number;
+  /** Customer/contact by default; members are resolved server-side at send time. */
+  recipient?: AutomationRecipient;
+  member_ids?: string[];
 }
 export interface NotifyStep {
   type: "notify";
   kind?: NotifyKind;
+  /** Business inbox by default; selected members are resolved server-side. */
+  recipient?: Exclude<AutomationRecipient, "customer">;
+  member_ids?: string[];
 }
 
 export type AutomationStep =
@@ -179,6 +196,12 @@ export interface Automation {
 
 const KNOWN_PRIORITIES = new Set(["Low", "Normal", "High", "Urgent"]);
 const KNOWN_NOTIFY_KINDS = new Set<string>(NOTIFY_KINDS);
+const KNOWN_RECIPIENTS = new Set<string>(AUTOMATION_RECIPIENTS);
+
+function parseMemberIds(raw: unknown): string[] {
+  if (!Array.isArray(raw)) return [];
+  return [...new Set(raw.map(String).filter((id) => /^[0-9a-f-]{36}$/i.test(id)))].slice(0, 25);
+}
 
 function clampDays(n: unknown): number {
   const v = typeof n === "number" && Number.isFinite(n) ? Math.round(n) : 0;
@@ -230,12 +253,19 @@ function parseStep(raw: Record<string, unknown>): AutomationStep | null {
         type: "send_email",
         template_id: raw.template_id ? String(raw.template_id) : null,
         delay_hours: clampHours(raw.delay_hours),
+        hours_before: clampHours(raw.hours_before),
+        recipient: KNOWN_RECIPIENTS.has(String(raw.recipient))
+          ? (raw.recipient as AutomationRecipient)
+          : "customer",
+        member_ids: parseMemberIds(raw.member_ids),
       };
     case "notify": {
       const kind = String(raw.kind ?? "new_lead");
       return {
         type: "notify",
         kind: KNOWN_NOTIFY_KINDS.has(kind) ? (kind as NotifyKind) : "new_lead",
+        recipient: raw.recipient === "selected_members" ? "selected_members" : "business",
+        member_ids: parseMemberIds(raw.member_ids),
       };
     }
     default:

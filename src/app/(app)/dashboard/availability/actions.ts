@@ -1,5 +1,6 @@
 "use server";
 
+import { localDateTimeToUtc } from "@/lib/timezone";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { getMyOrg } from "@/lib/auth/org";
@@ -98,8 +99,10 @@ export async function addBlockedTimeAction(
   const endsAt = String(formData.get("endsAt") ?? "").trim();
   const reason = String(formData.get("reason") ?? "").trim() || null;
 
-  const startDate = startsAt ? new Date(startsAt) : null;
-  const endDate = endsAt ? new Date(endsAt) : null;
+  const startDate = startsAt
+    ? localDateTimeToUtc(startsAt, ctx.org.timezone ?? "America/Halifax")
+    : null;
+  const endDate = endsAt ? localDateTimeToUtc(endsAt, ctx.org.timezone ?? "America/Halifax") : null;
   if (!startDate || !endDate) return { error: "Start and end date/time are required." };
   if (Number.isNaN(startDate.getTime()) || Number.isNaN(endDate.getTime())) {
     return { error: "Those dates don't look valid." };

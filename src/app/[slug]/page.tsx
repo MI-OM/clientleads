@@ -322,32 +322,29 @@ export default async function PublicBusinessPage({
           >
             <div className="grid gap-8 lg:grid-cols-2 lg:items-start">
               <div>
-                <SectionTitle>{page.forms[0].name}</SectionTitle>
+                <SectionTitle>Get in touch</SectionTitle>
                 <p className="mt-4 max-w-md text-muted-foreground">
-                  Send us a message and we&apos;ll get back to you — no commitment, just a
-                  conversation.
+                  Choose a form and send us a message — no commitment, just a conversation.
                 </p>
                 {page.forms.length > 1 ? (
                   <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
                     {page.forms.map((form) => (
                       <li key={form.id}>
-                        <Link
-                          href={`#${form.slug}`}
-                          className="text-primary underline-offset-4 hover:underline"
-                        >
+                        <a href={`#${form.slug}`} className="text-primary underline-offset-4 hover:underline">
                           {form.name}
-                        </Link>
+                        </a>
                       </li>
                     ))}
                   </ul>
                 ) : null}
               </div>
-              <div className="lg:max-w-lg">
-                <LeadForm
-                  form={page.forms[0]}
-                  pageSlug={org.slug}
-                  serviceName={requestedService?.name}
-                />
+              <div className="grid gap-8 lg:col-span-2">
+                {page.forms.map((form) => (
+                  <div key={form.id} id={form.slug} className="scroll-mt-24 rounded-lg border border-border bg-card p-5 lg:p-6">
+                    <h3 className="mb-4 text-lg font-semibold">{form.name}</h3>
+                    <LeadForm form={form} pageSlug={org.slug} serviceName={requestedService?.name} />
+                  </div>
+                ))}
               </div>
             </div>
           </Section>

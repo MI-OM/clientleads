@@ -11,6 +11,7 @@ export default async function FormsPage() {
   const ctx = await getMyOrg();
   const canManage = ctx?.role === "owner" || ctx?.role === "admin";
   const forms = ctx ? await listForms(ctx.org.id) : [];
+  const appUrl = (process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000").replace(/\/+$/, "");
 
   return (
     <div className="flex flex-col gap-6">
@@ -48,6 +49,12 @@ export default async function FormsPage() {
               </CardHeader>
               <CardContent className="flex flex-1 flex-col gap-3">
                 <p className="font-mono text-xs text-muted-foreground">/{form.slug}</p>
+                {form.active ? (
+                  <details className="text-xs">
+                    <summary className="cursor-pointer font-medium text-primary">Embed on another site</summary>
+                    <code className="mt-2 block overflow-x-auto rounded bg-muted p-2">{`<iframe src="${appUrl}/${ctx?.org.slug ?? ""}/forms/${form.slug}/embed" title="${form.name}" style="width:100%;min-height:520px;border:0"></iframe>`}</code>
+                  </details>
+                ) : null}
                 {form.description ? (
                   <p className="line-clamp-2 text-sm text-muted-foreground">{form.description}</p>
                 ) : null}

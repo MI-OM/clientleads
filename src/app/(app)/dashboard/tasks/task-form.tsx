@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
+import { utcToLocalDateTime } from "@/lib/timezone";
 
 export interface TaskFormOption {
   id: string;
@@ -23,19 +24,10 @@ interface TaskFormProps {
   contacts: TaskFormOption[];
   leads: TaskFormOption[];
   appointments: TaskFormOption[];
+  timezone: string;
 }
 
 /** ISO timestamp → value for an <input type="datetime-local"> (local tz). */
-function toLocalInput(iso: string | null | undefined): string {
-  if (!iso) return "";
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return "";
-  const pad = (n: number) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}T${pad(
-    d.getHours(),
-  )}:${pad(d.getMinutes())}`;
-}
-
 function FormStatus({ state }: { state: TaskActionState }) {
   if (!state.error) return null;
   return (
@@ -45,7 +37,7 @@ function FormStatus({ state }: { state: TaskActionState }) {
   );
 }
 
-export function TaskForm({ task, members, contacts, leads, appointments }: TaskFormProps) {
+export function TaskForm({ task, members, contacts, leads, appointments, timezone }: TaskFormProps) {
   const [state, formAction, pending] = useActionState<TaskActionState, FormData>(
     task ? updateTaskAction : createTaskAction,
     {},
@@ -100,7 +92,7 @@ export function TaskForm({ task, members, contacts, leads, appointments }: TaskF
                 id="dueDate"
                 name="dueDate"
                 type="datetime-local"
-                defaultValue={toLocalInput(task?.dueDate)}
+                defaultValue={utcToLocalDateTime(task?.dueDate, timezone)}
               />
             </div>
             <div className="grid gap-2">

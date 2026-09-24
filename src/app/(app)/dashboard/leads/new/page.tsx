@@ -26,6 +26,7 @@ export default async function NewLeadPage({
         contacts={contacts}
         members={members}
         preselectContactId={preselect}
+        timezone={ctx.org.timezone}
       />
     </div>
   );

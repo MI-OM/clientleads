@@ -18,6 +18,7 @@ export default async function NewTaskPage() {
         contacts={options.contacts}
         leads={options.leads}
         appointments={options.appointments}
+        timezone={ctx.org.timezone}
       />
     </div>
   );

@@ -44,7 +44,7 @@ const RECIPIENT_STATUS_VARIANT: Record<
   Suppressed: "danger",
 };
 
-function formatWhen(value: string | null): string {
+function formatWhen(value: string | null, timeZone: string): string {
   if (!value) return "—";
   const d = new Date(value);
   return Number.isNaN(d.getTime())
@@ -52,6 +52,7 @@ function formatWhen(value: string | null): string {
     : new Intl.DateTimeFormat("en-CA", {
         dateStyle: "medium",
         timeStyle: "short",
+        timeZone,
       }).format(d);
 }
 
@@ -138,11 +139,11 @@ export default async function CampaignDetailPage({ params }: CampaignDetailPageP
               </div>
               <div>
                 <dt className="text-muted-foreground">Scheduled for</dt>
-                <dd>{formatWhen(campaign.scheduledFor)}</dd>
+                <dd>{formatWhen(campaign.scheduledFor, ctx.org.timezone)}</dd>
               </div>
               <div>
                 <dt className="text-muted-foreground">Sent</dt>
-                <dd>{formatWhen(campaign.sentAt)}</dd>
+                <dd>{formatWhen(campaign.sentAt, ctx.org.timezone)}</dd>
               </div>
             </dl>
             {campaign.previewText ? (
@@ -224,7 +225,7 @@ export default async function CampaignDetailPage({ params }: CampaignDetailPageP
                           {RECIPIENT_STATUS_LABELS[r.status]}
                         </Badge>
                       </td>
-                      <td className="py-2 pr-4 text-muted-foreground">{formatWhen(r.sentAt)}</td>
+                      <td className="py-2 pr-4 text-muted-foreground">{formatWhen(r.sentAt, ctx.org.timezone)}</td>
                       <td className="py-2 text-muted-foreground">
                         {formatWhen(
                           r.openedAt ??
@@ -232,6 +233,7 @@ export default async function CampaignDetailPage({ params }: CampaignDetailPageP
                             r.bouncedAt ??
                             r.unsubscribedAt ??
                             r.deliveredAt,
+                          ctx.org.timezone,
                         )}
                       </td>
                     </tr>

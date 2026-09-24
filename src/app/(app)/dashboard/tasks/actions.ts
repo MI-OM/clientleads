@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { localDateTimeToUtc } from "@/lib/timezone";
 import { createClient } from "@/lib/supabase/server";
 import { getCurrentUser, getMyOrg } from "@/lib/auth/org";
 import { getTask } from "@/lib/tasks/queries";
@@ -53,8 +54,9 @@ async function parseTaskInput(formData: FormData): Promise<ParsedTaskInput | { e
   const dueRaw = String(formData.get("dueDate") ?? "").trim();
   let dueDate: string | null = null;
   if (dueRaw) {
-    const due = new Date(dueRaw);
-    if (Number.isNaN(due.getTime())) return { error: "That due date doesn't look valid." };
+    const tz = (await getMyOrg())?.org?.timezone ?? "America/Halifax";
+    const due = localDateTimeToUtc(dueRaw, tz);
+    if (!due) return { error: "That due date doesn't look valid." };
     dueDate = due.toISOString();
   }
 
@@ -173,7 +175,7 @@ export async function updateTaskAction(
   const user = await getCurrentUser();
   const current = await getTask(ctx.org.id, id);
   if (!current) return { error: "Task not found." };
-  if (!await canManageTask(current, user?.id, ctx)) {
+  if (!(await canManageTask(current, user?.id, ctx))) {
     return { error: "You can only manage tasks assigned to you (or created by you)." };
   }
 
@@ -275,7 +277,7 @@ export async function setTaskStatusAction(formData: FormData): Promise<void> {
   const user = await getCurrentUser();
   const current = await getTask(ctx.org.id, id);
   if (!current) return;
-  if (!await canManageTask(current, user?.id, ctx)) return;
+  if (!(await canManageTask(current, user?.id, ctx))) return;
 
   const { error } = await supabase
     .from("tasks")
@@ -327,7 +329,7 @@ export async function deleteTaskAction(formData: FormData): Promise<void> {
   const user = await getCurrentUser();
   const current = await getTask(ctx.org.id, id);
   if (!current) return;
-  if (!await canManageTask(current, user?.id, ctx)) return;
+  if (!(await canManageTask(current, user?.id, ctx))) return;
 
   await supabase.from("tasks").delete().eq("id", id).eq("organization_id", ctx.org.id);
 
@@ -356,4 +358,42 @@ export async function deleteTaskAction(formData: FormData): Promise<void> {
   }
 
   revalidatePath("/dashboard/tasks");
+}
+
+export async function bulkDeleteTasksAction(
+  _prev: TaskActionState,
+  formData: FormData,
+): Promise<TaskActionState> {
+  const ctx = await getMyOrg();
+  if (!ctx) return { error: "No workspace was found for your account." };
+  const ids = formData
+    .getAll("taskId")
+    .map(String)
+    .filter((id) => /^[0-9a-f-]{36}$/i.test(id));
+  if (ids.length === 0) return { error: "Select at least one task." };
+
+  const supabase = await createClient();
+  const user = await getCurrentUser();
+  const { data: rows, error: loadError } = await supabase
+    .from("tasks")
+    .select("id, assignee_id, created_by")
+    .eq("organization_id", ctx.org.id)
+    .in("id", ids);
+  if (loadError) return { error: loadError.message };
+
+  const allowed = isAdmin(ctx)
+    ? (rows ?? []).map((row) => String(row.id))
+    : (rows ?? [])
+        .filter((row) => row.assignee_id === user?.id || row.created_by === user?.id)
+        .map((row) => String(row.id));
+  if (allowed.length === 0) return { error: "You can only delete tasks assigned to or created by you." };
+
+  const { error } = await supabase
+    .from("tasks")
+    .delete()
+    .eq("organization_id", ctx.org.id)
+    .in("id", allowed);
+  if (error) return { error: error.message };
+  revalidatePath("/dashboard/tasks");
+  return { ok: true };
 }

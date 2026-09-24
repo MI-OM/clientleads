@@ -47,7 +47,23 @@ function formatWhen(startsAt: string, endsAt: string, timezone: string): string 
     }).format(end)}`;
     return `${date} · ${times}`;
   } catch {
-    return new Date(startsAt).toLocaleString();
+    const date = new Intl.DateTimeFormat("en-CA", {
+      timeZone: timezone,
+      weekday: "short",
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    }).format(new Date(startsAt));
+    const times = `${new Intl.DateTimeFormat("en-CA", {
+      timeZone: timezone,
+      hour: "numeric",
+      minute: "2-digit",
+    }).format(new Date(startsAt))}–${new Intl.DateTimeFormat("en-CA", {
+      timeZone: timezone,
+      hour: "numeric",
+      minute: "2-digit",
+    }).format(new Date(endsAt))}`;
+    return `${date} · ${times}`;
   }
 }
 

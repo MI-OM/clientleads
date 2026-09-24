@@ -68,6 +68,7 @@ export function CampaignControls({
               <input
                 type="datetime-local"
                 name="scheduledFor"
+                required
                 className="flex h-10 w-full rounded-md border border-input bg-card px-3 py-2 text-sm shadow-sm"
               />
               <div>

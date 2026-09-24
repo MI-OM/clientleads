@@ -16,6 +16,16 @@ export function localDateTimeToUtc(value: string, timeZone: string): Date | null
 
   const [, year, month, day, hour, minute] = match;
   const wallClock = Date.UTC(+year, +month - 1, +day, +hour, +minute);
+  const check = new Date(wallClock);
+  if (
+    check.getUTCFullYear() !== +year ||
+    check.getUTCMonth() + 1 !== +month ||
+    check.getUTCDate() !== +day ||
+    check.getUTCHours() !== +hour ||
+    check.getUTCMinutes() !== +minute
+  ) {
+    return null;
+  }
   let instant = wallClock;
 
   for (let attempt = 0; attempt < 3; attempt += 1) {
@@ -42,5 +52,30 @@ export function localDateTimeToUtc(value: string, timeZone: string): Date | null
   }
 
   const result = new Date(instant);
-  return Number.isNaN(result.getTime()) ? null : result;
+  if (Number.isNaN(result.getTime())) return null;
+  return formatDateTimeInZone(result, timeZone) === value ? result : null;
+}
+
+/** Format a stored UTC timestamp for an IANA-zone datetime-local input. */
+export function utcToLocalDateTime(iso: string | null | undefined, timeZone: string): string {
+  if (!iso || !isValidTimeZone(timeZone)) return "";
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return "";
+  return formatDateTimeInZone(date, timeZone);
+}
+
+function formatDateTimeInZone(date: Date, timeZone: string): string {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    timeZone,
+    hour12: false,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).formatToParts(date);
+  const values = Object.fromEntries(
+    parts.filter(({ type }) => type !== "literal").map(({ type, value }) => [type, value]),
+  );
+  return `${values.year}-${values.month}-${values.day}T${values.hour === "24" ? "00" : values.hour}:${values.minute}`;
 }

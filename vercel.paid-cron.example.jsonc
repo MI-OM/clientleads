@@ -1,0 +1,15 @@
+// Vercel Hobby accepts cron jobs only once daily. Keep this out of
+// vercel.json while validating on the free plan. When upgrading, copy this
+// "crons" array into vercel.json and redeploy.
+{
+  "crons": [
+    {
+      "path": "/api/campaigns/schedule",
+      "schedule": "*/5 * * * *",
+    },
+    {
+      "path": "/api/automations/run",
+      "schedule": "*/5 * * * *",
+    },
+  ],
+}

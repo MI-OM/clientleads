@@ -130,6 +130,52 @@ export const listTasks = cache(
   },
 );
 
+export const listTasksPage = cache(
+  async (
+    orgId: string,
+    opts: { view?: TaskView; userId?: string; page?: number; pageSize?: number } = {},
+  ): Promise<{ tasks: Task[]; total: number; page: number; totalPages: number }> => {
+    const supabase = await createClient();
+    const page = Math.max(1, opts.page ?? 1);
+    const pageSize = opts.pageSize ?? 25;
+    const now = new Date();
+    const nowIso = now.toISOString();
+    const soonIso = new Date(now.getTime() + 7 * 86400_000).toISOString();
+    const view = opts.view ?? "mine";
+
+    let query = supabase
+      .from("tasks")
+      .select(
+        "id, organization_id, title, description, contact_id, lead_id, appointment_id, assignee_id, created_by, due_date, priority, status, notes, completed_at, created_at, updated_at",
+        { count: "exact" },
+      )
+      .eq("organization_id", orgId);
+
+    if (view === "mine") {
+      if (!opts.userId) return { tasks: [], total: 0, page, totalPages: 1 };
+      query = query.or(`assignee_id.eq.${opts.userId},created_by.eq.${opts.userId}`);
+    } else if (view === "open") {
+      query = query.in("status", OPEN_TASK_STATUSES);
+    } else if (view === "overdue") {
+      query = query.in("status", OPEN_TASK_STATUSES).lt("due_date", nowIso);
+    } else if (view === "due-soon") {
+      query = query
+        .in("status", OPEN_TASK_STATUSES)
+        .gte("due_date", nowIso)
+        .lte("due_date", soonIso);
+    }
+
+    const from = (page - 1) * pageSize;
+    const { data, count } = await query
+      .order("status", { ascending: true })
+      .order("due_date", { ascending: true, nullsFirst: false })
+      .range(from, from + pageSize - 1);
+    const tasks = await attachNames((data ?? []).map((r) => mapTask(r as unknown as TaskRow)));
+    const total = count ?? 0;
+    return { tasks, total, page, totalPages: Math.max(1, Math.ceil(total / pageSize)) };
+  },
+);
+
 export const getTask = cache(async (orgId: string, id: string): Promise<Task | null> => {
   const supabase = await createClient();
   const { data } = await supabase

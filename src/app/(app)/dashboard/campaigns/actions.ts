@@ -221,9 +221,13 @@ export async function scheduleCampaignAction(
   const raw = String(formData.get("scheduledFor") ?? "").trim();
   const timeZone = String(formData.get("timeZone") ?? ctx.org.timezone ?? "America/Halifax").trim();
   if (!isValidTimeZone(timeZone)) return { error: "Choose a valid timezone in business settings." };
-  const scheduledDate = raw ? localDateTimeToUtc(raw, timeZone) : null;
-  if (raw && !scheduledDate) return { error: "That date doesn't look valid." };
-  const scheduledFor = scheduledDate?.toISOString() ?? null;
+  if (!raw) return { error: "Choose a future date and time for this campaign." };
+  const scheduledDate = localDateTimeToUtc(raw, timeZone);
+  if (!scheduledDate) return { error: "That date doesn't look valid in your business timezone." };
+  if (scheduledDate.getTime() <= Date.now()) {
+    return { error: "Choose a future date and time for this campaign." };
+  }
+  const scheduledFor = scheduledDate.toISOString();
 
   const admin = createAdminClient();
   const { data, error } = await admin.rpc("schedule_campaign", {

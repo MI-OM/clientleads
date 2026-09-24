@@ -3,10 +3,6 @@
     {
       "path": "/api/campaigns/schedule",
       "schedule": "0 8 * * *"
-    },
-    {
-      "path": "/api/automations/run",
-      "schedule": "30 8 * * *"
     }
   ]
 }

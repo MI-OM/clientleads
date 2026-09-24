@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { getMyOrg } from "@/lib/auth/org";
+import { isValidTimeZone } from "@/lib/timezone";
 
 export interface SettingsState {
   error?: string;
@@ -45,6 +46,7 @@ export async function updateOrganizationAction(
     .toLowerCase();
   const primaryColor = String(formData.get("primaryColor") ?? "").trim();
   const secondaryColor = String(formData.get("secondaryColor") ?? "").trim();
+  const timezone = String(formData.get("timezone") ?? "America/Halifax").trim();
 
   if (!name) return { error: "Business name is required." };
   if (!SLUG.test(slug)) {
@@ -55,6 +57,7 @@ export async function updateOrganizationAction(
   if (!HEX_COLOR.test(primaryColor) || !HEX_COLOR.test(secondaryColor)) {
     return { error: "Brand colors must be 6-digit hex codes, e.g. #14532d." };
   }
+  if (!isValidTimeZone(timezone)) return { error: "Choose a valid IANA timezone." };
 
   const social_links: Record<string, string> = {};
   for (const key of SOCIAL_KEYS) {
@@ -78,7 +81,7 @@ export async function updateOrganizationAction(
       province: String(formData.get("province") ?? "").trim() || null,
       country: String(formData.get("country") ?? "").trim() || null,
       postal_code: String(formData.get("postalCode") ?? "").trim() || null,
-      timezone: String(formData.get("timezone") ?? "").trim(),
+      timezone,
       primary_color: primaryColor,
       secondary_color: secondaryColor,
       social_links,

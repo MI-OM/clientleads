@@ -45,6 +45,11 @@ const NOTIFY_KIND_LABELS: Record<string, string> = {
   appointment_cancelled: "Appointment cancelled",
   appointment_rescheduled: "Appointment rescheduled",
 };
+const RECIPIENT_LABELS: Record<string, string> = {
+  customer: "Customer/contact",
+  business: "Business inbox",
+  selected_members: "Selected team members",
+};
 
 interface AutomationConfigFormProps {
   automation: Automation;
@@ -305,22 +310,60 @@ export function AutomationConfigForm({ automation, trigger, options }: Automatio
                       </Select>
                     </div>
                     <div className="grid gap-1.5">
-                      <Label htmlFor={`delay-${automation.id}-${i}`}>Send after (hours)</Label>
+                      <Label htmlFor={`delay-${automation.id}-${i}`}>
+                        {trigger === "appointment_reminder" ? "Send before appointment (hours)" : "Send after (hours)"}
+                      </Label>
                       <Input
                         id={`delay-${automation.id}-${i}`}
                         type="number"
                         min={0}
                         max={8760}
                         step={1}
-                        value={String((step as { delay_hours?: number }).delay_hours ?? 0)}
-                        onChange={(e) => patchStep(i, { delay_hours: Number(e.target.value) })}
+                        value={String(
+                          trigger === "appointment_reminder"
+                            ? ((step as { hours_before?: number }).hours_before ?? 24)
+                            : ((step as { delay_hours?: number }).delay_hours ?? 0),
+                        )}
+                        onChange={(e) =>
+                          patchStep(
+                            i,
+                            trigger === "appointment_reminder"
+                              ? { hours_before: Number(e.target.value) }
+                              : { delay_hours: Number(e.target.value) },
+                          )
+                        }
                       />
                     </div>
+                    <div className="grid gap-1.5">
+                      <Label htmlFor={`email-recipient-${automation.id}-${i}`}>Send to</Label>
+                      <Select
+                        id={`email-recipient-${automation.id}-${i}`}
+                        value={(step as { recipient?: string }).recipient ?? "customer"}
+                        onChange={(e) => patchStep(i, { recipient: e.target.value as "customer" | "business" | "selected_members", member_ids: [] })}
+                      >
+                        {Object.entries(RECIPIENT_LABELS).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+                      </Select>
+                    </div>
+                    {(step as { recipient?: string }).recipient === "selected_members" ? (
+                      <div className="grid gap-1.5 sm:col-span-2">
+                        <Label htmlFor={`email-members-${automation.id}-${i}`}>Team members</Label>
+                        <select
+                          id={`email-members-${automation.id}-${i}`}
+                          multiple
+                          value={(step as { member_ids?: string[] }).member_ids ?? []}
+                          onChange={(e) => patchStep(i, { member_ids: Array.from(e.target.selectedOptions, (option) => option.value) })}
+                          className="min-h-24 rounded-md border border-input bg-card px-3 py-2 text-sm"
+                        >
+                          {options.members.map((member) => <option key={member.id} value={member.id}>{member.name}</option>)}
+                        </select>
+                      </div>
+                    ) : null}
                   </div>
                 )}
 
                 {step.type === "notify" && (
-                  <div className="grid gap-1.5">
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    <div className="grid gap-1.5">
                     <Label htmlFor={`notify-kind-${automation.id}-${i}`}>Notification kind</Label>
                     <Select
                       id={`notify-kind-${automation.id}-${i}`}
@@ -333,6 +376,32 @@ export function AutomationConfigForm({ automation, trigger, options }: Automatio
                         </option>
                       ))}
                     </Select>
+                    </div>
+                    <div className="grid gap-1.5">
+                      <Label htmlFor={`notify-recipient-${automation.id}-${i}`}>Notify</Label>
+                      <Select
+                        id={`notify-recipient-${automation.id}-${i}`}
+                        value={(step as { recipient?: string }).recipient ?? "business"}
+                        onChange={(e) => patchStep(i, { recipient: e.target.value as "business" | "selected_members", member_ids: [] })}
+                      >
+                        <option value="business">Business inbox</option>
+                        <option value="selected_members">Selected team members</option>
+                      </Select>
+                    </div>
+                    {(step as { recipient?: string }).recipient === "selected_members" ? (
+                      <div className="grid gap-1.5 sm:col-span-2">
+                        <Label htmlFor={`notify-members-${automation.id}-${i}`}>Team members</Label>
+                        <select
+                          id={`notify-members-${automation.id}-${i}`}
+                          multiple
+                          value={(step as { member_ids?: string[] }).member_ids ?? []}
+                          onChange={(e) => patchStep(i, { member_ids: Array.from(e.target.selectedOptions, (option) => option.value) })}
+                          className="min-h-24 rounded-md border border-input bg-card px-3 py-2 text-sm"
+                        >
+                          {options.members.map((member) => <option key={member.id} value={member.id}>{member.name}</option>)}
+                        </select>
+                      </div>
+                    ) : null}
                   </div>
                 )}
               </div>
