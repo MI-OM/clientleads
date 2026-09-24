@@ -1,14 +1,12 @@
 import { redirect } from "next/navigation";
-import { Bot, Power, PowerOff } from "lucide-react";
 import { PageHeader } from "@/components/dashboard/page-header";
-import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { getMyOrg } from "@/lib/auth/org";
 import { listAutomations } from "@/lib/automations/queries";
 import { AUTOMATION_TRIGGERS, AUTOMATION_TRIGGER_LABELS } from "@/lib/automations/types";
 import type { AutomationTrigger } from "@/lib/automations/types";
-import { toggleAutomationAction } from "./actions";
-import { AutomationConfigForm, type AutomationFormOptions } from "./automation-config-form";
+import { AutomationCard } from "./automation-card";
+import type { AutomationFormOptions } from "./automation-config-form";
 import { listForms } from "@/lib/forms/queries";
 import { listServices } from "@/lib/services/queries";
 import { listResources } from "@/lib/resources/queries";
@@ -62,59 +60,31 @@ export default async function AutomationsPage() {
       <div className="grid gap-6 lg:grid-cols-2">
         {AUTOMATION_TRIGGERS.map((trigger) => {
           const automation = automations.find((a) => a.triggerType === trigger) ?? null;
-          return (
+          return automation ? (
+            <AutomationCard
+              key={trigger}
+              automation={automation}
+              trigger={trigger}
+              description={TRIGGER_DESCRIPTIONS[trigger]}
+              options={options}
+            />
+          ) : (
             <Card key={trigger} className="flex flex-col gap-4">
               <CardHeader>
                 <div className="flex items-start justify-between gap-3">
-                  <div className="flex items-start gap-3">
-                    <Bot className="mt-0.5 size-5 text-primary" aria-hidden />
-                    <div>
-                      <CardTitle className="text-base">
-                        {automation?.name ?? AUTOMATION_TRIGGER_LABELS[trigger]}
-                      </CardTitle>
-                      <CardDescription>{TRIGGER_DESCRIPTIONS[trigger]}</CardDescription>
-                    </div>
+                  <div>
+                    <CardTitle className="text-base">
+                      {AUTOMATION_TRIGGER_LABELS[trigger]}
+                    </CardTitle>
+                    <CardDescription>{TRIGGER_DESCRIPTIONS[trigger]}</CardDescription>
                   </div>
-                  <Badge variant={automation?.active ? "success" : "secondary"}>
-                    {automation?.active ? "On" : "Off"}
-                  </Badge>
                 </div>
               </CardHeader>
               <CardContent className="flex flex-col gap-4">
-                <p className="text-xs text-muted-foreground">
-                  Trigger: <code className="font-mono">{AUTOMATION_TRIGGER_LABELS[trigger]}</code>
+                <p className="text-sm text-muted-foreground">
+                  This trigger isn&apos;t configured yet — the migration seed only covers the
+                  “first-client” demo org.
                 </p>
-                {automation ? (
-                  <>
-                    <form action={toggleAutomationAction}>
-                      <input type="hidden" name="id" value={automation.id} />
-                      <button
-                        type="submit"
-                        className="inline-flex h-9 items-center gap-1.5 rounded-md border border-input bg-card px-3 text-sm font-medium shadow-sm hover:bg-accent"
-                      >
-                        {automation.active ? (
-                          <>
-                            <PowerOff className="size-4" aria-hidden /> Turn off
-                          </>
-                        ) : (
-                          <>
-                            <Power className="size-4" aria-hidden /> Turn on
-                          </>
-                        )}
-                      </button>
-                    </form>
-                    <AutomationConfigForm
-                      automation={automation}
-                      trigger={trigger}
-                      options={options}
-                    />
-                  </>
-                ) : (
-                  <p className="text-sm text-muted-foreground">
-                    This trigger isn&apos;t configured yet — the migration seed only covers the
-                    “first-client” demo org.
-                  </p>
-                )}
               </CardContent>
             </Card>
           );
