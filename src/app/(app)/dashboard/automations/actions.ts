@@ -8,6 +8,8 @@ import { DEFAULT_ACTION_CONFIG } from "@/lib/automations/types";
 import type { AutomationActionConfig, AutomationStep } from "@/lib/automations/types";
 import { AUTOMATION_RECIPIENTS, AUTOMATION_STEP_TYPES, NOTIFY_KINDS } from "@/lib/automations/types";
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+
 export interface AutomationActionState {
   error?: string;
   ok?: boolean;
