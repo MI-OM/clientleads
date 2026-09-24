@@ -16,7 +16,10 @@
     "test:public": "node scripts/smoke-public.mjs",
     "test:pages": "node scripts/check-pages.mjs",
     "test:upload": "node scripts/check-upload.mjs",
-    "test:booking": "node scripts/smoke-booking.mjs"
+    "test:booking": "node scripts/smoke-booking.mjs",
+    "test:campaigns": "node scripts/smoke-campaigns.mjs",
+    "test:productivity": "node scripts/smoke-productivity.mjs",
+    "test:automations": "node scripts/smoke-automations.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.7",

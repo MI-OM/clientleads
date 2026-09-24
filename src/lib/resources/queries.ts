@@ -68,6 +68,27 @@ export async function listResources(orgId: string): Promise<Resource[]> {
   return (data ?? []).map((row) => mapResource(row as unknown as ResourceRow));
 }
 
+export async function listResourcesPage(
+  orgId: string,
+  page = 1,
+  pageSize = 20,
+): Promise<{ resources: Resource[]; totalPages: number }> {
+  const supabase = await createClient();
+  const currentPage = Math.max(1, page);
+  const from = (currentPage - 1) * pageSize;
+  const { data, error, count } = await supabase
+    .from("resources")
+    .select("*", { count: "exact" })
+    .eq("organization_id", orgId)
+    .order("created_at", { ascending: false })
+    .range(from, from + pageSize - 1);
+  if (error) throw error;
+  return {
+    resources: (data ?? []).map((row) => mapResource(row as unknown as ResourceRow)),
+    totalPages: Math.max(1, Math.ceil((count ?? 0) / pageSize)),
+  };
+}
+
 export async function getResource(orgId: string, id: string): Promise<Resource | null> {
   const supabase = await createClient();
   const { data, error } = await supabase

@@ -17,7 +17,7 @@ import {
   ThumbsUp,
 } from "lucide-react";
 import { getPublicPageData } from "@/lib/public/page-data";
-import type { PublicPage, PublicService } from "@/lib/public/types";
+import type { PublicService } from "@/lib/public/types";
 import { formatDuration, formatPrice, locationShort } from "@/lib/public/format";
 import { LeadForm } from "./lead-form";
 import { ResourceDownload } from "./resource-gate";
@@ -64,7 +64,10 @@ function Section({
 
 function SectionTitle({ children }: { children: ReactNode }) {
   return (
-    <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl" style={{ color: "var(--brand)" }}>
+    <h2
+      className="text-2xl font-semibold tracking-tight sm:text-3xl"
+      style={{ color: "var(--brand)" }}
+    >
       {children}
     </h2>
   );
@@ -80,8 +83,14 @@ function ServiceCard({
   bookHref?: string;
 }) {
   return (
-    <article className="flex flex-col gap-3 rounded-lg border border-border bg-card p-5 shadow-sm">
-      <h3 className="text-lg font-semibold">{service.name}</h3>
+    <article className="group relative flex flex-col gap-4 overflow-hidden rounded-xl border border-border bg-card p-6 shadow-sm transition-all hover:-translate-y-0.5 hover:border-[var(--brand)]/40 hover:shadow-md">
+      <div className="absolute inset-x-0 top-0 h-1 bg-[var(--brand)] opacity-70" />
+      <div>
+        <p className="mb-2 text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+          Service
+        </p>
+        <h3 className="text-lg font-semibold tracking-tight">{service.name}</h3>
+      </div>
       {service.description ? (
         <p className="flex-1 text-sm text-muted-foreground">{service.description}</p>
       ) : null}
@@ -107,7 +116,7 @@ function ServiceCard({
           ) : null}
           <a
             href={enquireHref}
-            className="rounded-md border border-border px-3 py-1.5 text-sm font-medium transition-colors hover:bg-muted"
+            className="rounded-md border border-border px-3 py-1.5 text-sm font-medium transition-colors hover:border-[var(--brand)]/40 hover:bg-muted"
           >
             Enquire
           </a>
@@ -117,12 +126,22 @@ function ServiceCard({
   );
 }
 
-export default async function PublicBusinessPage({ params }: PageProps) {
+interface SearchParams {
+  service?: string | string[];
+}
+
+export default async function PublicBusinessPage({
+  params,
+  searchParams,
+}: PageProps & { searchParams: Promise<SearchParams> }) {
   const { slug } = await params;
+  const { service: serviceParam } = await searchParams;
   const page = await getPublicPageData(slug);
   if (!page) notFound();
 
   const { org } = page;
+  const requestedServiceId = Array.isArray(serviceParam) ? serviceParam[0] : serviceParam;
+  const requestedService = page.services.find((service) => service.id === requestedServiceId);
   const brandVars = {
     "--brand": org.primary_color,
     "--brand-soft": org.secondary_color,
@@ -168,7 +187,6 @@ export default async function PublicBusinessPage({ params }: PageProps) {
           </a>
           <nav className="flex items-center gap-1 sm:gap-4" aria-label="Site">
             {navLinks.map((link) =>
-              // eslint-disable-next-line jsx-a11y/anchor-is-valid
               link.href.startsWith("#") ? (
                 <a
                   key={link.href}
@@ -200,21 +218,24 @@ export default async function PublicBusinessPage({ params }: PageProps) {
 
       <main id="top">
         {/* Hero */}
-        <Section id="hero" className="bg-[color-mix(in_srgb,var(--brand)_6%,white)]">
-          <div className="flex flex-col items-start gap-6 py-6 sm:py-10">
-            <div>
-              <h1 className="max-w-2xl text-3xl font-bold tracking-tight sm:text-5xl">
-                {org.description ? (
-                  <>
-                    {org.description}
-                  </>
-                ) : (
-                  org.name
-                )}
+        <Section
+          id="hero"
+          className="overflow-hidden bg-[color-mix(in_srgb,var(--brand)_6%,white)] py-0 sm:py-0"
+        >
+          <div className="relative flex min-h-[27rem] flex-col justify-center gap-8 py-16 sm:min-h-[31rem] sm:py-20">
+            <div className="relative max-w-3xl">
+              <p
+                className="mb-4 text-xs font-semibold uppercase tracking-[0.24em]"
+                style={{ color: "var(--brand)" }}
+              >
+                Welcome to {org.name}
+              </p>
+              <h1 className="max-w-3xl text-4xl font-semibold leading-[1.05] tracking-tight sm:text-6xl">
+                {org.name}
               </h1>
               {org.description ? (
-                <p className="mt-3 max-w-xl text-base text-muted-foreground sm:text-lg">
-                  {org.name}
+                <p className="mt-6 max-w-2xl text-lg leading-8 text-muted-foreground sm:text-xl">
+                  {org.description}
                 </p>
               ) : null}
             </div>
@@ -240,11 +261,19 @@ export default async function PublicBusinessPage({ params }: PageProps) {
         </Section>
 
         {/* About */}
-        <Section id="about" className="border-t border-border/60">
-          <div className="max-w-3xl">
-            <SectionTitle>About</SectionTitle>
-            <p className="mt-4 text-muted-foreground">
-              {org.description || `${org.name} looks forward to working with you.`}
+        <Section id="about" className="border-t border-border/60 bg-card">
+          <div className="grid gap-8 lg:grid-cols-[0.7fr_1.3fr] lg:gap-16">
+            <div>
+              <p
+                className="text-xs font-semibold uppercase tracking-[0.24em]"
+                style={{ color: "var(--brand)" }}
+              >
+                Our story
+              </p>
+              <SectionTitle>About {org.name}</SectionTitle>
+            </div>
+            <p className="max-w-3xl whitespace-pre-line text-lg leading-8 text-muted-foreground">
+              {org.about || `${org.name} looks forward to working with you.`}
             </p>
           </div>
         </Section>
@@ -252,17 +281,32 @@ export default async function PublicBusinessPage({ params }: PageProps) {
         {/* Services */}
         {page.services.length > 0 ? (
           <Section id="services" className="border-t border-border/60 bg-muted/30">
-            <SectionTitle>Services</SectionTitle>
+            <div className="flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
+              <div>
+                <p
+                  className="mb-2 text-xs font-semibold uppercase tracking-[0.24em]"
+                  style={{ color: "var(--brand)" }}
+                >
+                  How we can help
+                </p>
+                <SectionTitle>Services</SectionTitle>
+              </div>
+              <p className="max-w-sm text-sm text-muted-foreground sm:text-right">
+                Choose a service to start a conversation or book a time that works for you.
+              </p>
+            </div>
             <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
               {page.services.map((service) => (
                 <ServiceCard
                   key={service.id}
                   service={service}
-                  enquireHref={page.forms.length > 0 ? "#lead" : "#contact"}
+                  enquireHref={
+                    page.forms.length > 0
+                      ? `?service=${encodeURIComponent(service.id)}#lead`
+                      : "#contact"
+                  }
                   bookHref={
-                    service.booking_enabled
-                      ? `/${org.slug}/book?service=${service.id}`
-                      : undefined
+                    service.booking_enabled ? `/${org.slug}/book?service=${service.id}` : undefined
                   }
                 />
               ))}
@@ -272,7 +316,10 @@ export default async function PublicBusinessPage({ params }: PageProps) {
 
         {/* Lead form */}
         {page.forms.length > 0 ? (
-          <Section id="lead" className="border-t border-border/60 bg-[color-mix(in_srgb,var(--brand)_6%,white)]">
+          <Section
+            id="lead"
+            className="border-t border-border/60 bg-[color-mix(in_srgb,var(--brand)_6%,white)]"
+          >
             <div className="grid gap-8 lg:grid-cols-2 lg:items-start">
               <div>
                 <SectionTitle>{page.forms[0].name}</SectionTitle>
@@ -284,7 +331,10 @@ export default async function PublicBusinessPage({ params }: PageProps) {
                   <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
                     {page.forms.map((form) => (
                       <li key={form.id}>
-                        <Link href={`#${form.slug}`} className="text-primary underline-offset-4 hover:underline">
+                        <Link
+                          href={`#${form.slug}`}
+                          className="text-primary underline-offset-4 hover:underline"
+                        >
                           {form.name}
                         </Link>
                       </li>
@@ -293,7 +343,11 @@ export default async function PublicBusinessPage({ params }: PageProps) {
                 ) : null}
               </div>
               <div className="lg:max-w-lg">
-                <LeadForm form={page.forms[0]} pageSlug={org.slug} />
+                <LeadForm
+                  form={page.forms[0]}
+                  pageSlug={org.slug}
+                  serviceName={requestedService?.name}
+                />
               </div>
             </div>
           </Section>
@@ -331,7 +385,11 @@ export default async function PublicBusinessPage({ params }: PageProps) {
                 href={`mailto:${org.email}`}
                 className="flex items-start gap-3 rounded-lg border border-border bg-card p-4 text-sm hover:shadow-sm"
               >
-                <Mail className="mt-0.5 size-4 shrink-0" style={{ color: "var(--brand)" }} aria-hidden />
+                <Mail
+                  className="mt-0.5 size-4 shrink-0"
+                  style={{ color: "var(--brand)" }}
+                  aria-hidden
+                />
                 <span className="break-all">{org.email}</span>
               </a>
             ) : null}
@@ -340,13 +398,21 @@ export default async function PublicBusinessPage({ params }: PageProps) {
                 href={`tel:${org.phone.replace(/\s/g, "")}`}
                 className="flex items-start gap-3 rounded-lg border border-border bg-card p-4 text-sm hover:shadow-sm"
               >
-                <Phone className="mt-0.5 size-4 shrink-0" style={{ color: "var(--brand)" }} aria-hidden />
+                <Phone
+                  className="mt-0.5 size-4 shrink-0"
+                  style={{ color: "var(--brand)" }}
+                  aria-hidden
+                />
                 <span>{org.phone}</span>
               </a>
             ) : null}
             {contactLine ? (
               <div className="flex items-start gap-3 rounded-lg border border-border bg-card p-4 text-sm">
-                <MapPin className="mt-0.5 size-4 shrink-0" style={{ color: "var(--brand)" }} aria-hidden />
+                <MapPin
+                  className="mt-0.5 size-4 shrink-0"
+                  style={{ color: "var(--brand)" }}
+                  aria-hidden
+                />
                 <span className="whitespace-pre-line">{contactLine}</span>
               </div>
             ) : null}

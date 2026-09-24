@@ -61,6 +61,7 @@ export interface PublicOrg {
   slug: string;
   logo_url: string | null;
   description: string | null;
+  about: string | null;
   email: string | null;
   phone: string | null;
   address: string | null;
@@ -95,6 +96,7 @@ export function parsePublicPage(payload: unknown): PublicPage | null {
       slug: String(org.slug),
       logo_url: (org.logo_url as string | null) ?? null,
       description: (org.description as string | null) ?? null,
+      about: (org.about as string | null) ?? null,
       email: (org.email as string | null) ?? null,
       phone: (org.phone as string | null) ?? null,
       address: (org.address as string | null) ?? null,

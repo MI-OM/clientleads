@@ -5,7 +5,8 @@ import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getMyOrg } from "@/lib/auth/org";
-import { listAppointments } from "@/lib/booking/queries";
+import { listUpcomingAppointments, listPastAppointmentsPage } from "@/lib/booking/queries";
+import { Pagination } from "@/components/dashboard/pagination";
 import type { Appointment, AppointmentStatus } from "@/lib/booking/types";
 import { setAppointmentStatusAction } from "./actions";
 
@@ -112,21 +113,20 @@ function AppointmentRow({
   );
 }
 
-export default async function AppointmentsPage() {
+export default async function AppointmentsPage({ searchParams }: { searchParams: Promise<{ page?: string | string[] }> }) {
   const ctx = await getMyOrg();
   const canManage = ctx?.role === "owner" || ctx?.role === "admin";
 
-  const appointments = ctx ? await listAppointments(ctx.org.id) : [];
   const now = new Date().toISOString();
-  const upcoming = appointments
-    .filter((a) => a.startsAt >= now && !["Cancelled", "No-show", "Completed"].includes(a.status))
-    .slice(0, 25);
-  const past = appointments
-    .filter(
-      (a) => !(a.startsAt >= now && !["Cancelled", "No-show", "Completed"].includes(a.status)),
-    )
-    .reverse()
-    .slice(0, 20);
+  const params = await searchParams;
+  const page = Number.parseInt(Array.isArray(params.page) ? params.page[0] ?? "" : params.page ?? "", 10) || 1;
+  const [upcoming, pastResult] = ctx
+    ? await Promise.all([
+        listUpcomingAppointments(ctx.org.id, now),
+        listPastAppointmentsPage(ctx.org.id, now, page),
+      ])
+    : [[], { appointments: [], totalPages: 1 }];
+  const past = pastResult.appointments;
 
   return (
     <div className="flex flex-col gap-6">
@@ -188,6 +188,7 @@ export default async function AppointmentsPage() {
           </CardContent>
         </Card>
       ) : null}
+      <Pagination page={page} totalPages={pastResult.totalPages} href={(target) => `/dashboard/appointments?page=${target}`} />
     </div>
   );
 }

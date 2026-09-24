@@ -12,12 +12,14 @@ import {
   FolderOpen,
   LayoutDashboard,
   ListTodo,
+  Mail,
   Menu,
   Megaphone,
   Search,
   Settings,
   Target,
   Users,
+  Workflow,
   Wrench,
   X,
   type LucideIcon,
@@ -42,16 +44,18 @@ const moduleNav: NavEntry[] = [
   { title: "Leads", href: "/dashboard/leads", icon: Target },
   { title: "Appointments", href: "/dashboard/appointments", icon: CalendarDays },
   { title: "Services", href: "/dashboard/services", icon: Wrench },
-  { title: "Tasks", href: "/dashboard/tasks", icon: ListTodo, milestone: "M6" },
-  { title: "Campaigns", href: "/dashboard/campaigns", icon: Megaphone, milestone: "M5" },
+  { title: "Tasks", href: "/dashboard/tasks", icon: ListTodo },
+  { title: "Campaigns", href: "/dashboard/campaigns", icon: Megaphone },
+  { title: "Templates", href: "/dashboard/templates", icon: Mail },
   { title: "Forms", href: "/dashboard/forms", icon: ClipboardList },
   { title: "Resources", href: "/dashboard/resources", icon: FolderOpen },
   { title: "Activities", href: "/dashboard/activities", icon: Activity },
-  { title: "Analytics", href: "/dashboard/analytics", icon: BarChart3, milestone: "M6" },
+  { title: "Analytics", href: "/dashboard/analytics", icon: BarChart3 },
 ];
 
 const manageNav: NavEntry[] = [
   { title: "Availability", href: "/dashboard/availability", icon: CalendarDays },
+  { title: "Automations", href: "/dashboard/automations", icon: Workflow },
   { title: "Settings", href: "/dashboard/settings", icon: Settings },
   { title: "Custom fields", href: "/dashboard/settings/fields", icon: ListTodo },
 ];
@@ -204,18 +208,22 @@ export function AppShell({
             <Menu className="size-4" />
           </Button>
 
-          <div className="relative hidden max-w-md flex-1 sm:block">
+          <form
+            action="/dashboard/search"
+            method="GET"
+            className="relative hidden max-w-md flex-1 sm:block"
+          >
             <Search
               className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground"
               aria-hidden
             />
             <input
               type="search"
-              placeholder="Search contacts…"
-              disabled
-              className="h-9 w-full rounded-md border border-input bg-background pl-9 pr-3 text-sm shadow-sm placeholder:text-muted-foreground disabled:opacity-60"
+              name="q"
+              placeholder="Search…"
+              className="h-9 w-full rounded-md border border-input bg-background pl-9 pr-3 text-sm shadow-sm placeholder:text-muted-foreground"
             />
-          </div>
+          </form>
 
           <div className="ml-auto flex items-center gap-2">
             <Button variant="ghost" size="icon" aria-label="Notifications" disabled>

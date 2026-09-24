@@ -1,0 +1,131 @@
+import { redirect } from "next/navigation";
+import { Bot, Power, PowerOff } from "lucide-react";
+import { PageHeader } from "@/components/dashboard/page-header";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { getMyOrg } from "@/lib/auth/org";
+import { listAutomations } from "@/lib/automations/queries";
+import { AUTOMATION_TRIGGERS, AUTOMATION_TRIGGER_LABELS } from "@/lib/automations/types";
+import type { AutomationTrigger } from "@/lib/automations/types";
+import { toggleAutomationAction } from "./actions";
+import { AutomationConfigForm, type AutomationFormOptions } from "./automation-config-form";
+import { listForms } from "@/lib/forms/queries";
+import { listServices } from "@/lib/services/queries";
+import { listResources } from "@/lib/resources/queries";
+import { listTags, listOrgMembers } from "@/lib/crm/queries";
+import { listEmailTemplates } from "@/lib/campaigns/queries";
+
+const TRIGGER_DESCRIPTIONS: Record<AutomationTrigger, string> = {
+  appointment_booked: "When a visitor books an appointment",
+  form_submitted: "When a visitor submits one of your public forms",
+  appointment_completed: "When an appointment is marked completed",
+  resource_downloaded: "When someone downloads a resource",
+  contact_created: "When a contact is added to your CRM",
+  lead_stage_changed: "When a lead moves between stages",
+  appointment_cancelled: "When an appointment is cancelled",
+  appointment_no_show: "When an appointment is marked no-show",
+};
+
+export default async function AutomationsPage() {
+  const ctx = await getMyOrg();
+  if (!ctx) redirect("/login");
+  if (ctx.role !== "owner" && ctx.role !== "admin") redirect("/dashboard");
+
+  const [automations, forms, services, resources, tags, templates, members] = await Promise.all([
+    listAutomations(ctx.org.id),
+    listForms(ctx.org.id).catch(() => [] as Awaited<ReturnType<typeof listForms>>),
+    listServices(ctx.org.id).catch(() => [] as Awaited<ReturnType<typeof listServices>>),
+    listResources(ctx.org.id).catch(() => [] as Awaited<ReturnType<typeof listResources>>),
+    listTags(ctx.org.id).catch(() => [] as Awaited<ReturnType<typeof listTags>>),
+    listEmailTemplates(ctx.org.id).catch(
+      () => [] as Awaited<ReturnType<typeof listEmailTemplates>>,
+    ),
+    listOrgMembers(ctx.org.id).catch(() => [] as Awaited<ReturnType<typeof listOrgMembers>>),
+  ]);
+
+  const options: AutomationFormOptions = {
+    forms: forms.map((f) => ({ id: f.id, name: f.name })),
+    services: services.map((s) => ({ id: s.id, name: s.name })),
+    resources: resources.map((r) => ({ id: r.id, name: r.title })),
+    tags: tags.map((t) => ({ id: t.id, name: t.name })),
+    templates: templates.map((t) => ({ id: t.id, name: t.name })),
+    members: members.map((m) => ({ id: m.id, name: m.fullName || m.id })),
+  };
+
+  return (
+    <div className="flex flex-col gap-6">
+      <PageHeader
+        title="Automations"
+        description="Configurable workflows that fire on CRM events: follow-up tasks, tags, emails and notifications (PRD §32)."
+      />
+
+      <div className="grid gap-6 lg:grid-cols-2">
+        {AUTOMATION_TRIGGERS.map((trigger) => {
+          const automation = automations.find((a) => a.triggerType === trigger) ?? null;
+          return (
+            <Card key={trigger} className="flex flex-col gap-4">
+              <CardHeader>
+                <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-start gap-3">
+                    <Bot className="mt-0.5 size-5 text-primary" aria-hidden />
+                    <div>
+                      <CardTitle className="text-base">
+                        {automation?.name ?? AUTOMATION_TRIGGER_LABELS[trigger]}
+                      </CardTitle>
+                      <CardDescription>{TRIGGER_DESCRIPTIONS[trigger]}</CardDescription>
+                    </div>
+                  </div>
+                  <Badge variant={automation?.active ? "success" : "secondary"}>
+                    {automation?.active ? "On" : "Off"}
+                  </Badge>
+                </div>
+              </CardHeader>
+              <CardContent className="flex flex-col gap-4">
+                <p className="text-xs text-muted-foreground">
+                  Trigger: <code className="font-mono">{AUTOMATION_TRIGGER_LABELS[trigger]}</code>
+                </p>
+                {automation ? (
+                  <>
+                    <form action={toggleAutomationAction}>
+                      <input type="hidden" name="id" value={automation.id} />
+                      <button
+                        type="submit"
+                        className="inline-flex h-9 items-center gap-1.5 rounded-md border border-input bg-card px-3 text-sm font-medium shadow-sm hover:bg-accent"
+                      >
+                        {automation.active ? (
+                          <>
+                            <PowerOff className="size-4" aria-hidden /> Turn off
+                          </>
+                        ) : (
+                          <>
+                            <Power className="size-4" aria-hidden /> Turn on
+                          </>
+                        )}
+                      </button>
+                    </form>
+                    <AutomationConfigForm
+                      automation={automation}
+                      trigger={trigger}
+                      options={options}
+                    />
+                  </>
+                ) : (
+                  <p className="text-sm text-muted-foreground">
+                    This trigger isn&apos;t configured yet — the migration seed only covers the
+                    “first-client” demo org.
+                  </p>
+                )}
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
+
+      <p className="text-xs text-muted-foreground">
+        SQL triggers execute task/tag/activity/lead-stage steps synchronously; emails and
+        notifications are queued and drained by the automation cron (no-op until RESEND_API_KEY is
+        set).
+      </p>
+    </div>
+  );
+}

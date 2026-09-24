@@ -373,6 +373,40 @@ export const listActivities = cache(
   },
 );
 
+export const listActivitiesPage = cache(
+  async (
+    orgId: string,
+    page = 1,
+    pageSize = 50,
+  ): Promise<{ activities: Activity[]; totalPages: number }> => {
+    const supabase = await createClient();
+    const currentPage = Math.max(1, page);
+    const from = (currentPage - 1) * pageSize;
+    const { data, count } = await supabase
+      .from("activities")
+      .select(
+        "id, activity_type, subject, description, metadata, created_at, user_id, contact_id, lead_id",
+        { count: "exact" },
+      )
+      .eq("organization_id", orgId)
+      .order("created_at", { ascending: false })
+      .range(from, from + pageSize - 1);
+    const activities = (data ?? []).map((r) => mapActivity(r as Record<string, unknown>));
+    const userIds = [...new Set(activities.map((a) => a.userId).filter(Boolean))];
+    if (userIds.length > 0) {
+      const { data: profiles } = await supabase
+        .from("profiles")
+        .select("id, full_name")
+        .in("id", userIds);
+      const names = new Map((profiles ?? []).map((p) => [String(p.id), String(p.full_name ?? "")]));
+      for (const activity of activities) {
+        if (activity.userId) activity.userName = names.get(activity.userId) ?? null;
+      }
+    }
+    return { activities, totalPages: Math.max(1, Math.ceil((count ?? 0) / pageSize)) };
+  },
+);
+
 /* ── org members (assignee pickers, activity names) ──────────────────── */
 
 export const listOrgMembers = cache(async (orgId: string): Promise<OrgMember[]> => {

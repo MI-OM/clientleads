@@ -29,7 +29,10 @@ function collectValues(formData: FormData): Record<string, string> {
   for (const key of formData.keys()) {
     if (key.startsWith("field_")) {
       const fieldKey = key.slice("field_".length);
-      const all = formData.getAll(key).map((v) => String(v).trim()).filter(Boolean);
+      const all = formData
+        .getAll(key)
+        .map((v) => String(v).trim())
+        .filter(Boolean);
       const value = all.join(", ");
       values[fieldKey] = value;
     }
@@ -64,6 +67,13 @@ export async function submitFormAction(
   values.email = values.email ?? "";
   values.phone = values.phone ?? "";
   values.message = values.message ?? "";
+
+  const serviceRequested = values.service_requested;
+  if (serviceRequested) {
+    values.message = [`Service requested: ${serviceRequested}`, values.message]
+      .filter(Boolean)
+      .join("\n\n");
+  }
 
   if (!values.name && !values.email && !values.phone && !values.message) {
     return { error: "Please fill in at least one field before sending." };
@@ -108,7 +118,9 @@ export async function requestResourceAction(
   }
 
   const name = String(formData.get("name") ?? "").trim();
-  const email = String(formData.get("email") ?? "").trim().toLowerCase();
+  const email = String(formData.get("email") ?? "")
+    .trim()
+    .toLowerCase();
   const phone = String(formData.get("phone") ?? "").trim();
 
   if (!name) return { error: "Please enter your name." };

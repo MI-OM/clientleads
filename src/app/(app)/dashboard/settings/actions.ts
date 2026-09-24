@@ -69,6 +69,7 @@ export async function updateOrganizationAction(
       name,
       slug,
       description: String(formData.get("description") ?? "").trim() || null,
+      about: String(formData.get("about") ?? "").trim() || null,
       email: String(formData.get("email") ?? "").trim() || null,
       phone: String(formData.get("phone") ?? "").trim() || null,
       website_url: String(formData.get("websiteUrl") ?? "").trim() || null,

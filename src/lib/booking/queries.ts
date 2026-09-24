@@ -105,6 +105,29 @@ export async function listUpcomingAppointments(
   return (data ?? []).map((row) => mapAppointment(row as unknown as AppointmentRow));
 }
 
+export async function listPastAppointmentsPage(
+  orgId: string,
+  before: string,
+  page = 1,
+  pageSize = 20,
+): Promise<{ appointments: Appointment[]; totalPages: number }> {
+  const supabase = await createClient();
+  const currentPage = Math.max(1, page);
+  const from = (currentPage - 1) * pageSize;
+  const { data, error, count } = await supabase
+    .from("appointments")
+    .select("*, service:services(name)", { count: "exact" })
+    .eq("organization_id", orgId)
+    .lt("starts_at", before)
+    .order("starts_at", { ascending: false })
+    .range(from, from + pageSize - 1);
+  if (error) throw error;
+  return {
+    appointments: (data ?? []).map((row) => mapAppointment(row as unknown as AppointmentRow)),
+    totalPages: Math.max(1, Math.ceil((count ?? 0) / pageSize)),
+  };
+}
+
 export async function listAvailabilityRules(orgId: string): Promise<AvailabilityRule[]> {
   const supabase = await createClient();
   const { data, error } = await supabase

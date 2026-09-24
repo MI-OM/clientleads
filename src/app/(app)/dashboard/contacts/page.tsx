@@ -1,17 +1,16 @@
 import Link from "next/link";
-import { Download, Mail, Phone, Plus, Upload } from "lucide-react";
+import { Download, Plus, Upload } from "lucide-react";
 import { getMyOrg } from "@/lib/auth/org";
 import { listContacts, listTags } from "@/lib/crm/queries";
 import { CONTACT_TYPES } from "@/lib/crm/constants";
-import { formatRelative } from "@/lib/crm/format";
 import { PageHeader } from "@/components/dashboard/page-header";
-import { Badge } from "@/components/ui/badge";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select } from "@/components/ui/select";
 import { TagsManager } from "@/components/crm/tags-manager";
+import { ContactsTable } from "./contacts-table";
 
 interface SearchParams {
   q?: string | string[];
@@ -185,81 +184,7 @@ export default async function ContactsPage({
         </Card>
       ) : (
         <Card className="overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b bg-muted/50 text-left text-xs uppercase tracking-wider text-muted-foreground">
-                  <th className="px-4 py-3 font-medium">Name</th>
-                  <th className="px-4 py-3 font-medium">Type</th>
-                  <th className="px-4 py-3 font-medium">Contact</th>
-                  <th className="px-4 py-3 font-medium">Tags</th>
-                  <th className="px-4 py-3 font-medium">Source</th>
-                  <th className="px-4 py-3 font-medium">Updated</th>
-                </tr>
-              </thead>
-              <tbody>
-                {result.contacts.map((contact) => (
-                  <tr key={contact.id} className="border-b last:border-0 hover:bg-muted/40">
-                    <td className="px-4 py-3">
-                      <Link
-                        href={`/dashboard/contacts/${contact.id}`}
-                        className="font-medium text-primary hover:underline"
-                      >
-                        {contact.name}
-                      </Link>
-                      {contact.archivedAt ? (
-                        <Badge variant="warning" className="ml-2">
-                          Archived
-                        </Badge>
-                      ) : null}
-                      {contact.company ? (
-                        <p className="text-xs text-muted-foreground">{contact.company}</p>
-                      ) : null}
-                    </td>
-                    <td className="px-4 py-3">
-                      <Badge variant="outline">{contact.contactType}</Badge>
-                    </td>
-                    <td className="px-4 py-3">
-                      {contact.email ? (
-                        <a
-                          href={`mailto:${contact.email}`}
-                          className="flex items-center gap-1.5 text-primary hover:underline"
-                        >
-                          <Mail className="size-3.5" aria-hidden /> {contact.email}
-                        </a>
-                      ) : (
-                        <span className="text-muted-foreground">—</span>
-                      )}
-                      {contact.phone ? (
-                        <a
-                          href={`tel:${contact.phone}`}
-                          className="mt-0.5 flex items-center gap-1.5 text-muted-foreground hover:text-primary"
-                        >
-                          <Phone className="size-3.5" aria-hidden /> {contact.phone}
-                        </a>
-                      ) : null}
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex max-w-56 flex-wrap gap-1">
-                        {contact.tags.slice(0, 3).map((name) => (
-                          <Badge key={name} variant="secondary">
-                            {name}
-                          </Badge>
-                        ))}
-                        {contact.tags.length > 3 ? (
-                          <Badge variant="outline">+{contact.tags.length - 3}</Badge>
-                        ) : null}
-                      </div>
-                    </td>
-                    <td className="px-4 py-3 text-muted-foreground">{contact.source}</td>
-                    <td className="px-4 py-3 text-muted-foreground">
-                      {formatRelative(contact.updatedAt)}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <ContactsTable contacts={result.contacts} />
           {result.totalPages > 1 ? (
             <div className="flex items-center justify-between border-t px-4 py-3">
               <p className="text-sm text-muted-foreground">

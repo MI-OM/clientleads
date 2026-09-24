@@ -9,13 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 
-function FieldInput({
-  field,
-  namePrefix,
-}: {
-  field: PublicFormField;
-  namePrefix: string;
-}) {
+function FieldInput({ field, namePrefix }: { field: PublicFormField; namePrefix: string }) {
   const name = `${namePrefix}${field.field_key}`;
   const required = field.required;
   const label = field.label;
@@ -114,15 +108,13 @@ function FieldInput({
           <Input
             id={name}
             name={name}
-            type={field.field_type === "email" ? "email" : field.field_type === "phone" ? "tel" : "text"}
+            type={
+              field.field_type === "email" ? "email" : field.field_type === "phone" ? "tel" : "text"
+            }
             required={required}
             placeholder={field.placeholder ?? ""}
             autoComplete={
-              field.field_type === "email"
-                ? "email"
-                : field.field_type === "phone"
-                  ? "tel"
-                  : "name"
+              field.field_type === "email" ? "email" : field.field_type === "phone" ? "tel" : "name"
             }
           />
         </div>
@@ -133,9 +125,10 @@ function FieldInput({
 interface LeadFormProps {
   form: PublicForm;
   pageSlug: string;
+  serviceName?: string;
 }
 
-export function LeadForm({ form, pageSlug }: LeadFormProps) {
+export function LeadForm({ form, pageSlug, serviceName }: LeadFormProps) {
   const [state, formAction, pending] = useActionState<PublicFormState, FormData>(
     submitFormAction,
     {},
@@ -161,6 +154,9 @@ export function LeadForm({ form, pageSlug }: LeadFormProps) {
       ) : null}
       <input type="hidden" name="form_slug" value={form.slug} />
       <input type="hidden" name="page_slug" value={pageSlug} />
+      {serviceName ? (
+        <input type="hidden" name="field_service_requested" value={serviceName} />
+      ) : null}
       {/* Honeypot — hidden from humans, irresistible to bots */}
       <div className="absolute -left-[9999px] top-0" aria-hidden>
         <label htmlFor="company_website">Leave this field empty</label>
@@ -177,6 +173,12 @@ export function LeadForm({ form, pageSlug }: LeadFormProps) {
           <FieldInput key={field.id} field={field} namePrefix="field_" />
         ))}
       </div>
+      {serviceName ? (
+        <div className="flex items-center gap-2 rounded-md border border-[var(--brand)]/25 bg-[color-mix(in_srgb,var(--brand)_6%,white)] px-3 py-2 text-sm">
+          <span className="font-medium">Service requested:</span>
+          <span className="text-muted-foreground">{serviceName}</span>
+        </div>
+      ) : null}
       {state.error ? (
         <p role="alert" className="text-sm text-destructive">
           {state.error}

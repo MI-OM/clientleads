@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { FileText, Pencil, Plus, Trash2 } from "lucide-react";
 import { getMyOrg } from "@/lib/auth/org";
-import { listResources } from "@/lib/resources/queries";
+import { listResourcesPage } from "@/lib/resources/queries";
+import { Pagination } from "@/components/dashboard/pagination";
 import { deleteResourceAction } from "./actions";
 import { PageHeader } from "@/components/dashboard/page-header";
 import { Badge } from "@/components/ui/badge";
@@ -14,10 +15,13 @@ function formatSize(bytes: number | null): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-export default async function ResourcesPage() {
+export default async function ResourcesPage({ searchParams }: { searchParams: Promise<{ page?: string | string[] }> }) {
   const ctx = await getMyOrg();
   const canManage = ctx?.role === "owner" || ctx?.role === "admin";
-  const resources = ctx ? await listResources(ctx.org.id) : [];
+  const params = await searchParams;
+  const page = Number.parseInt(Array.isArray(params.page) ? params.page[0] ?? "" : params.page ?? "", 10) || 1;
+  const result = ctx ? await listResourcesPage(ctx.org.id, page) : { resources: [], totalPages: 1 };
+  const resources = result.resources;
 
   return (
     <div className="flex flex-col gap-6">
@@ -119,6 +123,7 @@ export default async function ResourcesPage() {
           </div>
         </Card>
       )}
+      <Pagination page={page} totalPages={result.totalPages} href={(target) => `/dashboard/resources?page=${target}`} />
     </div>
   );
 }

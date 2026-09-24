@@ -11,17 +11,12 @@ import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
+const DEFAULT_TIMEZONE = "America/Halifax";
 const TIMEZONES = [
-  "America/Halifax",
-  "America/Toronto",
-  "America/Vancouver",
-  "America/New_York",
-  "America/Chicago",
-  "America/Denver",
-  "America/Los_Angeles",
-  "Europe/London",
-  "Europe/Dublin",
-  "Australia/Sydney",
+  DEFAULT_TIMEZONE,
+  ...(typeof Intl.supportedValuesOf === "function"
+    ? Intl.supportedValuesOf("timeZone").filter((tz) => tz !== DEFAULT_TIMEZONE)
+    : []),
 ];
 
 const SOCIAL_FIELDS: Array<{ key: string; label: string }> = [
@@ -176,6 +171,21 @@ export function BusinessSettingsForm({ org, canEdit }: { org: Org; canEdit: bool
                 disabled={!canEdit}
                 placeholder="Tell visitors what your business does…"
               />
+            </div>
+
+            <div className="grid gap-2">
+              <Label htmlFor="about">About your business</Label>
+              <Textarea
+                id="about"
+                name="about"
+                defaultValue={org.about ?? ""}
+                disabled={!canEdit}
+                placeholder="Share your story, approach, and what makes your business different…"
+              />
+              <p className="text-xs text-muted-foreground">
+                This appears in the About section of your public page, separately from the hero
+                description.
+              </p>
             </div>
 
             <div className="grid gap-4 sm:grid-cols-2">

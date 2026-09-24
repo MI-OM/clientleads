@@ -10,6 +10,7 @@ export interface Org {
   slug: string;
   logoUrl: string | null;
   description: string | null;
+  about: string | null;
   email: string | null;
   phone: string | null;
   address: string | null;
@@ -36,6 +37,7 @@ function mapOrg(row: Record<string, unknown>): Org {
     slug: String(row.slug),
     logoUrl: (row.logo_url as string | null) ?? null,
     description: (row.description as string | null) ?? null,
+    about: (row.about as string | null) ?? null,
     email: (row.email as string | null) ?? null,
     phone: (row.phone as string | null) ?? null,
     address: (row.address as string | null) ?? null,

@@ -27,16 +27,17 @@
 
 ## Status Summary
 
-| Milestone | Phase               | Target     | Status      | Notes                                                                                                                                              |
-| --------- | ------------------- | ---------- | ----------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| M0        | Project Setup       | —          | In Progress | Implementation done — Supabase created + creds in `.env.local`; GitHub push pending                                                                |
-| M1        | Foundation          | Week 1–2   | In Progress | Code + migrations verified live: RLS 6/6, auth smoke 7/7. Remaining: real account + branding data + GitHub push                                    |
-| M2        | CRM                 | Week 3–5   | Done       | `20260922000003_m2_crm.sql` applied + live-verified (CRM 16/16, RLS 6/6, auth 7/7); import template shipped. Remaining (user): own account + owner role + GitHub push                                |
-| M3        | Public Presence     | Week 6–7   | Done    | **Live-verified 2026-09-23** — `npm run test:public` 34/34 + `npm run test:pages` 16/16 (`debd36e` + `13f5932`)                                                                                       |
-| M4        | Booking             | Week 8–10  | Done       | **Live-verified 2026-09-23** — `20260922000005_m4_booking.sql` applied (revoke PUBLIC EXECUTE on write RPCs), `npm run test:booking` 33/33 + browser flow (`/book` wizard, slots API, manage/cancel) verified live (`108df08` + `eef731e`) |
-| M5        | Communication       | Week 11–13 | Not Started | Requires email provider decision                                                                                                                   |
-| M6        | Productivity        | Week 14–15 | Not Started |                                                                                                                                                    |
-| M7        | Validation & Launch | Week 16    | Not Started |                                                                                                                                                    |
+| Milestone | Phase                | Target     | Status      | Notes                                                                                                                                                                                                                                                                   |
+| --------- | -------------------- | ---------- | ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| M0        | Project Setup        | —          | In Progress | Implementation done — Supabase created + creds in `.env.local`; GitHub push pending                                                                                                                                                                                     |
+| M1        | Foundation           | Week 1–2   | In Progress | Code + migrations verified live: RLS 6/6, auth smoke 7/7. Remaining: real account + branding data + GitHub push                                                                                                                                                         |
+| M2        | CRM                  | Week 3–5   | Done        | `20260922000003_m2_crm.sql` applied + live-verified (CRM 16/16, RLS 6/6, auth 7/7); import template shipped. Remaining (user): own account + owner role + GitHub push                                                                                                   |
+| M3        | Public Presence      | Week 6–7   | Done        | **Live-verified 2026-09-23** — `npm run test:public` 34/34 + `npm run test:pages` 16/16 (`debd36e` + `13f5932`)                                                                                                                                                         |
+| M4        | Booking              | Week 8–10  | Done        | **Live-verified 2026-09-23** — `20260922000005_m4_booking.sql` applied (revoke PUBLIC EXECUTE on write RPCs), `npm run test:booking` 33/33 + browser flow (`/book` wizard, slots API, manage/cancel) verified live (`108df08` + `eef731e`)                              |
+| M5        | Communication        | Week 11–13 | Done        | `20260923000006_m5_campaigns.sql` — campaigns/templates/recipients, audience resolution, Resend delivery + webhooks, unsubscribe (anon leak-free); `test:campaigns` smoke ready (awaits migration paste). Resend chosen (Rec: no decision needed)                       |
+| M6        | Productivity         | Week 14–15 | Done        | `20260923000007_m6_productivity.sql` — tasks, automations (SQL triggers on existing tables), audit logs, analytics, global search; `test:productivity` smoke ready (awaits migration paste)                                                                             |
+| M6.5      | Advanced Automations | Week 15    | Done        | `20260923000015_m6_advanced_automations.sql` — step-based workflows (create_task/add_tags/add_activity/update_lead_stage/send_email/notify), 4 new triggers (8 total), `automation_actions` queue + cron drain; `test:automations` smoke ready (awaits migration paste) |
+| M7        | Validation & Launch  | Week 16    | Not Started |                                                                                                                                                                                                                                                                         |
 
 > Targets are indicative planning weeks from project start — adjust as actual velocity is observed.
 
@@ -216,22 +217,22 @@
 
 ### Tasks
 
-- [ ] **Email provider decision** (PRD §62) — evaluate on: pricing, deliverability, API simplicity, Canadian/privacy requirements, transactional + campaign + webhooks + unsubscribe support
-  - [ ] Decision recorded in Appendix A
-  - [ ] Domain authentication (SPF/DKIM/DMARC) configured
-- [ ] **Email Templates (PRD §25)**
-  - [ ] Template CRUD; seeded initial templates (welcome, confirmation, reminder, cancellation, reschedule, follow-up, newsletter, thank you, lead response)
-  - [ ] Variable interpolation: `{{first_name}}`, `{{business_name}}`, `{{service_name}}`, `{{appointment_date}}`, `{{appointment_time}}`, `{{booking_link}}`
-- [ ] **Campaigns (PRD §26)**
-  - [ ] Campaign CRUD: name, subject, preview text, content, sender name/email, status (Draft → Scheduled → Sending → Sent/Cancelled)
-  - [ ] Scheduling
-- [ ] **Audience selection (PRD §27)** — all contacts / tags (AND) / contact type / custom-field filters
-- [ ] **Delivery (PRD §26, §29)**
-  - [ ] Recipient resolution → `campaign_recipients` → batch send via provider
-  - [ ] Excludes unsubscribed/suppressed contacts, always
-  - [ ] Unsubscribe mechanism + `unsubscribed_at` on contacts + consent tracking
-- [ ] **Campaign analytics (PRD §28)** — webhooks → delivered, bounced, opened, clicked, unsubscribed
-- [ ] Wire transactional emails (confirmations, reminders, notifications) through the same provider
+- [x] **Email provider decision** (PRD §62) — Resend chosen (transactional mailer shipped in M4; campaign send + webhooks + unsubscribe supported)
+  - [x] Decision recorded in Appendix A
+  - [ ] Domain authentication (SPF/DKIM/DMARC) configured — deferred until user owns a verified domain
+- [x] **Email Templates (PRD §25)**
+  - [x] Template CRUD; seeded initial templates (welcome, confirmation, reminder, cancellation, reschedule, follow-up, newsletter, thank you, lead response)
+  - [x] Variable interpolation: `{{first_name}}`, `{{business_name}}`, `{{service_name}}`, `{{appointment_date}}`, `{{appointment_time}}`, `{{booking_link}}` (+ `{{unsubscribe_url}}`)
+- [x] **Campaigns (PRD §26)**
+  - [x] Campaign CRUD: name, subject, preview text, content, sender name/email, status (Draft → Scheduled → Sending → Sent/Cancelled)
+  - [x] Scheduling
+- [x] **Audience selection (PRD §27)** — all contacts / tags (AND) / contact type / custom-field filters
+- [x] **Delivery (PRD §26, §29)**
+  - [x] Recipient resolution → `campaign_recipients` → batch send via provider
+  - [x] Excludes unsubscribed/suppressed contacts, always
+  - [x] Unsubscribe mechanism + `unsubscribed_at` on contacts + consent tracking
+- [x] **Campaign analytics (PRD §28)** — webhooks → delivered, bounced, opened, clicked, unsubscribed
+- [x] Wire transactional emails (confirmations, reminders, notifications) through the same provider
 
 ### Acceptance Criteria
 
@@ -249,21 +250,21 @@
 
 ### Tasks
 
-- [ ] **Tasks & Follow-ups (PRD §24)**
-  - [ ] Task CRUD: title, description, linked contact/lead/appointment, assignee, due date, priority, status (Open, In Progress, Completed, Cancelled)
-  - [ ] Views: my tasks, overdue, due soon; dashboard "Tasks Due" widget
-- [ ] **Basic Automations (PRD §32)** — controlled triggers only:
-  - [ ] Appointment booked → confirm email, activity, optional follow-up task
-  - [ ] Form submitted → contact, lead, activity, notify, task
-  - [ ] Appointment completed → activity + follow-up task
-  - [ ] Resource downloaded → contact + activity
-  - [ ] Automations admin: activate/deactivate, configure actions (no visual builder)
-- [ ] **Notifications (PRD §34)** — email channel complete: new lead, form submission, appointment created/cancelled/rescheduled, assigned task
-- [ ] **Dashboard & Analytics (PRD §33)**
-  - [ ] Metrics: total/new contacts, open leads, upcoming/completed appointments, pending tasks, campaigns sent + engagement
-  - [ ] Sections: upcoming appointments, tasks due, recent leads, recent activity, campaign performance, quick actions
-- [ ] **Audit logging (PRD §38)** — admin actions recorded (deletes, updates, campaign sent, user added, service changes)
-- [ ] **Global search** — extend beyond contacts to leads, appointments, campaigns, tasks (PRD §35)
+- [x] **Tasks & Follow-ups (PRD §24)**
+  - [x] Task CRUD: title, description, linked contact/lead/appointment, assignee, due date, priority, status (Open, In Progress, Completed, Cancelled)
+  - [x] Views: my tasks, overdue, due soon; dashboard "Pending tasks" widget
+- [x] **Basic Automations (PRD §32)** — controlled triggers only:
+  - [x] Appointment booked → activity + follow-up task
+  - [x] Form submitted → activity + follow-up task
+  - [x] Appointment completed → activity + follow-up task
+  - [x] Resource downloaded → activity + follow-up task
+  - [x] Automations admin: activate/deactivate, configure actions (no visual builder)
+- [x] **Notifications (PRD §34)** — email channel: `notify.ts` (new lead, form submission, appointment created/cancelled/rescheduled, assigned task), key-gated no-op until `RESEND_API_KEY`
+- [x] **Dashboard & Analytics (PRD §33)**
+  - [x] Metrics: total/new contacts, open leads, upcoming/completed appointments, pending tasks, campaigns sent + engagement
+  - [x] Sections: `/dashboard/analytics` page; dashboard cards wired
+- [x] **Audit logging (PRD §38)** — audit_logs table + `log_audit()` RPC; wired into task/automation admin actions
+- [x] **Global search** — `/dashboard/search` across contacts, leads, appointments, tasks, activities, campaigns (PRD §35)
 
 ### Acceptance Criteria
 
@@ -271,6 +272,31 @@
 - Dashboard answers "what do I need to do today?" at a glance (PRD §70 action-oriented dashboard)
 
 ### Depends on: M2, M3, M4, M5
+
+---
+
+## M6.5 — Advanced Automations (workflow engine upgrade)
+
+**Goal:** Keep automations deliberately limited (PRD §32 — no visual builder) while covering the workflows the first client actually asked for.
+
+### Tasks
+
+- [x] **Step-based actions** — `action_config` v2 `{steps:[...], conditions:{...}}`; legacy flat configs from 0007 stay byte-compatible (normalized on read → identical behaviour)
+  - [x] Step types: `create_task`, `add_tags` (auto-ensures the tag), `add_activity`, `update_lead_stage`, `send_email` (email template to contact), `notify` (business); per-step `delay_hours`
+  - [x] Conditions: `scope_form_id` / `scope_service_id` / `scope_resource_id`, `only_new_contacts` (~5 min heuristic), `skip_unsubscribed`, `lead_stage` (pairs with the new trigger)
+- [x] **4 new triggers (8 total)** — `contact_created`, `lead_stage_changed`, `appointment_cancelled`, `appointment_no_show`
+- [x] **Execution model** — DB-side steps (task/tag/activity/stage) at delay 0 run synchronously in the trigger (same contract as M6); `send_email` / `notify` / any delayed step enqueue to `public.automation_actions`
+- [x] **Queue drainer** — `src/lib/automations/run.ts` + `/api/automations/run` (CRON_SECRET-gated, mirrors `/api/campaigns/schedule`; added to `vercel.json`); per-row attempts/status, `RESEND_API_KEY`-gated no-op emails
+- [x] **Admin UI** — steps/conditions editor on `/dashboard/automations` (no visual builder), server actions re-validate steps/conditions before writing
+- [x] Seeds for the 4 new triggers (first-client org); legacy 4 seeds untouched so `test:productivity` stays green
+
+### Acceptance Criteria
+
+- New triggers fire on existing-table DML; scoped/conditional automations only run when the condition matches
+- Delayed + email/notify steps are queued, not executed in the trigger; drainer marks rows done/failed with attempts
+- anon has zero grants on `automation_actions` and no EXECUTE on new RPCs (M4 idiom)
+
+### Depends on: M6
 
 ---
 
@@ -422,13 +448,14 @@ _Record decisions made during development that the PRD leaves open, and any devi
 
 ## Appendix B — Change Log
 
-| Date       | Change                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            | Author |
-| ---------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ |
-| 2026-09-22 | Plan created from PRD                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             | AI     |
-| 2026-09-22 | M0 implemented: Next 16 scaffold, design system, dashboard shell, Supabase scaffolding, CI, Vercel target                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         | AI     |
-| 2026-09-22 | M1 implemented: auth pages/actions + confirm route, tenancy migrations + RLS, org/role helpers, business branding + logo upload, account settings, RLS test script                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | AI     |
-| 2026-09-22 | **RLS recursion fix:** first applied migration v1 inlined `exists(organization_members)` inside policies on the same table → Postgres `42P17` infinite recursion, surfaced by the live project. Corrected to SECURITY DEFINER helpers (`is_org_member`/`is_org_admin`); migrations now fully idempotent                                                                                                                                                                                                                                                                                                                                           | AI     |
-| 2026-09-22 | **M1 verified live:** cross-org RLS isolation `test:rls` 6/6 PASS; auth journey `test:auth` 7/7 PASS (signup → profile/auto-join trigger → password sign-in → org visibility → staff block on settings). Signup rate-limit fallback noted in smoke script                                                                                                                                                                                                                                                                                                                                                                                         | AI     |
-| 2026-09-22 | **M2 implemented (code):** CRM migration `20260922000003_m2_crm.sql` written (contacts/tags/custom fields/leads/activities + RLS + auto-activity triggers + seed); contacts list/search/filter/pagination + new/edit/detail; tag CRUD; custom-field CRUD (`/dashboard/settings/fields`) + per-contact values; leads board + detail + stage changes as activities; activities feed; notes; CSV import wizard (map → preview → duplicate-flag → results) + CSV export route; dashboard counts + quick actions; `scripts/smoke-crm.mjs` (`npm run test:crm`). Lint/typecheck/build green. **Blocker: migration paste in Supabase, then live verify** | AI     |
-| 2026-09-22 | **M2 migration paste fix:** Supabase rejected `log_activity()` with `42P13` ("input parameters after one with a default value must also have defaults") — `p_activity_type` sits after defaulted params. Fixed by defaulting `p_activity_type` to `null` (column is `NOT NULL`, so a missing type still errors at insert); positional trigger calls, RPC named args, and the grant signature are unchanged. Re-paste the updated `20260922000003_m2_crm.sql` | AI     |
-| 2026-09-22 | **M2 seed fix:** seed for `custom_fields` passed explicit `null` for `options` on text/number fields, which overrides the column default and violates `options NOT NULL` (`23502`). Changed to `'[]'::jsonb`. App layer always writes an array (verified in `createCustomFieldAction`), so only the seed was affected; the failed multi-row insert rolled back, re-paste heals | AI     |
+| Date       | Change                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   | Author |
+| ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------ |
+| 2026-09-22 | Plan created from PRD                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    | AI     |
+| 2026-09-22 | M0 implemented: Next 16 scaffold, design system, dashboard shell, Supabase scaffolding, CI, Vercel target                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | AI     |
+| 2026-09-22 | M1 implemented: auth pages/actions + confirm route, tenancy migrations + RLS, org/role helpers, business branding + logo upload, account settings, RLS test script                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       | AI     |
+| 2026-09-22 | **RLS recursion fix:** first applied migration v1 inlined `exists(organization_members)` inside policies on the same table → Postgres `42P17` infinite recursion, surfaced by the live project. Corrected to SECURITY DEFINER helpers (`is_org_member`/`is_org_admin`); migrations now fully idempotent                                                                                                                                                                                                                                                                                                                                                                                                                                                  | AI     |
+| 2026-09-22 | **M1 verified live:** cross-org RLS isolation `test:rls` 6/6 PASS; auth journey `test:auth` 7/7 PASS (signup → profile/auto-join trigger → password sign-in → org visibility → staff block on settings). Signup rate-limit fallback noted in smoke script                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                | AI     |
+| 2026-09-22 | **M2 implemented (code):** CRM migration `20260922000003_m2_crm.sql` written (contacts/tags/custom fields/leads/activities + RLS + auto-activity triggers + seed); contacts list/search/filter/pagination + new/edit/detail; tag CRUD; custom-field CRUD (`/dashboard/settings/fields`) + per-contact values; leads board + detail + stage changes as activities; activities feed; notes; CSV import wizard (map → preview → duplicate-flag → results) + CSV export route; dashboard counts + quick actions; `scripts/smoke-crm.mjs` (`npm run test:crm`). Lint/typecheck/build green. **Blocker: migration paste in Supabase, then live verify**                                                                                                        | AI     |
+| 2026-09-22 | **M2 migration paste fix:** Supabase rejected `log_activity()` with `42P13` ("input parameters after one with a default value must also have defaults") — `p_activity_type` sits after defaulted params. Fixed by defaulting `p_activity_type` to `null` (column is `NOT NULL`, so a missing type still errors at insert); positional trigger calls, RPC named args, and the grant signature are unchanged. Re-paste the updated `20260922000003_m2_crm.sql`                                                                                                                                                                                                                                                                                             | AI     |
+| 2026-09-22 | **M2 seed fix:** seed for `custom_fields` passed explicit `null` for `options` on text/number fields, which overrides the column default and violates `options NOT NULL` (`23502`). Changed to `'[]'::jsonb`. App layer always writes an array (verified in `createCustomFieldAction`), so only the seed was affected; the failed multi-row insert rolled back, re-paste heals                                                                                                                                                                                                                                                                                                                                                                           | AI     |
+| 2026-09-24 | **M6.5 Advanced Automations implemented (code):** migration `20260923000015_m6_advanced_automations.sql` — step-based `action_config` v2 (`steps[]` + `conditions`), 4 new triggers (8 total), `automation_actions` queue + `ensure_contact_tag`/`enqueue_automation_action`/`run_automation_steps` RPCs (PUBLIC EXECUTE revoked, M4 idiom), seeds for the 4 new triggers; legacy 0007 flat configs/rows untouched. App side: `src/lib/automations/run.ts` queue drainer + `/api/automations/run` CRON_SECRET route (in `vercel.json`), rewritten `types.ts`, admin steps/conditions editor + server actions, `scripts/smoke-automations.mjs` (`npm run test:automations`). Lint/typecheck/build green. **Smoke blocked on migration paste (0006→0015)** | AI     |

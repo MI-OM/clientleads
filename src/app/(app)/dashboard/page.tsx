@@ -3,6 +3,7 @@ import { AlertTriangle } from "lucide-react";
 import { getMyOrg } from "@/lib/auth/org";
 import { getDashboardCounts } from "@/lib/crm/queries";
 import { countUpcomingAppointments } from "@/lib/booking/queries";
+import { countPendingTasks } from "@/lib/tasks/queries";
 import { PageHeader } from "@/components/dashboard/page-header";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
@@ -16,6 +17,7 @@ export default async function DashboardPage() {
   const upcomingAppointments = ctx
     ? await countUpcomingAppointments(ctx.org.id, new Date().toISOString())
     : null;
+  const pendingTasks = ctx ? await countPendingTasks(ctx.org.id) : null;
 
   const linkAction = (href: string, label: string) => (
     <Link href={href} className={buttonVariants({ variant: "outline" })}>
@@ -30,7 +32,7 @@ export default async function DashboardPage() {
         description="An action-oriented overview of your business."
         actions={
           <Badge variant="secondary" className="h-fit">
-            CRM · M4
+            CRM · M6
           </Badge>
         }
       />
@@ -83,9 +85,7 @@ export default async function DashboardPage() {
             <p className="text-3xl font-semibold">
               {upcomingAppointments?.toLocaleString() ?? "—"}
             </p>
-            <p className="mt-1 text-xs text-muted-foreground">
-              Scheduled + confirmed, from now on
-            </p>
+            <p className="mt-1 text-xs text-muted-foreground">Scheduled + confirmed, from now on</p>
           </CardContent>
         </Card>
         <Card>
@@ -95,8 +95,8 @@ export default async function DashboardPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-3xl font-semibold">—</p>
-            <p className="mt-1 text-xs text-muted-foreground">Tasks land in M6</p>
+            <p className="text-3xl font-semibold">{pendingTasks?.toLocaleString() ?? "—"}</p>
+            <p className="mt-1 text-xs text-muted-foreground">Open or in progress</p>
           </CardContent>
         </Card>
       </div>
@@ -114,25 +114,18 @@ export default async function DashboardPage() {
           >
             Import contacts
           </Link>
-          <Link
-            href="/dashboard/availability"
-            className={buttonVariants({ variant: "outline" })}
-          >
+          <Link href="/dashboard/availability" className={buttonVariants({ variant: "outline" })}>
             Set availability
           </Link>
-          <Link
-            href="/dashboard/appointments"
-            className={buttonVariants({ variant: "outline" })}
-          >
+          <Link href="/dashboard/appointments" className={buttonVariants({ variant: "outline" })}>
             View appointments
           </Link>
-          <span
-            className={buttonVariants({ variant: "outline" }) + " cursor-not-allowed opacity-50"}
-            title="Campaigns land in M5"
-            aria-disabled
-          >
+          <Link href="/dashboard/campaigns/new" className={buttonVariants({ variant: "outline" })}>
             New campaign
-          </span>
+          </Link>
+          <Link href="/dashboard/tasks/new" className={buttonVariants({ variant: "outline" })}>
+            New task
+          </Link>
         </CardContent>
       </Card>
     </div>

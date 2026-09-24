@@ -1,11 +1,12 @@
 import { getMyOrg } from "@/lib/auth/org";
-import { listActivities } from "@/lib/crm/queries";
+import { listActivitiesPage } from "@/lib/crm/queries";
+import { Pagination } from "@/components/dashboard/pagination";
 import { PageHeader } from "@/components/dashboard/page-header";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ActivityTimeline } from "@/components/crm/activity-timeline";
 import Link from "next/link";
 
-export default async function ActivitiesPage() {
+export default async function ActivitiesPage({ searchParams }: { searchParams: Promise<{ page?: string | string[] }> }) {
   const ctx = await getMyOrg();
   if (!ctx) {
     return (
@@ -18,7 +19,10 @@ export default async function ActivitiesPage() {
     );
   }
 
-  const activities = await listActivities(ctx.org.id, { limit: 100 });
+  const params = await searchParams;
+  const page = Number.parseInt(Array.isArray(params.page) ? params.page[0] ?? "" : params.page ?? "", 10) || 1;
+  const result = await listActivitiesPage(ctx.org.id, page);
+  const activities = result.activities;
 
   return (
     <div className="flex flex-col gap-6">
@@ -42,12 +46,13 @@ export default async function ActivitiesPage() {
         </CardContent>
       </Card>
       <p className="text-sm text-muted-foreground">
-        Showing the {activities.length} most recent events.{" "}
+        Showing page {page} of the workspace activity.{" "}
         <Link href="/dashboard/contacts" className="text-primary hover:underline">
           Browse contacts
         </Link>{" "}
         to see per-contact timelines.
       </p>
+      <Pagination page={page} totalPages={result.totalPages} href={(target) => `/dashboard/activities?page=${target}`} />
     </div>
   );
 }

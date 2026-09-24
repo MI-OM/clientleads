@@ -50,6 +50,9 @@ function dbError(message: string): string {
   if (/unique/i.test(message)) {
     return "A record with that value already exists.";
   }
+  if (/foreign key|violates.*constraint/i.test(message)) {
+    return "These contacts are linked to another record and cannot be permanently deleted. Archive them instead.";
+  }
   return "Something went wrong. Please try again.";
 }
 
@@ -179,7 +182,9 @@ export async function createContactAction(_prev: CrmState, formData: FormData): 
     })
     .select("id")
     .single();
-  if (error) return { error: dbError(error.message) };
+  if (error) {
+    return { error: dbError(error.message) };
+  }
 
   const contactId = String(data.id);
   try {
@@ -321,6 +326,33 @@ export async function deleteContactAction(contactId: string) {
   if (error) return { error: dbError(error.message) };
   revalidatePath("/dashboard/contacts");
   return { success: "Contact deleted." };
+}
+
+export async function bulkArchiveContactsAction(
+  _prev: CrmState,
+  formData: FormData,
+): Promise<CrmState> {
+  const ctx = await getMyOrg();
+  if (!ctx) return { error: "No workspace was found for your account." };
+  const contactIds = formData
+    .getAll("contactId")
+    .map(String)
+    .filter((id) => /^[0-9a-f-]{36}$/i.test(id));
+  if (contactIds.length === 0) return { error: "Select at least one contact." };
+
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("contacts")
+    .update({ archived_at: new Date().toISOString() })
+    .eq("organization_id", ctx.org.id)
+    .in("id", contactIds);
+  if (error) {
+    return { error: dbError(error.message) };
+  }
+  revalidatePath("/dashboard/contacts");
+  return {
+    success: `${contactIds.length} contact${contactIds.length === 1 ? "" : "s"} archived.`,
+  };
 }
 
 /* ── tags ────────────────────────────────────────────────────────────── */

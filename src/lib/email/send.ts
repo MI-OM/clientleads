@@ -10,10 +10,9 @@
 
 const RESEND_API = "https://api.resend.com/emails";
 
-function baseUrl(): string {
-  return (process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3001").replace(/\/+$/, "");
+export function baseUrl(): string {
+  return (process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000").replace(/\/+$/, "");
 }
-
 /** Human "Thursday, September 24, 2026 at 9:30 AM" in the org timezone. */
 function formatWhen(startsAt: string, endsAt: string, timezone: string): string {
   try {
@@ -40,7 +39,6 @@ function formatWhen(startsAt: string, endsAt: string, timezone: string): string 
     return new Date(startsAt).toString();
   }
 }
-
 export type BookingEmailKind = "booked" | "cancelled" | "rescheduled";
 
 export interface BookingEmailData {
@@ -142,4 +140,3 @@ export async function sendBookingEmails(data: BookingEmailData): Promise<void> {
   }
 }
 
-export { baseUrl };

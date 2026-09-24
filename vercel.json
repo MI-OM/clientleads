@@ -1,0 +1,12 @@
+{
+  "crons": [
+    {
+      "path": "/api/campaigns/schedule",
+      "schedule": "* * * * *"
+    },
+    {
+      "path": "/api/automations/run",
+      "schedule": "* * * * *"
+    }
+  ]
+}
