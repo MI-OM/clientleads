@@ -2,35 +2,29 @@ name: CI
 
 on:
   push:
-    branches: ["main"]
+    branches: [main]
   pull_request:
-
-concurrency:
-  group: ci-${{ github.ref }}
-  cancel-in-progress: true
 
 jobs:
   quality:
-    name: Lint, typecheck & build
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 24
           cache: npm
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Lint
-        run: npm run lint
-
-      - name: Typecheck
-        run: npm run typecheck
-
-      - name: Build
-        run: npm run build
+      - run: npm ci
+      - name: Stub env for build (real keys live in Vercel project env)
+        run: |
+          cat > .env.local <<'EOF'
+          NEXT_PUBLIC_SUPABASE_URL=https://placeholder.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY=placeholder-anon-key
+          SUPABASE_SERVICE_ROLE_KEY=placeholder-service-role-key
+          NEXT_PUBLIC_APP_URL=http://localhost:3000
+          NEXT_PUBLIC_APP_ENV=development
+          EOF
+      - run: npm run lint
+      - run: npm run format:check
+      - run: npm run typecheck
+      - run: npm run build
