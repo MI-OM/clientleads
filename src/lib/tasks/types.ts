@@ -11,9 +11,18 @@ export const TASK_PRIORITIES: TaskPriority[] = ["Low", "Normal", "High", "Urgent
 export const OPEN_TASK_STATUSES: TaskStatus[] = ["Open", "In Progress"];
 
 /** Task list view filters offered on the tasks page. */
-export type TaskView = "mine" | "open" | "overdue" | "due-soon" | "all";
+export type TaskView =
+  "mine" | "open" | "in-progress" | "overdue" | "due-soon" | "completed" | "all";
 
-export const TASK_VIEWS: TaskView[] = ["mine", "open", "overdue", "due-soon", "all"];
+export const TASK_VIEWS: TaskView[] = [
+  "mine",
+  "open",
+  "in-progress",
+  "overdue",
+  "due-soon",
+  "completed",
+  "all",
+];
 
 export interface Task {
   id: string;

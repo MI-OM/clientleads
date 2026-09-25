@@ -106,6 +106,12 @@ export const listTasks = cache(
       case "open":
         tasks = tasks.filter((t) => OPEN_TASK_STATUSES.includes(t.status));
         break;
+      case "in-progress":
+        tasks = tasks.filter((t) => t.status === "In Progress");
+        break;
+      case "completed":
+        tasks = tasks.filter((t) => t.status === "Completed");
+        break;
       case "overdue":
         tasks = tasks.filter(
           (t) => OPEN_TASK_STATUSES.includes(t.status) && t.dueDate !== null && t.dueDate < now,
@@ -156,6 +162,10 @@ export const listTasksPage = cache(
       query = query.or(`assignee_id.eq.${opts.userId},created_by.eq.${opts.userId}`);
     } else if (view === "open") {
       query = query.in("status", OPEN_TASK_STATUSES);
+    } else if (view === "in-progress") {
+      query = query.eq("status", "In Progress");
+    } else if (view === "completed") {
+      query = query.eq("status", "Completed");
     } else if (view === "overdue") {
       query = query.in("status", OPEN_TASK_STATUSES).lt("due_date", nowIso);
     } else if (view === "due-soon") {

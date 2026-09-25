@@ -22,8 +22,10 @@ function stringParam(value: string | string[] | undefined): string {
 const VIEW_LABELS: Record<TaskView, string> = {
   mine: "My tasks",
   open: "Open",
+  "in-progress": "In progress",
   overdue: "Overdue",
   "due-soon": "Due soon",
+  completed: "Completed",
   all: "All",
 };
 
@@ -111,7 +113,9 @@ export default async function TasksPage({ searchParams }: { searchParams: Promis
 
       <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
         <CalendarClock className="size-3.5" aria-hidden />
-        Overdue counts tasks still open past their due date; Due soon = next 7 days.
+        Open includes both Open and In progress. Overdue counts tasks still open past their due
+        date; Due soon = next 7 days. Use Start to move a task to In progress, then Complete to
+        finish it.
       </p>
     </div>
   );

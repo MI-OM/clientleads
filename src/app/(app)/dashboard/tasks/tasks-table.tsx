@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useActionState, useState } from "react";
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle2, CirclePlay } from "lucide-react";
 import type { Task, TaskPriority, TaskStatus } from "@/lib/tasks/types";
 import type { TaskActionState } from "./actions";
 import { bulkDeleteTasksAction, deleteTaskAction, setTaskStatusAction } from "./actions";
@@ -136,6 +136,18 @@ export function TasksTable({
               </div>
               {canManage(task) ? (
                 <div className="flex shrink-0 flex-wrap items-center gap-2">
+                  {task.status === "Open" ? (
+                    <form action={setTaskStatusAction}>
+                      <input type="hidden" name="id" value={task.id} />
+                      <input type="hidden" name="status" value="In Progress" />
+                      <button
+                        type="submit"
+                        className="inline-flex h-9 items-center gap-1.5 rounded-md border border-input bg-card px-3 text-sm font-medium shadow-sm hover:bg-accent"
+                      >
+                        <CirclePlay className="size-4" aria-hidden /> Start
+                      </button>
+                    </form>
+                  ) : null}
                   {open ? (
                     <form action={setTaskStatusAction}>
                       <input type="hidden" name="id" value={task.id} />
