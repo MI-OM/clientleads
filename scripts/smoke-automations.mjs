@@ -286,7 +286,7 @@ try {
         organization_id: orgId,
         starts_at: APPT_START,
         ends_at: APPT_END,
-        timezone: "America/Halifax",
+        timezone: "America/St_Johns",
         customer_name: name,
         customer_email: `appt-${tag}@example.com`,
         status: "Scheduled",

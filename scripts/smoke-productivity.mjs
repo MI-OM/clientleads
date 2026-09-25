@@ -305,7 +305,7 @@ try {
       organization_id: orgId,
       starts_at: APPT_START,
       ends_at: APPT_END,
-      timezone: "America/Halifax",
+      timezone: "America/St_Johns",
       customer_name: `Trigger Smoke ${tag}`,
       customer_email: `trigger-${tag}@example.com`,
       status: "Scheduled",

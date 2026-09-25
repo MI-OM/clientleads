@@ -204,7 +204,7 @@ try {
   const pageRes = await anon.rpc("get_public_page", { p_slug: "first-client" });
   record(
     "public page projects org timezone",
-    pageRes.data?.org?.timezone === "America/Halifax",
+    pageRes.data?.org?.timezone === "America/St_Johns",
     pageRes.data?.org?.timezone ?? "",
   );
   record(
@@ -297,7 +297,7 @@ try {
     service_id: scratchSvc?.id, // different service, same org calendar
     starts_at: slots[0],
     ends_at: new Date(new Date(slots[0]).getTime() + 30 * 60_000).toISOString(),
-    timezone: "America/Halifax",
+    timezone: "America/St_Johns",
     customer_name: "Backstop",
     customer_email: `backstop-${tag}@example.com`,
     status: "Scheduled",
