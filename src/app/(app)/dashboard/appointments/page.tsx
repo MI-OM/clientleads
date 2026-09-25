@@ -83,13 +83,18 @@ function AppointmentRow({
     <li className="flex flex-wrap items-center justify-between gap-3 py-3">
       <div className="min-w-0">
         <p className="font-medium">
-          {formatWhen(appointment.startsAt, appointment.endsAt, timezone)}
+          <Link href={`/dashboard/appointments/${appointment.id}`} className="hover:underline">
+            {formatWhen(appointment.startsAt, appointment.endsAt, timezone)}
+          </Link>
           {live ? null : " · " + appointment.status}
         </p>
         <p className="truncate text-sm text-muted-foreground">
-          <span className="font-medium text-foreground">
+          <Link
+            href={`/dashboard/appointments/${appointment.id}`}
+            className="font-medium text-foreground hover:underline"
+          >
             {appointment.serviceName ?? "Appointment"}
-          </span>
+          </Link>
           {" · "}
           {appointment.customerName}
           {" · "}

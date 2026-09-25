@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
 import type {
   Appointment,
@@ -84,6 +85,21 @@ export async function listAppointments(orgId: string): Promise<Appointment[]> {
   if (error) throw error;
   return (data ?? []).map((row) => mapAppointment(row as unknown as AppointmentRow));
 }
+
+/** Single appointment scoped to the org (RLS applies; explicit org filter too). */
+export const getAppointment = cache(
+  async (orgId: string, id: string): Promise<Appointment | null> => {
+    const supabase = await createClient();
+    const { data, error } = await supabase
+      .from("appointments")
+      .select("*, service:services(name)")
+      .eq("organization_id", orgId)
+      .eq("id", id)
+      .maybeSingle();
+    if (error) return null;
+    return data ? mapAppointment(data as unknown as AppointmentRow) : null;
+  },
+);
 
 /** Live (Scheduled/Confirmed) appointments starting at/after `from`, soonest first. */
 export async function listUpcomingAppointments(

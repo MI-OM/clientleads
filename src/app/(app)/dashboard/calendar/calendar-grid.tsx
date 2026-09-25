@@ -47,6 +47,8 @@ interface DayItem {
   title: string;
   time: string;
   provider?: string;
+  /** Present on chips that have a detail page to link to (appointments). */
+  href?: string;
 }
 
 function hourMinute(iso: string, timezone: string): string {
@@ -116,6 +118,7 @@ export function CalendarGrid({
       key: appt.id,
       title: appt.serviceName ?? (appt.customerName || appt.status),
       time: hourMinute(appt.startsAt, timezone),
+      href: `/dashboard/appointments/${appt.id}`,
     });
   }
   for (const event of events) {
@@ -154,11 +157,18 @@ export function CalendarGrid({
       provider?: string;
       title: string;
       time: string;
+      href?: string;
     }[] = [];
     const push = (kind: "app" | "event" | "blocked", list?: DayItem[]) => {
       const items = (list ?? []).slice(0, Math.max(0, MAX_CHIPS_PER_DAY - chips.length));
       for (const item of items)
-        chips.push({ kind, title: item.title, time: item.time, provider: item.provider });
+        chips.push({
+          kind,
+          title: item.title,
+          time: item.time,
+          provider: item.provider,
+          href: item.href,
+        });
     };
     push("app", bucket?.apps);
     push("event", bucket?.imported);
@@ -228,13 +238,28 @@ export function CalendarGrid({
               <div className="flex flex-col gap-0.5">
                 {cell.chips.map((chip, i) => {
                   const variantClass = chipClass(chip.kind, cell.inMonth, chip.provider);
-                  return (
+                  const body = (
+                    <>
+                      <span className="font-medium">{chip.time}</span> {chip.title}
+                    </>
+                  );
+                  const title = `${chip.time} ${chip.title}`;
+                  return chip.href ? (
+                    <Link
+                      key={`${cell.day}-${chip.kind}-${i}`}
+                      href={chip.href}
+                      className={`block truncate rounded border px-1 py-0.5 text-[11px] leading-tight hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring ${variantClass}`}
+                      title={title}
+                    >
+                      {body}
+                    </Link>
+                  ) : (
                     <span
                       key={`${cell.day}-${chip.kind}-${i}`}
                       className={`truncate rounded border px-1 py-0.5 text-[11px] leading-tight ${variantClass}`}
-                      title={`${chip.time} ${chip.title}`}
+                      title={title}
                     >
-                      <span className="font-medium">{chip.time}</span> {chip.title}
+                      {body}
                     </span>
                   );
                 })}

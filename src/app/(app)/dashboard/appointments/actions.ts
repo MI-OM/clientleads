@@ -42,4 +42,6 @@ export async function setAppointmentStatusAction(formData: FormData): Promise<vo
     .eq("organization_id", ctx.org.id);
 
   revalidatePath("/dashboard/appointments");
+  revalidatePath(`/dashboard/appointments/${id}`);
+  revalidatePath("/dashboard/calendar");
 }
