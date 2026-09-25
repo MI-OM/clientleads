@@ -6,7 +6,11 @@ import { getCurrentUser, getMyOrg } from "@/lib/auth/org";
 import { getAutomation } from "@/lib/automations/queries";
 import { DEFAULT_ACTION_CONFIG } from "@/lib/automations/types";
 import type { AutomationActionConfig, AutomationStep } from "@/lib/automations/types";
-import { AUTOMATION_RECIPIENTS, AUTOMATION_STEP_TYPES, NOTIFY_KINDS } from "@/lib/automations/types";
+import {
+  AUTOMATION_RECIPIENTS,
+  AUTOMATION_STEP_TYPES,
+  NOTIFY_KINDS,
+} from "@/lib/automations/types";
 
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -78,7 +82,9 @@ function parseStepInput(raw: unknown): AutomationStep | null {
         template_id: step.template_id ? String(step.template_id) : null,
         delay_hours: clampHours(step.delay_hours),
         hours_before: clampHours(step.hours_before),
-        recipient: AUTOMATION_RECIPIENTS.includes(step.recipient as (typeof AUTOMATION_RECIPIENTS)[number])
+        recipient: AUTOMATION_RECIPIENTS.includes(
+          step.recipient as (typeof AUTOMATION_RECIPIENTS)[number],
+        )
           ? (step.recipient as "customer" | "business" | "selected_members")
           : "customer",
         member_ids: cleanMemberIds(step.member_ids),

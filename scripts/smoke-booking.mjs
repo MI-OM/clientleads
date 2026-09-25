@@ -461,9 +461,7 @@ try {
     p_name: "Hacker",
     p_email: "hacker@example.com",
   });
-  const permissionRejected = /permission denied|42501/i.test(
-    anonWrite.error?.message ?? "",
-  );
+  const permissionRejected = /permission denied|42501/i.test(anonWrite.error?.message ?? "");
   record(
     "anon cannot execute book_appointment (permission denied)",
     permissionRejected,

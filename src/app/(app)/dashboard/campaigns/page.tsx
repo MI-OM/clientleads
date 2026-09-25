@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Megaphone, Pencil, Plus, FileText } from "lucide-react";
 import { getMyOrg } from "@/lib/auth/org";
+import { DEFAULT_TIME_ZONE } from "@/lib/timezone";
 import { listCampaignsPage, describeAudience } from "@/lib/campaigns/queries";
 import { Pagination } from "@/components/dashboard/pagination";
 import type { Campaign } from "@/lib/campaigns/types";
@@ -21,7 +22,7 @@ const STATUS_VARIANT: Record<
   Cancelled: "danger",
 };
 
-function formatWhen(value: string | null): string {
+function formatWhen(value: string | null, timeZone: string): string {
   if (!value) return "—";
   const d = new Date(value);
   return Number.isNaN(d.getTime())
@@ -29,6 +30,7 @@ function formatWhen(value: string | null): string {
     : new Intl.DateTimeFormat("en-CA", {
         dateStyle: "medium",
         timeStyle: "short",
+        timeZone,
       }).format(d);
 }
 
@@ -39,6 +41,7 @@ export default async function CampaignsPage({
 }) {
   const ctx = await getMyOrg();
   const canManage = ctx?.role === "owner" || ctx?.role === "admin";
+  const timeZone = ctx?.org?.timezone ?? DEFAULT_TIME_ZONE;
 
   const params = await searchParams;
   const page =
@@ -120,6 +123,7 @@ export default async function CampaignsPage({
                     <dd>
                       {formatWhen(
                         campaign.status === "Scheduled" ? campaign.scheduledFor : campaign.sentAt,
+                        timeZone,
                       )}
                     </dd>
                   </div>

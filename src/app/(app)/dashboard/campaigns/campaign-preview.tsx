@@ -21,7 +21,7 @@ function fillVariables(value: string, businessName = ""): string {
   return value
     .replace(/\\n/g, "\n")
     .replace(/\{\{\s*([A-Za-z_][A-Za-z0-9_]*)\s*\}\}/g, (whole, name: string) => {
-      return name === "business_name" ? businessName || whole : SAMPLE_VALUES[name] ?? whole;
+      return name === "business_name" ? businessName || whole : (SAMPLE_VALUES[name] ?? whole);
     });
 }
 
@@ -70,7 +70,9 @@ export function CampaignPreview({
                 <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
                   Recipient preview
                 </p>
-                <h2 className="text-lg font-semibold">{previewVariables(subject) || "No subject"}</h2>
+                <h2 className="text-lg font-semibold">
+                  {previewVariables(subject) || "No subject"}
+                </h2>
               </div>
               <Button
                 type="button"

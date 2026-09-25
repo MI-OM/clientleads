@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { formatWhen, formatDateInZone } from "@/lib/timezone";
 
 /**
  * M6 global search (PRD §35): one query box across contacts, leads,
@@ -37,7 +38,11 @@ interface LeadRow {
   contact: { first_name?: string; last_name?: string; email?: string | null } | null;
 }
 
-export async function globalSearch(orgId: string, rawQuery: string): Promise<SearchHit[]> {
+export async function globalSearch(
+  orgId: string,
+  rawQuery: string,
+  timeZone = "America/St_Johns",
+): Promise<SearchHit[]> {
   const q = rawQuery.trim();
   if (q.length < 2) return [];
   const pattern = `%${q}%`;
@@ -120,7 +125,7 @@ export async function globalSearch(orgId: string, rawQuery: string): Promise<Sea
       id: String(a.id),
       type: "appointment",
       title: `${String(a.customer_name ?? "")} · ${String(a.status ?? "")}`,
-      subtitle: [a.customer_email, a.starts_at ? new Date(a.starts_at).toLocaleString() : ""]
+      subtitle: [a.customer_email, a.starts_at ? formatWhen(a.starts_at, timeZone) : ""]
         .filter(Boolean)
         .join(" · "),
       href: "/dashboard/appointments",
@@ -135,7 +140,7 @@ export async function globalSearch(orgId: string, rawQuery: string): Promise<Sea
       title: String(t.title),
       subtitle: [
         String(t.status ?? ""),
-        t.due_date ? `Due ${new Date(t.due_date).toLocaleDateString()}` : "",
+        t.due_date ? `Due ${formatDateInZone(t.due_date, timeZone)}` : "",
       ]
         .filter(Boolean)
         .join(" · "),

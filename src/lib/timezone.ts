@@ -1,5 +1,8 @@
 const LOCAL_DATE_TIME_RE = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/;
 
+/** The business region this product is built for (St. John's, UTC−3:30/−2:30). */
+export const DEFAULT_TIME_ZONE = "America/St_Johns";
+
 export function isValidTimeZone(value: string): boolean {
   try {
     new Intl.DateTimeFormat("en-US", { timeZone: value }).format();
@@ -62,6 +65,34 @@ export function utcToLocalDateTime(iso: string | null | undefined, timeZone: str
   const date = new Date(iso);
   if (Number.isNaN(date.getTime())) return "";
   return formatDateTimeInZone(date, timeZone);
+}
+
+/** Human-readable "Sep 25, 2026, 9:00 a.m." in a specific IANA zone. */
+export function formatWhen(iso: string | null | undefined, timeZone: string): string {
+  if (!iso || !isValidTimeZone(timeZone)) return "—";
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return "—";
+  try {
+    return new Intl.DateTimeFormat("en-CA", {
+      dateStyle: "medium",
+      timeStyle: "short",
+      timeZone,
+    }).format(date);
+  } catch {
+    return date.toLocaleString();
+  }
+}
+
+/** Short date ("Sep 24, 2026") in a specific IANA zone. */
+export function formatDateInZone(iso: string | null | undefined, timeZone: string): string {
+  if (!iso || !isValidTimeZone(timeZone)) return "";
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return "";
+  try {
+    return new Intl.DateTimeFormat("en-CA", { dateStyle: "medium", timeZone }).format(date);
+  } catch {
+    return date.toLocaleDateString();
+  }
 }
 
 function formatDateTimeInZone(date: Date, timeZone: string): string {

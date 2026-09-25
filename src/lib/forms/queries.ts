@@ -63,7 +63,10 @@ export async function listForms(orgId: string): Promise<PublicForm[]> {
   if (error) throw error;
 
   const forms = (formRows ?? []) as unknown as FormRow[];
-  const fields = await listFieldsForForms(orgId, forms.map((f) => f.id));
+  const fields = await listFieldsForForms(
+    orgId,
+    forms.map((f) => f.id),
+  );
   return forms.map((f) => mapForm(f, fields.get(f.id) ?? []));
 }
 

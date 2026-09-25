@@ -56,61 +56,61 @@ const THIRTY_DAYS_AGO = () => new Date(Date.now() - 30 * 86400_000).toISOString(
 
 export const getAnalytics = cache(
   async (orgId: string, filters: AnalyticsFilters = {}): Promise<AnalyticsMetrics> => {
-  const supabase = await createClient();
-  const from = filters.from ?? THIRTY_DAYS_AGO();
-  const to = filters.to ?? NOW();
+    const supabase = await createClient();
+    const from = filters.from ?? THIRTY_DAYS_AGO();
+    const to = filters.to ?? NOW();
 
-  const [contacts, newContacts, openLeads, upcoming, completed, pendingTasks, overdueTasks] =
-    await Promise.all([
-      supabase
-        .from("contacts")
-        .select("id", { count: "exact", head: true })
-        .eq("organization_id", orgId)
-        .is("archived_at", null),
-      supabase
-        .from("contacts")
-        .select("id", { count: "exact", head: true })
-        .eq("organization_id", orgId)
-        .is("archived_at", null)
-        .gte("created_at", from)
-        .lte("created_at", to),
-      supabase
-        .from("leads")
-        .select("id", { count: "exact", head: true })
-        .eq("organization_id", orgId)
-        .not("stage", "in", '("Won","Lost")'),
-      supabase
-        .from("appointments")
-        .select("id", { count: "exact", head: true })
-        .eq("organization_id", orgId)
-        .in("status", ["Scheduled", "Confirmed"])
-        .gte("starts_at", NOW()),
-      supabase
-        .from("appointments")
-        .select("id", { count: "exact", head: true })
-        .eq("organization_id", orgId)
-        .eq("status", "Completed")
-        .gte("starts_at", from)
-        .lte("starts_at", to),
-      countPendingTasks(orgId),
-      countOverdueTasks(orgId),
-    ]);
+    const [contacts, newContacts, openLeads, upcoming, completed, pendingTasks, overdueTasks] =
+      await Promise.all([
+        supabase
+          .from("contacts")
+          .select("id", { count: "exact", head: true })
+          .eq("organization_id", orgId)
+          .is("archived_at", null),
+        supabase
+          .from("contacts")
+          .select("id", { count: "exact", head: true })
+          .eq("organization_id", orgId)
+          .is("archived_at", null)
+          .gte("created_at", from)
+          .lte("created_at", to),
+        supabase
+          .from("leads")
+          .select("id", { count: "exact", head: true })
+          .eq("organization_id", orgId)
+          .not("stage", "in", '("Won","Lost")'),
+        supabase
+          .from("appointments")
+          .select("id", { count: "exact", head: true })
+          .eq("organization_id", orgId)
+          .in("status", ["Scheduled", "Confirmed"])
+          .gte("starts_at", NOW()),
+        supabase
+          .from("appointments")
+          .select("id", { count: "exact", head: true })
+          .eq("organization_id", orgId)
+          .eq("status", "Completed")
+          .gte("starts_at", from)
+          .lte("starts_at", to),
+        countPendingTasks(orgId),
+        countOverdueTasks(orgId),
+      ]);
 
-  const campaigns = await queryCampaignStats(orgId, { ...filters, from, to });
+    const campaigns = await queryCampaignStats(orgId, { ...filters, from, to });
 
-  return {
-    totalContacts: contacts.count ?? 0,
-    newContacts30d: newContacts.count ?? 0,
-    openLeads: openLeads.count ?? 0,
-    upcomingAppointments: upcoming.count ?? 0,
-    completedAppointments30d: completed.count ?? 0,
-    pendingTasks,
-    overdueTasks,
-    campaignsSent: campaigns?.sent ?? null,
-    campaignRecipients: campaigns?.recipients ?? null,
-    campaignOpened: campaigns?.opened ?? null,
-    campaignClicked: campaigns?.clicked ?? null,
-  };
+    return {
+      totalContacts: contacts.count ?? 0,
+      newContacts30d: newContacts.count ?? 0,
+      openLeads: openLeads.count ?? 0,
+      upcomingAppointments: upcoming.count ?? 0,
+      completedAppointments30d: completed.count ?? 0,
+      pendingTasks,
+      overdueTasks,
+      campaignsSent: campaigns?.sent ?? null,
+      campaignRecipients: campaigns?.recipients ?? null,
+      campaignOpened: campaigns?.opened ?? null,
+      campaignClicked: campaigns?.clicked ?? null,
+    };
   },
 );
 

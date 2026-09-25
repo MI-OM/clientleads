@@ -107,7 +107,9 @@ export default async function ResourcesPage({
                     <td className="px-4 py-3">
                       {resource.published && resource.visibility === "public" ? (
                         <details className="text-xs">
-                          <summary className="cursor-pointer font-medium text-primary">Embed</summary>
+                          <summary className="cursor-pointer font-medium text-primary">
+                            Embed
+                          </summary>
                           <code className="mt-2 block max-w-xs overflow-x-auto rounded bg-muted p-2">{`<iframe src="${appUrl}/${ctx?.org.slug ?? ""}/resources/${resource.id}/embed" title="${resource.title}" style="width:100%;min-height:220px;border:0"></iframe>`}</code>
                         </details>
                       ) : null}

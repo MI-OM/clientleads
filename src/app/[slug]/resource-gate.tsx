@@ -13,7 +13,13 @@ import { Label } from "@/components/ui/label";
  * Gated resources ask for name/email/phone before the download starts
  * (PRD §31). Non-gated resources are plain download links.
  */
-export function ResourceDownload({ resource, pageSlug }: { resource: PublicResource; pageSlug: string }) {
+export function ResourceDownload({
+  resource,
+  pageSlug,
+}: {
+  resource: PublicResource;
+  pageSlug: string;
+}) {
   const [state, formAction, pending] = useActionState<PublicFormState, FormData>(
     requestResourceAction,
     {},
@@ -66,7 +72,13 @@ export function ResourceDownload({ resource, pageSlug }: { resource: PublicResou
           <Label htmlFor={`name-${resource.id}`} className="text-xs">
             Name
           </Label>
-          <Input id={`name-${resource.id}`} name="name" required autoComplete="name" className="h-9" />
+          <Input
+            id={`name-${resource.id}`}
+            name="name"
+            required
+            autoComplete="name"
+            className="h-9"
+          />
         </div>
         <div className="grid gap-1.5">
           <Label htmlFor={`email-${resource.id}`} className="text-xs">
@@ -85,7 +97,13 @@ export function ResourceDownload({ resource, pageSlug }: { resource: PublicResou
           <Label htmlFor={`phone-${resource.id}`} className="text-xs">
             Phone <span className="font-normal text-muted-foreground">(optional)</span>
           </Label>
-          <Input id={`phone-${resource.id}`} name="phone" type="tel" autoComplete="tel" className="h-9" />
+          <Input
+            id={`phone-${resource.id}`}
+            name="phone"
+            type="tel"
+            autoComplete="tel"
+            className="h-9"
+          />
         </div>
         {state.error ? (
           <p role="alert" className="text-sm text-destructive sm:col-span-2">

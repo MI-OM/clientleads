@@ -46,7 +46,7 @@ export async function updateOrganizationAction(
     .toLowerCase();
   const primaryColor = String(formData.get("primaryColor") ?? "").trim();
   const secondaryColor = String(formData.get("secondaryColor") ?? "").trim();
-  const timezone = String(formData.get("timezone") ?? "America/Halifax").trim();
+  const timezone = String(formData.get("timezone") ?? "America/St_Johns").trim();
 
   if (!name) return { error: "Business name is required." };
   if (!SLUG.test(slug)) {

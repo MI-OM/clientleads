@@ -17,13 +17,19 @@ export function Pagination({
         <Link href={href(page - 1)} className={buttonVariants({ variant: "outline", size: "sm" })}>
           Previous
         </Link>
-      ) : <span />}
-      <span className="text-muted-foreground">Page {page} of {totalPages}</span>
+      ) : (
+        <span />
+      )}
+      <span className="text-muted-foreground">
+        Page {page} of {totalPages}
+      </span>
       {page < totalPages ? (
         <Link href={href(page + 1)} className={buttonVariants({ variant: "outline", size: "sm" })}>
           Next
         </Link>
-      ) : <span />}
+      ) : (
+        <span />
+      )}
     </div>
   );
 }

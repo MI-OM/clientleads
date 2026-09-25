@@ -219,7 +219,9 @@ export async function scheduleCampaignAction(
   if (!UUID_RE.test(id)) return { error: "Missing campaign id." };
 
   const raw = String(formData.get("scheduledFor") ?? "").trim();
-  const timeZone = String(formData.get("timeZone") ?? ctx.org.timezone ?? "America/Halifax").trim();
+  const timeZone = String(
+    formData.get("timeZone") ?? ctx.org.timezone ?? "America/St_Johns",
+  ).trim();
   if (!isValidTimeZone(timeZone)) return { error: "Choose a valid timezone in business settings." };
   if (!raw) return { error: "Choose a future date and time for this campaign." };
   const scheduledDate = localDateTimeToUtc(raw, timeZone);

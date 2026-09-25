@@ -39,7 +39,10 @@ function parseFields(formData: FormData): FieldPayload[] | null {
     if (!item || typeof item !== "object") return null;
     const f = item as Record<string, unknown>;
     const label = String(f.label ?? "").trim();
-    const fieldKey = String(f.fieldKey ?? "").trim().toLowerCase().replace(/\s+/g, "_");
+    const fieldKey = String(f.fieldKey ?? "")
+      .trim()
+      .toLowerCase()
+      .replace(/\s+/g, "_");
     const fieldType = String(f.fieldType ?? "");
     if (!label || !fieldKey || !FORM_FIELD_TYPES.includes(fieldType as never)) return null;
     if (!/^[a-z0-9_]+$/.test(fieldKey)) return null;
@@ -73,14 +76,17 @@ export async function createFormAction(
   }
 
   const name = String(formData.get("name") ?? "").trim();
-  const slug = String(formData.get("slug") ?? "").trim().toLowerCase();
+  const slug = String(formData.get("slug") ?? "")
+    .trim()
+    .toLowerCase();
   if (!name) return { error: "Form name is required." };
   if (!SLUG.test(slug)) {
     return { error: "Web address can only contain lowercase letters, numbers, and hyphens." };
   }
 
   const fields = parseFields(formData);
-  if (fields === null) return { error: "One of the form fields is invalid. Check labels, keys and types." };
+  if (fields === null)
+    return { error: "One of the form fields is invalid. Check labels, keys and types." };
 
   const supabase = await createClient();
   const { data: formRow, error } = await supabase
@@ -133,14 +139,17 @@ export async function updateFormAction(
   if (!id) return { error: "Missing form id." };
 
   const name = String(formData.get("name") ?? "").trim();
-  const slug = String(formData.get("slug") ?? "").trim().toLowerCase();
+  const slug = String(formData.get("slug") ?? "")
+    .trim()
+    .toLowerCase();
   if (!name) return { error: "Form name is required." };
   if (!SLUG.test(slug)) {
     return { error: "Web address can only contain lowercase letters, numbers, and hyphens." };
   }
 
   const fields = parseFields(formData);
-  if (fields === null) return { error: "One of the form fields is invalid. Check labels, keys and types." };
+  if (fields === null)
+    return { error: "One of the form fields is invalid. Check labels, keys and types." };
 
   const supabase = await createClient();
   const { error } = await supabase

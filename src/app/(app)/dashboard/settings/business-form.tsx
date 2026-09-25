@@ -11,7 +11,7 @@ import { Select } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
-const DEFAULT_TIMEZONE = "America/Halifax";
+const DEFAULT_TIMEZONE = "America/St_Johns";
 const TIMEZONES = [
   DEFAULT_TIMEZONE,
   ...(typeof Intl.supportedValuesOf === "function"

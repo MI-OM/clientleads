@@ -1,11 +1,5 @@
 export type TemplateSectionType =
-  | "hero"
-  | "text"
-  | "bullets"
-  | "image"
-  | "button"
-  | "divider"
-  | "footer";
+  "hero" | "text" | "bullets" | "image" | "button" | "divider" | "footer";
 
 export interface TemplateSection {
   id: string;

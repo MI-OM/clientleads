@@ -139,4 +139,3 @@ export async function sendBookingEmails(data: BookingEmailData): Promise<void> {
     }
   }
 }
-

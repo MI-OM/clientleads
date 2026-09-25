@@ -76,9 +76,7 @@ export function FormBuilder({ form }: FormBuilderProps) {
     form ? updateFormAction : createFormAction,
     {},
   );
-  const [fields, setFields] = useState<FieldDraft[]>(() =>
-    draftsFromFields(form?.fields ?? []),
-  );
+  const [fields, setFields] = useState<FieldDraft[]>(() => draftsFromFields(form?.fields ?? []));
 
   function patch(index: number, patch: Partial<FieldDraft>) {
     setFields((prev) => prev.map((f, i) => (i === index ? { ...f, ...patch } : f)));
@@ -87,7 +85,15 @@ export function FormBuilder({ form }: FormBuilderProps) {
   function addField(type: FormFieldType = "text") {
     setFields((prev) => [
       ...prev,
-      { uid: uid(), label: "", fieldKey: "", fieldType: type, required: false, options: "", placeholder: "" },
+      {
+        uid: uid(),
+        label: "",
+        fieldKey: "",
+        fieldType: type,
+        required: false,
+        options: "",
+        placeholder: "",
+      },
     ]);
   }
 
@@ -190,10 +196,7 @@ export function FormBuilder({ form }: FormBuilderProps) {
             </p>
           ) : (
             fields.map((field, index) => (
-              <div
-                key={field.uid}
-                className="rounded-md border border-border bg-muted/30 p-3"
-              >
+              <div key={field.uid} className="rounded-md border border-border bg-muted/30 p-3">
                 <div className="grid gap-3 sm:grid-cols-12">
                   <div className="grid gap-1.5 sm:col-span-4">
                     <Label className="text-xs" htmlFor={`label-${field.uid}`}>

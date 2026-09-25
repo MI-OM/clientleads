@@ -260,21 +260,17 @@ export async function sendCampaign(
             campaign.body_background_color,
             {
               businessName: orgName,
-              address: [
-                org?.address,
-                org?.city,
-                org?.province,
-                org?.country,
-                org?.postal_code,
-              ],
+              address: [org?.address, org?.city, org?.province, org?.country, org?.postal_code],
               unsubscribeUrl: vars.unsubscribe_url,
             },
           )
-        : `<div style="font-family:system-ui,sans-serif;line-height:1.6">${escapeHtml(text)}${renderCampaignFooter({
-            businessName: orgName,
-            address: [org?.address, org?.city, org?.province, org?.country, org?.postal_code],
-            unsubscribeUrl: vars.unsubscribe_url,
-          })}</div>`;
+        : `<div style="font-family:system-ui,sans-serif;line-height:1.6">${escapeHtml(text)}${renderCampaignFooter(
+            {
+              businessName: orgName,
+              address: [org?.address, org?.city, org?.province, org?.country, org?.postal_code],
+              unsubscribeUrl: vars.unsubscribe_url,
+            },
+          )}</div>`;
 
       try {
         const res = await fetch(RESEND_API, {

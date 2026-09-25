@@ -22,7 +22,9 @@ export default async function EmbeddedResourcePage({
     >
       <article className="mx-auto max-w-xl rounded-lg border border-border bg-card p-5 shadow-sm">
         <h1 className="text-lg font-semibold">{resource.title}</h1>
-        {resource.description ? <p className="mt-2 text-sm text-muted-foreground">{resource.description}</p> : null}
+        {resource.description ? (
+          <p className="mt-2 text-sm text-muted-foreground">{resource.description}</p>
+        ) : null}
         <div className="mt-4 border-t border-border pt-4">
           <ResourceDownload resource={resource} pageSlug={page.org.slug} />
         </div>

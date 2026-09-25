@@ -52,7 +52,7 @@ function renderVars(
   appointment: Record<string, unknown> | null,
 ): Record<string, string | undefined> {
   const service = appointment?.service as { name?: string } | null;
-  const timezone = String(appointment?.timezone ?? org?.timezone ?? "America/Halifax");
+  const timezone = String(appointment?.timezone ?? org?.timezone ?? "America/St_Johns");
   const startsAt = appointment?.starts_at ? new Date(String(appointment.starts_at)) : null;
   const appointmentDate = startsAt
     ? new Intl.DateTimeFormat("en-CA", { timeZone: timezone, dateStyle: "long" }).format(startsAt)
@@ -220,8 +220,10 @@ async function runRow(
         .maybeSingle()
     : { data: null };
 
-  if (row.trigger_type === "appointment_reminder" &&
-      (!appointment || !["Scheduled", "Confirmed"].includes(String(appointment.status)))) {
+  if (
+    row.trigger_type === "appointment_reminder" &&
+    (!appointment || !["Scheduled", "Confirmed"].includes(String(appointment.status)))
+  ) {
     return { ok: true, skipped: true };
   }
 
@@ -298,12 +300,21 @@ async function runRow(
     case "send_email": {
       const template = await resolveTemplate(admin, orgId, row.step.template_id as string | null);
       const recipients = await resolveRecipients(
-        admin, orgId, row.step, "customer", (org as Record<string, unknown> | null) ?? null,
+        admin,
+        orgId,
+        row.step,
+        "customer",
+        (org as Record<string, unknown> | null) ?? null,
         (contact as Record<string, unknown> | null) ?? null,
       );
       if (recipients.length === 0) return { ok: true, skipped: true };
       for (const to of recipients) {
-        const outcome = await sendTemplateEmail((org as Record<string, unknown> | null) ?? null, to, template, vars);
+        const outcome = await sendTemplateEmail(
+          (org as Record<string, unknown> | null) ?? null,
+          to,
+          template,
+          vars,
+        );
         if (!outcome.ok) return outcome;
       }
       return { ok: true };
@@ -311,7 +322,11 @@ async function runRow(
     case "notify": {
       const kind = notifyKindFor(row.step, row.trigger_type);
       const recipients = await resolveRecipients(
-        admin, orgId, row.step, "business", (org as Record<string, unknown> | null) ?? null,
+        admin,
+        orgId,
+        row.step,
+        "business",
+        (org as Record<string, unknown> | null) ?? null,
         (contact as Record<string, unknown> | null) ?? null,
       );
       if (recipients.length === 0) return { ok: true, skipped: true };
@@ -321,6 +336,7 @@ async function runRow(
           to,
           orgName: (org?.name as string) || "",
           contactName: (contact?.first_name as string) || "",
+          timeZone: (org?.timezone as string | null) ?? undefined,
           extras: { automation: row.trigger_type },
         });
       }
@@ -412,14 +428,18 @@ export async function enqueueDueAppointmentReminders(): Promise<number> {
       for (const step of steps) {
         if (!step || (step.type !== "send_email" && step.type !== "notify")) continue;
         const hoursBefore = Math.max(0, Number(step.hours_before ?? 24));
-        const runAt = new Date(new Date(String(appointment.starts_at)).getTime() - hoursBefore * 3600000);
+        const runAt = new Date(
+          new Date(String(appointment.starts_at)).getTime() - hoursBefore * 3600000,
+        );
         if (runAt > now) continue;
         const { data: existing } = await admin
           .from("automation_actions")
           .select("id, step")
           .eq("appointment_id", appointment.id)
           .eq("trigger_type", "appointment_reminder");
-        const duplicate = (existing ?? []).some((row) => JSON.stringify(row.step) === JSON.stringify(step));
+        const duplicate = (existing ?? []).some(
+          (row) => JSON.stringify(row.step) === JSON.stringify(step),
+        );
         if (duplicate) continue;
         const { error } = await admin.from("automation_actions").insert({
           organization_id: automation.organization_id,

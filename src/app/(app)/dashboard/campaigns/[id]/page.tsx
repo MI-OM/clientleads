@@ -225,7 +225,9 @@ export default async function CampaignDetailPage({ params }: CampaignDetailPageP
                           {RECIPIENT_STATUS_LABELS[r.status]}
                         </Badge>
                       </td>
-                      <td className="py-2 pr-4 text-muted-foreground">{formatWhen(r.sentAt, ctx.org.timezone)}</td>
+                      <td className="py-2 pr-4 text-muted-foreground">
+                        {formatWhen(r.sentAt, ctx.org.timezone)}
+                      </td>
                       <td className="py-2 text-muted-foreground">
                         {formatWhen(
                           r.openedAt ??

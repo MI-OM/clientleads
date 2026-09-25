@@ -77,7 +77,14 @@ try {
   //    pg_tables / information_schema reflection views are NOT reachable over
   //    REST; an absent table surfaces as "Could not find the table ...".
   const tableNames = new Set();
-  const EXPECTED_TABLES = ["services", "public_forms", "form_fields", "resources", "resource_gates", "form_submission_events"];
+  const EXPECTED_TABLES = [
+    "services",
+    "public_forms",
+    "form_fields",
+    "resources",
+    "resource_gates",
+    "form_submission_events",
+  ];
   for (const t of EXPECTED_TABLES) {
     const { error } = await admin.from(t).select("id").limit(1);
     if (!error || !/could not find the table/i.test(error.message)) tableNames.add(t);
@@ -85,7 +92,9 @@ try {
   }
   if (!tableNames.has("services")) {
     console.log("\nMigration 0004 does not appear to be applied yet.");
-    console.log('Open Supabase dashboard → SQL editor, paste supabase/migrations/20260922000004_m3_public.sql, run it.');
+    console.log(
+      "Open Supabase dashboard → SQL editor, paste supabase/migrations/20260922000004_m3_public.sql, run it.",
+    );
     process.exitCode = 1;
     process.exit(0);
   }
@@ -96,19 +105,38 @@ try {
 
   // 2) resources bucket is private
   const { data: bucket } = await admin.storage.getBucket("resources");
-  record("resources bucket exists", bucket?.name === "resources", bucket ? `public=${bucket.public}` : "missing");
+  record(
+    "resources bucket exists",
+    bucket?.name === "resources",
+    bucket ? `public=${bucket.public}` : "missing",
+  );
 
   // 3) get_public_page — seeded org + form
   const pageRes = await anon.rpc("get_public_page", { p_slug: "first-client" });
   const page = pageRes.data;
-  record("get_public_page('first-client') works", !pageRes.error && !!page, pageRes.error?.message ?? "");
+  record(
+    "get_public_page('first-client') works",
+    !pageRes.error && !!page,
+    pageRes.error?.message ?? "",
+  );
   if (page) {
-    record("public page has org branding (name)", page.org?.name === "First Client Real Estate", page.org?.name ?? "");
+    record(
+      "public page has org branding (name)",
+      page.org?.name === "First Client Real Estate",
+      page.org?.name ?? "",
+    );
     const form = (page.forms ?? [])[0];
     record("seeded Contact-us form visible", form?.name === "Contact us", form?.name ?? "");
-    record("form exposes its fields", Array.isArray(form?.fields) && form.fields.length === 4, String(form?.fields?.length));
+    record(
+      "form exposes its fields",
+      Array.isArray(form?.fields) && form.fields.length === 4,
+      String(form?.fields?.length),
+    );
     const keys = new Set((form?.fields ?? []).map((f) => f.field_key));
-    record("form field keys are safe projection", keys.has("email") && keys.has("name") && !keys.has("id"));
+    record(
+      "form field keys are safe projection",
+      keys.has("email") && keys.has("name") && !keys.has("id"),
+    );
   }
 
   const missing = await anon.rpc("get_public_page", { p_slug: "no-such-business-xyz" });
@@ -166,7 +194,11 @@ try {
     p_values: { name: "Public Smoke", email: submissionEmail, phone: runPhone, message: "Hello!" },
   });
   const submitData = submit.data;
-  record("form submission creates contact+lead", submitData?.ok === true, submit.error?.message ?? "");
+  record(
+    "form submission creates contact+lead",
+    submitData?.ok === true,
+    submit.error?.message ?? "",
+  );
   if (submitData?.contact_id) cleanupIds.contacts.push(submitData.contact_id);
   if (submitData?.lead_id) cleanupIds.leads.push(submitData.lead_id);
   record("first submission creates a NEW contact", submitData?.contact_created === true);
@@ -200,7 +232,11 @@ try {
     p_ip_hash: `hash-b-${tag}`,
     p_values: { message: "no email" },
   });
-  record("missing required field rejected", /FORM_FIELD_REQUIRED/i.test(missingField.error?.message ?? ""), missingField.error?.message ?? "");
+  record(
+    "missing required field rejected",
+    /FORM_FIELD_REQUIRED/i.test(missingField.error?.message ?? ""),
+    missingField.error?.message ?? "",
+  );
 
   // invalid email rejected
   const badEmail = await admin.rpc("submit_public_form", {
@@ -208,7 +244,11 @@ try {
     p_ip_hash: `hash-c-${tag}`,
     p_values: { name: "A", email: "not-an-email" },
   });
-  record("invalid email rejected", /FORM_INVALID_EMAIL/i.test(badEmail.error?.message ?? ""), badEmail.error?.message ?? "");
+  record(
+    "invalid email rejected",
+    /FORM_INVALID_EMAIL/i.test(badEmail.error?.message ?? ""),
+    badEmail.error?.message ?? "",
+  );
 
   // 6) rate limiting: 10 allowed, 11th blocked (same ip_hash)
   const burstHash = `hash-burst-${tag}`;
@@ -234,7 +274,11 @@ try {
       break;
     }
   }
-  record("rate limit blocks the 11th submission", blocked === 11, blocked ? `blocked on #${blocked}` : "never blocked");
+  record(
+    "rate limit blocks the 11th submission",
+    blocked === 11,
+    blocked ? `blocked on #${blocked}` : "never blocked",
+  );
 
   // 7) gated resources — one-time token flow
   const { data: gated } = await admin
@@ -262,7 +306,11 @@ try {
     p_phone: null,
   });
   const gateData = gate.data;
-  record("gate request issues a token", gateData?.ok === true && !!gateData?.token, gate.error?.message ?? "");
+  record(
+    "gate request issues a token",
+    gateData?.ok === true && !!gateData?.token,
+    gate.error?.message ?? "",
+  );
   if (gateData?.contact_id) cleanupIds.contacts.push(gateData.contact_id);
   if (gateData?.lead_id) cleanupIds.leads.push(gateData.lead_id);
 
@@ -277,20 +325,43 @@ try {
     p_resource_id: gated?.id,
     p_token: gateData?.token,
   });
-  record("valid token unlocks download", download1.data?.ok === true, download1.error?.message ?? "");
+  record(
+    "valid token unlocks download",
+    download1.data?.ok === true,
+    download1.error?.message ?? "",
+  );
 
   const download2 = await admin.rpc("record_resource_download", {
     p_resource_id: gated?.id,
     p_token: gateData?.token,
   });
-  record("token is single-use (replay rejected)", /RESOURCE_GATE_REQUIRED/i.test(download2.error?.message ?? ""), download2.error?.message ?? "");
+  record(
+    "token is single-use (replay rejected)",
+    /RESOURCE_GATE_REQUIRED/i.test(download2.error?.message ?? ""),
+    download2.error?.message ?? "",
+  );
 
-  const { data: updatedGated } = await admin.from("resources").select("download_count").eq("id", gated?.id).maybeSingle();
-  record("download counter incremented once", updatedGated?.download_count === 1, String(updatedGated?.download_count));
+  const { data: updatedGated } = await admin
+    .from("resources")
+    .select("download_count")
+    .eq("id", gated?.id)
+    .maybeSingle();
+  record(
+    "download counter incremented once",
+    updatedGated?.download_count === 1,
+    String(updatedGated?.download_count),
+  );
 
   // gated without token → rejected
-  const noToken = await admin.rpc("record_resource_download", { p_resource_id: gated?.id, p_token: null });
-  record("gated download without token rejected", /RESOURCE_GATE_REQUIRED/i.test(noToken.error?.message ?? ""), noToken.error?.message ?? "");
+  const noToken = await admin.rpc("record_resource_download", {
+    p_resource_id: gated?.id,
+    p_token: null,
+  });
+  record(
+    "gated download without token rejected",
+    /RESOURCE_GATE_REQUIRED/i.test(noToken.error?.message ?? ""),
+    noToken.error?.message ?? "",
+  );
 
   // 8) non-gated resource → no token issued, public download works
   const { data: open } = await admin
@@ -315,10 +386,21 @@ try {
     p_name: "X",
     p_email: "x@example.com",
   });
-  record("non-gated resource yields no gate token", /RESOURCE_NOT_GATED/i.test(openGate.error?.message ?? ""), openGate.error?.message ?? "");
+  record(
+    "non-gated resource yields no gate token",
+    /RESOURCE_NOT_GATED/i.test(openGate.error?.message ?? ""),
+    openGate.error?.message ?? "",
+  );
 
-  const openDownload = await admin.rpc("record_resource_download", { p_resource_id: open?.id, p_token: null });
-  record("non-gated resource downloads directly", openDownload.data?.ok === true, openDownload.error?.message ?? "");
+  const openDownload = await admin.rpc("record_resource_download", {
+    p_resource_id: open?.id,
+    p_token: null,
+  });
+  record(
+    "non-gated resource downloads directly",
+    openDownload.data?.ok === true,
+    openDownload.error?.message ?? "",
+  );
 
   // private resources never appear publicly
   const { data: priv } = await admin
@@ -338,7 +420,10 @@ try {
 
   const pageFinal = await anon.rpc("get_public_page", { p_slug: "first-client" });
   const publicTitles = (pageFinal.data?.resources ?? []).map((r) => r.title);
-  record("private resource hidden from public page", !publicTitles.includes(`Smoke private ${tag}`));
+  record(
+    "private resource hidden from public page",
+    !publicTitles.includes(`Smoke private ${tag}`),
+  );
 } catch (err) {
   record("smoke test executed cleanly", false, err.message);
 } finally {
@@ -347,15 +432,26 @@ try {
     const { data: events } = await admin
       .from("form_submission_events")
       .select("id")
-      .in("ip_hash", [`hash-a-${tag}`, `hash-a2-${tag}`, `hash-b-${tag}`, `hash-c-${tag}`, `hash-burst-${tag}`]);
+      .in("ip_hash", [
+        `hash-a-${tag}`,
+        `hash-a2-${tag}`,
+        `hash-b-${tag}`,
+        `hash-c-${tag}`,
+        `hash-burst-${tag}`,
+      ]);
     for (const e of events ?? []) cleanupIds.events.push(e.id);
-    if (cleanupIds.events.length) await admin.from("form_submission_events").delete().in("id", cleanupIds.events);
-    if (cleanupIds.gates.length) await admin.from("resource_gates").delete().in("id", cleanupIds.gates);
-    if (cleanupIds.resources.length) await admin.from("resources").delete().in("id", cleanupIds.resources);
+    if (cleanupIds.events.length)
+      await admin.from("form_submission_events").delete().in("id", cleanupIds.events);
+    if (cleanupIds.gates.length)
+      await admin.from("resource_gates").delete().in("id", cleanupIds.gates);
+    if (cleanupIds.resources.length)
+      await admin.from("resources").delete().in("id", cleanupIds.resources);
     if (cleanupIds.leads.length) await admin.from("leads").delete().in("id", cleanupIds.leads);
-    if (cleanupIds.contacts.length) await admin.from("contacts").delete().in("id", cleanupIds.contacts);
+    if (cleanupIds.contacts.length)
+      await admin.from("contacts").delete().in("id", cleanupIds.contacts);
     if (cleanupIds.services) await admin.from("services").delete().eq("id", cleanupIds.services);
-    if (cleanupIds.servicesInactive) await admin.from("services").delete().eq("id", cleanupIds.servicesInactive);
+    if (cleanupIds.servicesInactive)
+      await admin.from("services").delete().eq("id", cleanupIds.servicesInactive);
   } catch {
     // keep going
   }

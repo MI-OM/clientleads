@@ -32,7 +32,10 @@ function loadLocalEnv() {
       const eq = trimmed.indexOf("=");
       if (eq === -1) continue;
       const key = trimmed.slice(0, eq).trim();
-      const value = trimmed.slice(eq + 1).trim().replace(/^["']|["']$/g, "");
+      const value = trimmed
+        .slice(eq + 1)
+        .trim()
+        .replace(/^["']|["']$/g, "");
       if (key && process.env[key] === undefined) process.env[key] = value;
     }
   } catch {
@@ -110,24 +113,18 @@ try {
       redirect: "manual",
       headers: withCookie ? { cookie, "user-agent": "smoke" } : { "user-agent": "smoke" },
     });
-    return { status: res.status, location: res.headers.get("location") ?? "", text: await res.text() };
+    return {
+      status: res.status,
+      location: res.headers.get("location") ?? "",
+      text: await res.text(),
+    };
   };
 
   // Public business page
   const pub = await get("/first-client");
-  record(
-    "GET /first-client → 200",
-    pub.status === 200,
-    `status=${pub.status}`,
-  );
-  record(
-    "public page shows branded org name",
-    pub.text.includes("First Client Real Estate"),
-  );
-  record(
-    "public page renders Contact us form",
-    pub.text.includes("Contact us"),
-  );
+  record("GET /first-client → 200", pub.status === 200, `status=${pub.status}`);
+  record("public page shows branded org name", pub.text.includes("First Client Real Estate"));
+  record("public page renders Contact us form", pub.text.includes("Contact us"));
 
   const missing = await get("/no-such-business-xyz");
   record("unknown slug → 404", missing.status === 404, `status=${missing.status}`);
@@ -143,9 +140,18 @@ try {
   // Authenticated dashboard renders
   const dash = await get("/dashboard", true);
   record("GET /dashboard (session) → 200", dash.status === 200, `status=${dash.status}`);
-  record("dashboard shell renders sidebar Services link", dash.text.includes('href="/dashboard/services"'));
-  record("dashboard shell renders sidebar Forms link", dash.text.includes('href="/dashboard/forms"'));
-  record("dashboard shell renders sidebar Resources link", dash.text.includes('href="/dashboard/resources"'));
+  record(
+    "dashboard shell renders sidebar Services link",
+    dash.text.includes('href="/dashboard/services"'),
+  );
+  record(
+    "dashboard shell renders sidebar Forms link",
+    dash.text.includes('href="/dashboard/forms"'),
+  );
+  record(
+    "dashboard shell renders sidebar Resources link",
+    dash.text.includes('href="/dashboard/resources"'),
+  );
 
   const services = await get("/dashboard/services", true);
   record("GET /dashboard/services → 200", services.status === 200, `status=${services.status}`);

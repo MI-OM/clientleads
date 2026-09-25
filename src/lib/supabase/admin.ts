@@ -12,7 +12,7 @@ export function createAdminClient() {
   const { url, serviceRoleKey } = getSupabaseConfig();
   if (!serviceRoleKey) {
     throw new Error(
-      "Missing environment variable \"SUPABASE_SERVICE_ROLE_KEY\". Copy .env.example to .env.local and fill it in.",
+      'Missing environment variable "SUPABASE_SERVICE_ROLE_KEY". Copy .env.example to .env.local and fill it in.',
     );
   }
   return createSupabaseClient(url, serviceRoleKey, { auth: { persistSession: false } });

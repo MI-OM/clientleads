@@ -15,7 +15,13 @@ function int(formData: FormData, key: string, fallback: number): number {
   return Number.isFinite(value) ? value : fallback;
 }
 
-function toNumber(formData: FormData, key: string, min: number, max: number, fallback: number): number {
+function toNumber(
+  formData: FormData,
+  key: string,
+  min: number,
+  max: number,
+  fallback: number,
+): number {
   const value = Number(String(formData.get(key) ?? "").trim());
   if (!Number.isFinite(value) || value < min || value > max) return fallback;
   return Math.round(value);

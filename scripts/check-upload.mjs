@@ -27,7 +27,10 @@ function loadLocalEnv() {
       const eq = trimmed.indexOf("=");
       if (eq === -1) continue;
       const key = trimmed.slice(0, eq).trim();
-      const value = trimmed.slice(eq + 1).trim().replace(/^["']|["']$/g, "");
+      const value = trimmed
+        .slice(eq + 1)
+        .trim()
+        .replace(/^["']|["']$/g, "");
       if (key && process.env[key] === undefined) process.env[key] = value;
     }
   } catch {
@@ -119,11 +122,12 @@ try {
 
   // Owner/admin upload into own org prefix → allowed
   objectPath = `orgs/${orgId}/smoke-${tag}.txt`;
-  const { error: upErr } = await sessionUser.storage.from("resources").upload(
-    objectPath,
-    new Blob(["hello from the upload check"], { type: "text/plain" }),
-    { contentType: "text/plain", upsert: false },
-  );
+  const { error: upErr } = await sessionUser.storage
+    .from("resources")
+    .upload(objectPath, new Blob(["hello from the upload check"], { type: "text/plain" }), {
+      contentType: "text/plain",
+      upsert: false,
+    });
   record("owner/admin uploads into own org prefix", !upErr, upErr?.message ?? "");
 
   // Member read → object visible via list
@@ -137,11 +141,13 @@ try {
   );
 
   // Wrong-org path → denied (cannot write outside own org)
-  const { error: wrongErr } = await sessionUser.storage.from("resources").upload(
-    `orgs/00000000-0000-0000-0000-000000000000/sneak-${tag}.txt`,
-    new Blob(["nope"], { type: "text/plain" }),
-    { contentType: "text/plain", upsert: false },
-  );
+  const { error: wrongErr } = await sessionUser.storage
+    .from("resources")
+    .upload(
+      `orgs/00000000-0000-0000-0000-000000000000/sneak-${tag}.txt`,
+      new Blob(["nope"], { type: "text/plain" }),
+      { contentType: "text/plain", upsert: false },
+    );
   record("upload into another org's prefix denied", !!wrongErr, wrongErr?.message ?? "");
 
   // Non-member (no org) upload → denied
@@ -159,16 +165,24 @@ try {
   });
   let strangerSession = strangerPw.data.session;
   if (!strangerSession) {
-    const link = await admin.auth.admin.generateLink({ type: "magiclink", email: `stranger-${tag}@example.com` });
-    const otp = await anon.auth.verifyOtp({ type: "magiclink", token_hash: link.data?.properties?.hashed_token, email: `stranger-${tag}@example.com` });
+    const link = await admin.auth.admin.generateLink({
+      type: "magiclink",
+      email: `stranger-${tag}@example.com`,
+    });
+    const otp = await anon.auth.verifyOtp({
+      type: "magiclink",
+      token_hash: link.data?.properties?.hashed_token,
+      email: `stranger-${tag}@example.com`,
+    });
     strangerSession = otp.data?.session ?? null;
   }
   await stranger.auth.setSession(strangerSession);
-  const { error: strangerErr } = await stranger.storage.from("resources").upload(
-    `orgs/${orgId}/stranger-${tag}.txt`,
-    new Blob(["nope"], { type: "text/plain" }),
-    { contentType: "text/plain", upsert: false },
-  );
+  const { error: strangerErr } = await stranger.storage
+    .from("resources")
+    .upload(`orgs/${orgId}/stranger-${tag}.txt`, new Blob(["nope"], { type: "text/plain" }), {
+      contentType: "text/plain",
+      upsert: false,
+    });
   record("non-member upload denied", !!strangerErr, strangerErr?.message ?? "");
   if (strangerUser?.user?.id) {
     await admin.from("organization_members").delete().eq("user_id", strangerUser.user.id);
@@ -176,11 +190,12 @@ try {
   }
 
   // Anon (no session) upload → denied
-  const { error: anonErr } = await anon.storage.from("resources").upload(
-    `orgs/${orgId}/anon-${tag}.txt`,
-    new Blob(["nope"], { type: "text/plain" }),
-    { contentType: "text/plain", upsert: false },
-  );
+  const { error: anonErr } = await anon.storage
+    .from("resources")
+    .upload(`orgs/${orgId}/anon-${tag}.txt`, new Blob(["nope"], { type: "text/plain" }), {
+      contentType: "text/plain",
+      upsert: false,
+    });
   record("anon upload denied", !!anonErr, anonErr?.message ?? "");
 
   // Render check: /dashboard/resources/new for the admin member
@@ -198,10 +213,16 @@ try {
     headers: { cookie: `sb-praegspjcewnzkcocmsj-auth-token=${cookieValue}`, "user-agent": "smoke" },
   });
   const html = await res.text();
-  record("GET /dashboard/resources/new (owner/admin) → 200", res.status === 200, `status=${res.status}`);
+  record(
+    "GET /dashboard/resources/new (owner/admin) → 200",
+    res.status === 200,
+    `status=${res.status}`,
+  );
   record(
     "new-resource form renders file input + title field",
-    html.includes('type="file"') && html.includes('name="title"') && !html.includes("Body exceeded"),
+    html.includes('type="file"') &&
+      html.includes('name="title"') &&
+      !html.includes("Body exceeded"),
     res.status === 200 ? "" : "page didn't render",
   );
 } catch (err) {

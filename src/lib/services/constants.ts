@@ -1,11 +1,6 @@
 /** Services domain constants (PRD §16). */
 
-export const LOCATION_TYPES = [
-  "in-person",
-  "phone",
-  "video",
-  "other",
-] as const;
+export const LOCATION_TYPES = ["in-person", "phone", "video", "other"] as const;
 
 export type LocationType = (typeof LOCATION_TYPES)[number];
 

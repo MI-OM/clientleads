@@ -92,7 +92,14 @@ export default async function TasksPage({ searchParams }: { searchParams: Promis
                 Create a task, or wait for an automation to generate a follow-up.
               </p>
             </div>
-          ) : <TasksTable tasks={result.tasks} timezone={ctx.org.timezone} canManageAny={canManageAny} userId={user?.id} />}
+          ) : (
+            <TasksTable
+              tasks={result.tasks}
+              timezone={ctx.org.timezone}
+              canManageAny={canManageAny}
+              userId={user?.id}
+            />
+          )}
         </CardContent>
       </Card>
 

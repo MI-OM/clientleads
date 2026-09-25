@@ -502,7 +502,7 @@ export async function createLeadAction(_prev: CrmState, formData: FormData): Pro
       ? null
       : (localDateTimeToUtc(
           nextFollowUpRaw,
-          ctx?.org?.timezone ?? "America/Halifax",
+          ctx?.org?.timezone ?? "America/St_Johns",
         )?.toISOString() ?? null);
 
   const supabase = await createClient();
@@ -552,7 +552,7 @@ export async function updateLeadAction(_prev: CrmState, formData: FormData): Pro
       ? null
       : (localDateTimeToUtc(
           nextFollowUpRaw,
-          ctx?.org?.timezone ?? "America/Halifax",
+          ctx?.org?.timezone ?? "America/St_Johns",
         )?.toISOString() ?? null);
 
   const supabase = await createClient();

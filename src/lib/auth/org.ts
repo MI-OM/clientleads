@@ -45,7 +45,7 @@ function mapOrg(row: Record<string, unknown>): Org {
     province: (row.province as string | null) ?? null,
     country: (row.country as string | null) ?? null,
     postalCode: (row.postal_code as string | null) ?? null,
-    timezone: (row.timezone as string) ?? "America/Halifax",
+    timezone: (row.timezone as string) ?? "America/St_Johns",
     websiteUrl: (row.website_url as string | null) ?? null,
     primaryColor: (row.primary_color as string) ?? "#14532d",
     secondaryColor: (row.secondary_color as string) ?? "#f5f5f4",

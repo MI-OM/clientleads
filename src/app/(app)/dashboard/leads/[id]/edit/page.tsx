@@ -22,7 +22,13 @@ export default async function EditLeadPage({ params }: { params: Promise<{ id: s
   return (
     <div className="mx-auto flex max-w-3xl flex-col gap-6">
       <PageHeader title={`Edit ${lead.contactName ?? "lead"}`} description="Update lead details." />
-      <LeadForm mode="edit" contacts={contacts} members={members} initial={initial} timezone={ctx.org.timezone} />
+      <LeadForm
+        mode="edit"
+        contacts={contacts}
+        members={members}
+        initial={initial}
+        timezone={ctx.org.timezone}
+      />
     </div>
   );
 }

@@ -37,7 +37,14 @@ function FormStatus({ state }: { state: TaskActionState }) {
   );
 }
 
-export function TaskForm({ task, members, contacts, leads, appointments, timezone }: TaskFormProps) {
+export function TaskForm({
+  task,
+  members,
+  contacts,
+  leads,
+  appointments,
+  timezone,
+}: TaskFormProps) {
   const [state, formAction, pending] = useActionState<TaskActionState, FormData>(
     task ? updateTaskAction : createTaskAction,
     {},

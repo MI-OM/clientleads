@@ -24,7 +24,8 @@ export function SampleCsvTemplate() {
           <CardHeader>
             <CardTitle>CSV template</CardTitle>
             <CardDescription>
-              Copy the text below and paste it into your CSV uploader. Columns match the mapping step.
+              Copy the text below and paste it into your CSV uploader. Columns match the mapping
+              step.
             </CardDescription>
           </CardHeader>
           <CardContent>

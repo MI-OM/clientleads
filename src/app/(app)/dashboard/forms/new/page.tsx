@@ -10,10 +10,7 @@ export default async function NewFormPage() {
 
   return (
     <div className="mx-auto max-w-4xl flex flex-col gap-6">
-      <PageHeader
-        title="New form"
-        description="Build a lead-capture form for your public page."
-      />
+      <PageHeader title="New form" description="Build a lead-capture form for your public page." />
       <FormBuilder />
     </div>
   );

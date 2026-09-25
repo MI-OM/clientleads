@@ -34,20 +34,37 @@ const SECTION_LABELS: Record<SearchHitType, string> = {
   campaign: "Campaigns",
 };
 
-function formatDate(iso: string | null): string {
+function formatDate(iso: string | null, timeZone: string): string {
   if (!iso) return "";
   try {
     return new Intl.DateTimeFormat("en-CA", {
       month: "short",
       day: "numeric",
       year: "numeric",
+      timeZone,
     }).format(new Date(iso));
   } catch {
-    return new Date(iso).toLocaleDateString();
+    try {
+      return new Intl.DateTimeFormat("en-CA", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      }).format(new Date(iso));
+    } catch {
+      return new Date(iso).toLocaleDateString();
+    }
   }
 }
 
-function SearchResults({ hits, query }: { hits: SearchHit[]; query: string }) {
+function SearchResults({
+  hits,
+  query,
+  timeZone,
+}: {
+  hits: SearchHit[];
+  query: string;
+  timeZone: string;
+}) {
   if (hits.length === 0) {
     return (
       <Card>
@@ -96,7 +113,7 @@ function SearchResults({ hits, query }: { hits: SearchHit[]; query: string }) {
                     </span>
                     {hit.date ? (
                       <span className="shrink-0 text-xs text-muted-foreground">
-                        {formatDate(hit.date)}
+                        {formatDate(hit.date, timeZone)}
                       </span>
                     ) : null}
                   </Link>
@@ -119,7 +136,8 @@ export default async function SearchPage({
   const params = await searchParams;
   const query = stringParam(params.q);
 
-  const hits = ctx && query.trim().length >= 2 ? await globalSearch(ctx.org.id, query) : [];
+  const hits =
+    ctx && query.trim().length >= 2 ? await globalSearch(ctx.org.id, query, ctx.org.timezone) : [];
 
   return (
     <div className="flex flex-col gap-6">
@@ -153,7 +171,7 @@ export default async function SearchPage({
           </CardHeader>
         </Card>
       ) : ctx ? (
-        <SearchResults hits={hits} query={query} />
+        <SearchResults hits={hits} query={query} timeZone={ctx.org.timezone} />
       ) : (
         <Card>
           <CardHeader>

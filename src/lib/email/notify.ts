@@ -14,6 +14,7 @@
  * exported here for the integrator / M5 to call from those actions.
  */
 import { baseUrl } from "./send";
+import { DEFAULT_TIME_ZONE, formatDateInZone } from "@/lib/timezone";
 
 const RESEND_API = "https://api.resend.com/emails";
 
@@ -36,21 +37,14 @@ export interface NotificationEmailData {
   taskTitle?: string | null;
   dueDate?: string | null;
   appointmentLabel?: string | null;
+  /** IANA zone for date rendering (defaults to the app's business region). */
+  timeZone?: string;
   extras?: Record<string, string>;
 }
 
-function formatDate(value?: string | null): string {
+function formatDate(value?: string | null, timeZone: string = DEFAULT_TIME_ZONE): string {
   if (!value) return "";
-  try {
-    return new Intl.DateTimeFormat("en-CA", {
-      weekday: "short",
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    }).format(new Date(value));
-  } catch {
-    return new Date(value).toLocaleDateString();
-  }
+  return formatDateInZone(value, timeZone);
 }
 
 function buildNotification(data: NotificationEmailData): { subject: string; body: string } {
@@ -87,7 +81,7 @@ function buildNotification(data: NotificationEmailData): { subject: string; body
     case "task_assigned":
       return {
         subject: `Task assigned to you — ${orgName}`,
-        body: `You've been assigned a task at ${orgName}:\n\n  Task:  ${taskTitle ?? "Untitled task"}\n  Due:   ${formatDate(dueDate) || "no due date"}\n\nOpen it: ${baseUrl()}/dashboard/tasks`,
+        body: `You've been assigned a task at ${orgName}:\n\n  Task:  ${taskTitle ?? "Untitled task"}\n  Due:   ${formatDate(dueDate, data.timeZone) || "no due date"}\n\nOpen it: ${baseUrl()}/dashboard/tasks`,
       };
   }
 }

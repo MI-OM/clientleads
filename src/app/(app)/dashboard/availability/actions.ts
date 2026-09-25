@@ -65,7 +65,7 @@ export async function addAvailabilityRuleAction(
     day_of_week: parsed.day,
     start_time: parsed.start,
     end_time: parsed.end,
-    timezone: ctx.org.timezone ?? "America/Halifax",
+    timezone: ctx.org.timezone ?? "America/St_Johns",
     active: true,
   });
   if (error) return { error: error.message };
@@ -100,9 +100,11 @@ export async function addBlockedTimeAction(
   const reason = String(formData.get("reason") ?? "").trim() || null;
 
   const startDate = startsAt
-    ? localDateTimeToUtc(startsAt, ctx.org.timezone ?? "America/Halifax")
+    ? localDateTimeToUtc(startsAt, ctx.org.timezone ?? "America/St_Johns")
     : null;
-  const endDate = endsAt ? localDateTimeToUtc(endsAt, ctx.org.timezone ?? "America/Halifax") : null;
+  const endDate = endsAt
+    ? localDateTimeToUtc(endsAt, ctx.org.timezone ?? "America/St_Johns")
+    : null;
   if (!startDate || !endDate) return { error: "Start and end date/time are required." };
   if (Number.isNaN(startDate.getTime()) || Number.isNaN(endDate.getTime())) {
     return { error: "Those dates don't look valid." };

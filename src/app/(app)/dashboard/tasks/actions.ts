@@ -54,7 +54,7 @@ async function parseTaskInput(formData: FormData): Promise<ParsedTaskInput | { e
   const dueRaw = String(formData.get("dueDate") ?? "").trim();
   let dueDate: string | null = null;
   if (dueRaw) {
-    const tz = (await getMyOrg())?.org?.timezone ?? "America/Halifax";
+    const tz = (await getMyOrg())?.org?.timezone ?? "America/St_Johns";
     const due = localDateTimeToUtc(dueRaw, tz);
     if (!due) return { error: "That due date doesn't look valid." };
     dueDate = due.toISOString();
@@ -93,6 +93,7 @@ async function notifyAssignee(
       orgName: ctx.org.name,
       taskTitle: input.title,
       dueDate: input.dueDate,
+      timeZone: ctx.org.timezone,
     });
   } catch {
     // Email is best-effort — never break the task mutation.
@@ -386,7 +387,8 @@ export async function bulkDeleteTasksAction(
     : (rows ?? [])
         .filter((row) => row.assignee_id === user?.id || row.created_by === user?.id)
         .map((row) => String(row.id));
-  if (allowed.length === 0) return { error: "You can only delete tasks assigned to or created by you." };
+  if (allowed.length === 0)
+    return { error: "You can only delete tasks assigned to or created by you." };
 
   const { error } = await supabase
     .from("tasks")

@@ -108,7 +108,7 @@ export function parsePublicPage(payload: unknown): PublicPage | null {
       social_links: (org.social_links as Record<string, string>) ?? {},
       primary_color: (org.primary_color as string) ?? "#14532d",
       secondary_color: (org.secondary_color as string) ?? "#f5f5f4",
-      timezone: (org.timezone as string) ?? "America/Halifax",
+      timezone: (org.timezone as string) ?? "America/St_Johns",
     },
     services: Array.isArray(page.services)
       ? (page.services as unknown as PublicService[])

@@ -330,7 +330,10 @@ export default async function PublicBusinessPage({
                   <ul className="mt-4 space-y-2 text-sm text-muted-foreground">
                     {page.forms.map((form) => (
                       <li key={form.id}>
-                        <a href={`#${form.slug}`} className="text-primary underline-offset-4 hover:underline">
+                        <a
+                          href={`#${form.slug}`}
+                          className="text-primary underline-offset-4 hover:underline"
+                        >
                           {form.name}
                         </a>
                       </li>
@@ -340,9 +343,17 @@ export default async function PublicBusinessPage({
               </div>
               <div className="grid gap-8 lg:col-span-2">
                 {page.forms.map((form) => (
-                  <div key={form.id} id={form.slug} className="scroll-mt-24 rounded-lg border border-border bg-card p-5 lg:p-6">
+                  <div
+                    key={form.id}
+                    id={form.slug}
+                    className="scroll-mt-24 rounded-lg border border-border bg-card p-5 lg:p-6"
+                  >
                     <h3 className="mb-4 text-lg font-semibold">{form.name}</h3>
-                    <LeadForm form={form} pageSlug={org.slug} serviceName={requestedService?.name} />
+                    <LeadForm
+                      form={form}
+                      pageSlug={org.slug}
+                      serviceName={requestedService?.name}
+                    />
                   </div>
                 ))}
               </div>

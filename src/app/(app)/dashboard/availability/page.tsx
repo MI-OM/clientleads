@@ -21,7 +21,7 @@ export default async function AvailabilityPage() {
         rules={rules}
         blocked={blocked}
         canManage={canManage}
-        timezone={ctx?.org.timezone ?? "America/Halifax"}
+        timezone={ctx?.org.timezone ?? "America/St_Johns"}
       />
     </div>
   );

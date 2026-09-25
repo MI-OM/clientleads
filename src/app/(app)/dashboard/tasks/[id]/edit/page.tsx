@@ -20,7 +20,7 @@ export default async function EditTaskPage({ params }: EditTaskPageProps) {
 
   // Assignee or creator can edit their own tasks; owner/admin edit anything.
   const user = await getCurrentUser();
-  if (!await canManageTask(task, user?.id, ctx)) redirect("/dashboard/tasks");
+  if (!(await canManageTask(task, user?.id, ctx))) redirect("/dashboard/tasks");
 
   const options = await getTaskFormOptions(ctx.org.id);
 

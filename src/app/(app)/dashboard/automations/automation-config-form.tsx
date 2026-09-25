@@ -311,7 +311,9 @@ export function AutomationConfigForm({ automation, trigger, options }: Automatio
                     </div>
                     <div className="grid gap-1.5">
                       <Label htmlFor={`delay-${automation.id}-${i}`}>
-                        {trigger === "appointment_reminder" ? "Send before appointment (hours)" : "Send after (hours)"}
+                        {trigger === "appointment_reminder"
+                          ? "Send before appointment (hours)"
+                          : "Send after (hours)"}
                       </Label>
                       <Input
                         id={`delay-${automation.id}-${i}`}
@@ -339,9 +341,19 @@ export function AutomationConfigForm({ automation, trigger, options }: Automatio
                       <Select
                         id={`email-recipient-${automation.id}-${i}`}
                         value={(step as { recipient?: string }).recipient ?? "customer"}
-                        onChange={(e) => patchStep(i, { recipient: e.target.value as "customer" | "business" | "selected_members", member_ids: [] })}
+                        onChange={(e) =>
+                          patchStep(i, {
+                            recipient: e.target.value as
+                              "customer" | "business" | "selected_members",
+                            member_ids: [],
+                          })
+                        }
                       >
-                        {Object.entries(RECIPIENT_LABELS).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+                        {Object.entries(RECIPIENT_LABELS).map(([value, label]) => (
+                          <option key={value} value={value}>
+                            {label}
+                          </option>
+                        ))}
                       </Select>
                     </div>
                     {(step as { recipient?: string }).recipient === "selected_members" ? (
@@ -351,10 +363,21 @@ export function AutomationConfigForm({ automation, trigger, options }: Automatio
                           id={`email-members-${automation.id}-${i}`}
                           multiple
                           value={(step as { member_ids?: string[] }).member_ids ?? []}
-                          onChange={(e) => patchStep(i, { member_ids: Array.from(e.target.selectedOptions, (option) => option.value) })}
+                          onChange={(e) =>
+                            patchStep(i, {
+                              member_ids: Array.from(
+                                e.target.selectedOptions,
+                                (option) => option.value,
+                              ),
+                            })
+                          }
                           className="min-h-24 rounded-md border border-input bg-card px-3 py-2 text-sm"
                         >
-                          {options.members.map((member) => <option key={member.id} value={member.id}>{member.name}</option>)}
+                          {options.members.map((member) => (
+                            <option key={member.id} value={member.id}>
+                              {member.name}
+                            </option>
+                          ))}
                         </select>
                       </div>
                     ) : null}
@@ -364,25 +387,30 @@ export function AutomationConfigForm({ automation, trigger, options }: Automatio
                 {step.type === "notify" && (
                   <div className="grid gap-3 sm:grid-cols-2">
                     <div className="grid gap-1.5">
-                    <Label htmlFor={`notify-kind-${automation.id}-${i}`}>Notification kind</Label>
-                    <Select
-                      id={`notify-kind-${automation.id}-${i}`}
-                      value={(step as { kind?: string }).kind ?? "new_lead"}
-                      onChange={(e) => patchStep(i, { kind: e.target.value as NotifyKind })}
-                    >
-                      {NOTIFY_KINDS.map((k) => (
-                        <option key={k} value={k}>
-                          {NOTIFY_KIND_LABELS[k] ?? k}
-                        </option>
-                      ))}
-                    </Select>
+                      <Label htmlFor={`notify-kind-${automation.id}-${i}`}>Notification kind</Label>
+                      <Select
+                        id={`notify-kind-${automation.id}-${i}`}
+                        value={(step as { kind?: string }).kind ?? "new_lead"}
+                        onChange={(e) => patchStep(i, { kind: e.target.value as NotifyKind })}
+                      >
+                        {NOTIFY_KINDS.map((k) => (
+                          <option key={k} value={k}>
+                            {NOTIFY_KIND_LABELS[k] ?? k}
+                          </option>
+                        ))}
+                      </Select>
                     </div>
                     <div className="grid gap-1.5">
                       <Label htmlFor={`notify-recipient-${automation.id}-${i}`}>Notify</Label>
                       <Select
                         id={`notify-recipient-${automation.id}-${i}`}
                         value={(step as { recipient?: string }).recipient ?? "business"}
-                        onChange={(e) => patchStep(i, { recipient: e.target.value as "business" | "selected_members", member_ids: [] })}
+                        onChange={(e) =>
+                          patchStep(i, {
+                            recipient: e.target.value as "business" | "selected_members",
+                            member_ids: [],
+                          })
+                        }
                       >
                         <option value="business">Business inbox</option>
                         <option value="selected_members">Selected team members</option>
@@ -395,10 +423,21 @@ export function AutomationConfigForm({ automation, trigger, options }: Automatio
                           id={`notify-members-${automation.id}-${i}`}
                           multiple
                           value={(step as { member_ids?: string[] }).member_ids ?? []}
-                          onChange={(e) => patchStep(i, { member_ids: Array.from(e.target.selectedOptions, (option) => option.value) })}
+                          onChange={(e) =>
+                            patchStep(i, {
+                              member_ids: Array.from(
+                                e.target.selectedOptions,
+                                (option) => option.value,
+                              ),
+                            })
+                          }
                           className="min-h-24 rounded-md border border-input bg-card px-3 py-2 text-sm"
                         >
-                          {options.members.map((member) => <option key={member.id} value={member.id}>{member.name}</option>)}
+                          {options.members.map((member) => (
+                            <option key={member.id} value={member.id}>
+                              {member.name}
+                            </option>
+                          ))}
                         </select>
                       </div>
                     ) : null}

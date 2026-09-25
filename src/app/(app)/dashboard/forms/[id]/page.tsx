@@ -19,7 +19,10 @@ export default async function EditFormPage({ params }: EditFormPageProps) {
 
   return (
     <div className="mx-auto max-w-4xl flex flex-col gap-6">
-      <PageHeader title={`Edit: ${form.name}`} description="Change the form's fields and settings." />
+      <PageHeader
+        title={`Edit: ${form.name}`}
+        description="Change the form's fields and settings."
+      />
       <FormBuilder form={form} />
     </div>
   );
