@@ -89,8 +89,8 @@ database policies, email, OAuth, or scheduling.
   - selected organization members;
   - optionally the appointment owner when appointment ownership is introduced.
 - [x] Let an administrator independently configure timing and recipients for each
-  appointment reminder step (for example, customer at 24 hours and staff at
-  two hours).
+      appointment reminder step (for example, customer at 24 hours and staff at
+      two hours).
 - [ ] Add task due-date reminders for the assigned user, with configurable timing.
 - Add database-level idempotency for every reminder type and an observable
   delivery result (queued, sent, skipped, failed, last error).
